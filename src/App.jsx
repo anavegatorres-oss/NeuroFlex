@@ -317,7 +317,7 @@ const baseStyles = `
 .nf-eval-domain-pill{font-size:.75rem;color:#64747A;padding:7px 10px;border:1px solid #DCE5E3;border-radius:999px;background:#fff;font-weight:600}
 .nf-eval-task-card,.nf-exercise-card{border:1px solid #DCE5E3!important;box-shadow:0 8px 28px rgba(36,59,83,.045)!important}
 .nf-eval-admin-note{display:flex;align-items:flex-start;gap:8px;background:#F7F9F8;border:1px solid #DCE5E3;border-radius:10px;padding:11px 13px;font-size:.76rem;color:#64747A;line-height:1.55;margin-bottom:22px}
-.nf-protected-stimulus-zone{position:relative;background:#fff!important;color:#263238;isolation:isolate}
+.nf-protected-stimulus-zone{position:relative;background:#fff!important;color:#263238;isolation:isolate;font-size:1rem;line-height:1.6}.nf-protected-stimulus-zone>p:first-child{font-size:1.02rem;line-height:1.55;margin-bottom:22px}.nf-evaluation-focus.is-senior .nf-protected-stimulus-zone{font-size:1.08rem}.nf-evaluation-focus.is-senior .nf-protected-stimulus-zone>p:first-child{font-size:1.16rem}.nf-evaluation-focus button{line-height:1.35}
 .nf-protected-stimulus-zone:before,.nf-protected-stimulus-zone:after{display:none!important;content:none!important}
 .nf-eval-intro-card{position:relative;overflow:hidden;border:1px solid #DCE5E3!important;box-shadow:0 12px 36px rgba(36,59,83,.07)!important}
 .nf-eval-intro-card:before{content:"";position:absolute;width:180px;height:180px;right:-70px;top:-80px;border-radius:50%;background:radial-gradient(circle,rgba(114,103,168,.09),transparent 70%);pointer-events:none}
@@ -670,8 +670,8 @@ function speakInstruction(text, { immediate = false } = {}) {
     const play = () => {
       try {
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = "es-ES";
-        u.rate = 0.88;
+        u.lang = "es-CO";
+        u.rate = 0.72;
         u.pitch = 1;
         u.volume = 1;
         u.onerror = () => {};
@@ -5386,6 +5386,36 @@ function AssessmentTaskShell({ taskId, paciente, children, note }) {
 // La enseñanza, el ejemplo y la práctica ocurren ANTES del componente puntuado.
 // Ninguna respuesta de esta fase se incorpora a las métricas NF-EVAL-2.0.
 const F61_EVALUATION_PREP = {
+  "NF-E02": {
+    instruction:"Busca únicamente la figura objetivo que aparece arriba. Toca todas las figuras exactamente iguales y evita las demás.",
+    example:"Si el objetivo es ◆, toca únicamente los rombos rellenos ◆. No toques ◇, ○, △ ni □.",
+    practice:{prompt:"Si el objetivo es ◆, ¿cuál debes tocar?",options:["◆","◇","○"],answer:"◆",correct:"Correcto. Debes buscar exactamente la figura objetivo.",wrong:"Busca la misma figura que aparece como objetivo: ◆."}
+  },
+  "NF-E15": {
+    instruction:"Observa el patrón completo y descubre la regla. Después elige la opción que mejor completa el espacio vacío.",
+    example:"Compara primero todos los elementos del patrón y luego mira las respuestas.",
+    practice:{prompt:"En una secuencia ● ○ ● ○, ¿qué seguiría?",options:["●","○","▲"],answer:"●",correct:"Correcto. La secuencia alterna círculo relleno y vacío.",wrong:"La regla alterna ● y ○, por eso sigue ●."}
+  },
+  "NF-E20": {
+    instruction:"Observa la figura y la dirección del giro indicada. Imagina el giro y elige cómo quedaría. Una figura reflejada en espejo no cuenta como rotación.",
+    example:"Si se indica 90 grados hacia la derecha, imagina un cuarto de vuelta en sentido horario.",
+    practice:{prompt:"Una flecha ↑ gira 90° hacia la derecha. ¿Hacia dónde apunta?",options:["→","←","↓"],answer:"→",correct:"Correcto. 90° hacia la derecha lleva ↑ a →.",wrong:"Un giro de 90° hacia la derecha es un cuarto de vuelta en sentido horario: ↑ pasa a →."}
+  },
+  "NF-E22": {
+    instruction:"Observa los fragmentos y piensa qué figura formarían si las partes faltantes estuvieran completas. Después elige el nombre de la figura.",
+    example:"No necesitas imaginar detalles adicionales: completa mentalmente los segmentos que faltan.",
+    practice:{prompt:"Si varios fragmentos forman casi todo un círculo, ¿qué opción elegirías?",options:["Círculo","Triángulo","Flecha"],answer:"Círculo",correct:"Correcto. Completa mentalmente la forma.",wrong:"Debes imaginar la figura completa a partir de los fragmentos visibles."}
+  },
+  "NF-E32": {
+    instruction:"Primero responde cada pregunta. Después, sin cambiar la respuesta, indica qué tan seguro estás de haber acertado.",
+    example:"Pregunta → eliges una respuesta → indicas Poco, Bastante o Muy seguro.",
+    practice:{prompt:"Después de responder una pregunta, ¿qué debes indicar?",options:["Tu nivel de seguridad","Tu edad","Otra respuesta"],answer:"Tu nivel de seguridad",correct:"Correcto. La segunda parte mide qué tan seguro estás de tu propia respuesta.",wrong:"Después de responder debes valorar qué tan seguro estás."}
+  },
+  "NF-E34": {
+    instruction:"La actividad comienza con pocas configuraciones visuales y aumenta gradualmente. En cada nivel memoriza las figuras y después selecciona únicamente las que viste.",
+    example:"Primero aparecerán pocas configuraciones. Los niveles siguientes tendrán más información visual.",
+    practice:{prompt:"Cuando aparezcan las opciones, ¿qué debes seleccionar?",options:["Solo las configuraciones que viste","Todas las figuras","Solo una figura"],answer:"Solo las configuraciones que viste",correct:"Correcto. Selecciona únicamente las configuraciones estudiadas.",wrong:"Debes seleccionar solo las configuraciones que viste durante la fase de estudio."}
+  },
   "NF-E03": {
     instruction:"Verás figuras una por una. Pulsa RESPONDER únicamente cuando aparezca el círculo. Si aparece cualquier otra figura, no pulses nada y espera la siguiente.",
     example:"Círculo ● → responder. Cuadrado ■, triángulo ▲ o rombo ◆ → esperar sin responder.",
@@ -5422,7 +5452,7 @@ const F61_EVALUATION_PREP = {
     practice:{prompt:"Si el camino directo hacia la estrella está bloqueado con ×, ¿qué debes hacer?",options:["Atravesar la casilla bloqueada","Buscar otra ruta","Tocar la estrella directamente"],answer:"Buscar otra ruta",correct:"Correcto. Planifica una ruta válida evitando las casillas bloqueadas.",wrong:"Aquí debías buscar otra ruta. Las casillas con × no se pueden atravesar."}
   },
   "NF-E21": {
-    instruction:"Observa con atención el modelo formado por cuatro cuadros y elige entre las opciones la construcción exactamente igual.",
+    instruction:"Observa con atención el modelo y elige entre las opciones la construcción exactamente igual. Fíjate en la posición de cada cuadro.",
     example:"La posición de cada cuadro marcado importa. Una opción parecida pero con un cuadro en otra posición no es idéntica.",
     practice:{prompt:"¿Qué debes comparar para elegir la respuesta?",options:["La posición exacta de los cuadros","Solo cuántos cuadros hay","El tamaño del botón"],answer:"La posición exacta de los cuadros",correct:"Correcto. Debes comparar la configuración completa y sus posiciones.",wrong:"Aquí debías comparar la posición exacta de todos los cuadros del modelo."}
   },
@@ -5527,10 +5557,11 @@ function NFE01Orientation({ paciente, onDone }) {
 }
 
 function NFE02Cancellation({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
   const [items] = useState(() => Array.from({length:48},(_,i)=>({id:i,target:[1,6,10,15,19,27,31,36,42,46].includes(i),symbol:[1,6,10,15,19,27,31,36,42,46].includes(i)?'◆':['◇','○','△','□','◌'][i%5]})));
   const [selected,setSelected]=useState([]);
   const clicks=useRef([]); const started=useRef(Date.now());
-  const toggle=(id)=>{ const t=Date.now()-started.current; clicks.current.push(t); setSelected(s=>s.includes(id)?s.filter(x=>x!==id):[...s,id]); };
+  const toggle=(id)=>{ const t=Date.now()-started.current; clicks.current.push(t); setSelected(v=>v.includes(id)?v.filter(x=>x!==id):[...v,id]); };
   const finish=()=>{
     const targetIds=items.filter(x=>x.target).map(x=>x.id);
     const correct=selected.filter(x=>targetIds.includes(x)).length;
@@ -5542,14 +5573,28 @@ function NFE02Cancellation({ paciente, onDone }) {
     const block2Targets=items.slice(half).filter(x=>x.target).map(x=>x.id);
     const b1=selected.filter(x=>block1Targets.includes(x)).length;
     const b2=selected.filter(x=>block2Targets.includes(x)).length;
-    onDone(nfTaskResult('NF-E02',{precision:pctSafe(correct,targetIds.length+commissions),correct,total:targetIds.length,omissions,commissions,errors:omissions+commissions,meanResponseMs:meanNum(rts),medianResponseMs:medianNum(rts),responseVariabilityMs:sdNum(rts),blockPerformance:[pctSafe(b1,block1Targets.length),pctSafe(b2,block2Targets.length)],latencyMs:Date.now()-started.current,taskVersionAdministered:'NF-E02-1.0'}));
+    onDone(nfTaskResult('NF-E02',{precision:pctSafe(correct,targetIds.length+commissions),correct,total:targetIds.length,omissions,commissions,errors:omissions+commissions,meanResponseMs:meanNum(rts),medianResponseMs:medianNum(rts),responseVariabilityMs:sdNum(rts),blockPerformance:[pctSafe(b1,block1Targets.length),pctSafe(b2,block2Targets.length)],latencyMs:Date.now()-started.current,taskVersionAdministered:'NF-E02-1.1'}));
   };
-  return <AssessmentTaskShell taskId='NF-E02' paciente={paciente} note='Busca únicamente todos los rombos negros ◆. Puedes revisar antes de finalizar.'>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(8,1fr)',gap:8}}>{items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} style={{aspectRatio:'1',borderRadius:9,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:'1.25rem',fontWeight:800}}>{it.symbol}</button>)}</div>
-    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:14,gap:10}}><span style={{fontSize:'.75rem',color:COLORS.textMuted}}>Seleccionados: {selected.length}</span><BtnPrimary onClick={finish}>Finalizar búsqueda</BtnPrimary></div>
+  return <AssessmentTaskShell taskId='NF-E02' paciente={paciente}>
+    <div style={{display:"grid",gridTemplateColumns:mayor?"1fr":"auto 1fr",gap:16,alignItems:"center",padding:14,border:`1px solid ${COLORS.border}`,borderRadius:14,background:COLORS.bg,marginBottom:24}}>
+      <div style={{textAlign:"center"}}>
+        <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,marginBottom:5}}>Figura objetivo</div>
+        <div style={{fontSize:mayor?"2.8rem":"2.35rem",fontWeight:900,lineHeight:1}}>◆</div>
+      </div>
+      <div>
+        <div style={{fontSize:mayor?"1.08rem":".96rem",fontWeight:800}}>Busca únicamente los rombos rellenos.</div>
+        <div style={{fontSize:mayor?".9rem":".8rem",color:COLORS.textMuted,marginTop:3}}>Toca todos los ◆ que encuentres. No selecciones figuras vacías ni otras formas.</div>
+      </div>
+    </div>
+    <div style={{display:'grid',gridTemplateColumns:mayor?'repeat(6,1fr)':'repeat(8,1fr)',gap:mayor?11:9}}>
+      {items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} aria-label={`Figura ${it.symbol}`} style={{aspectRatio:'1',minHeight:mayor?68:56,borderRadius:10,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:mayor?'1.75rem':'1.45rem',fontWeight:800}}>{it.symbol}</button>)}
+    </div>
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:18,gap:10}}>
+      <span style={{fontSize:mayor?'.88rem':'.78rem',color:COLORS.textMuted}}>Seleccionados: {selected.length}</span>
+      <BtnPrimary onClick={finish}>Finalizar búsqueda</BtnPrimary>
+    </div>
   </AssessmentTaskShell>;
 }
-
 function TimedSignalTaskCore({ taskId, paciente, mode, onDone }) {
   const isCpt=mode==='cpt';
   const [trials] = useState(() => Array.from({length:isCpt?32:30},(_,i)=>{
@@ -5884,92 +5929,65 @@ function NFE09LearningPhase({ paciente, onEncoded }) {
   const [phase,setPhase]=useState("study");
   const [trial,setTrial]=useState(0);
   const [input,setInput]=useState("");
-  const learning=useRef([]);
-  const interferenceRecord=useRef(null);
+  const [calcIdx,setCalcIdx]=useState(0);
+  const learning=useRef([]),calcRecord=useRef([]);
   const started=useRef(Date.now());
-
-  const targetWords = NF_E09_TARGETS;
-  const interference = NF_E09_INTERFERENCE;
+  const targetWords=NF_E09_TARGETS;
+  const calculations=[{q:"3 + 4",a:7,o:[6,7,8]},{q:"9 − 5",a:4,o:[3,4,5]},{q:"2 + 6",a:8,o:[7,8,9]},{q:"10 − 3",a:7,o:[6,7,8]}];
 
   const registerRecall=(kind)=>{
     const words=splitRecallWords(input);
     if(kind==="learning"){
-      learning.current.push({
-        correct:countUniqueTargets(words,targetWords),
-        intrusions:countIntrusions(words,targetWords),
-        perseverations:countPerseverations(words)
-      });
-      if(trial<2){setTrial(t=>t+1);setInput("");setPhase("study");}
-      else{setInput("");setPhase("interferenceStudy");}
+      learning.current.push({correct:countUniqueTargets(words,targetWords),intrusions:countIntrusions(words,targetWords),perseverations:countPerseverations(words)});
+      if(trial<2){setTrial(t=>t+1);setInput("");setPhase("study")}
+      else{setInput("");setCalcIdx(0);setPhase("interferenceCalc")}
       return;
     }
-    if(kind==="interference"){
-      const intRec={
-        correct:countUniqueTargets(words,interference),
-        intrusions:countIntrusions(words,interference),
-        perseverations:countPerseverations(words)
-      };
-      setInput("");
-      setPhase("immediate");
-      interferenceRecord.current=intRec;
-      return;
-    }
-    const immediate={
-      words,
-      correct:countUniqueTargets(words,targetWords),
-      intrusions:countIntrusions(words,targetWords),
-      perseverations:countPerseverations(words)
-    };
+    const immediate={words,correct:countUniqueTargets(words,targetWords),intrusions:countIntrusions(words,targetWords),perseverations:countPerseverations(words)};
     onEncoded({
-      targets:targetWords,
-      learning:[...learning.current],
-      interference:interferenceRecord.current,
-      immediate,
-      taskVersionAdministered:"NF-E09-2.0",
-      recognitionOrderId:"NF-E09-R2-FIXED-A",
-
-      startedAt:new Date(started.current).toISOString(),
-      delayStartedAt:Date.now(),
+      targets:targetWords,learning:[...learning.current],
+      interference:{type:"arithmetic",correct:calcRecord.current.filter(x=>x.correct).length,total:calcRecord.current.length,records:[...calcRecord.current]},
+      immediate,taskVersionAdministered:"NF-E09-2.1",recognitionOrderId:"NF-E09-R2-FIXED-A",
+      startedAt:new Date(started.current).toISOString(),delayStartedAt:Date.now(),
     });
   };
+  const chooseCalc=(n)=>{
+    const c=calculations[calcIdx];calcRecord.current.push({correct:n===c.a,response:n});
+    if(calcIdx+1>=calculations.length){setPhase("immediate");setInput("")}
+    else setCalcIdx(i=>i+1);
+  };
+  const wordCard=(w,i)=><span key={`${w}-${i}`} style={{padding:mayor?"12px 15px":"10px 13px",borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontWeight:700,fontSize:mayor?"1.02rem":".9rem"}}>{w}</span>;
 
-  const wordCard=(w,i)=><span key={`${w}-${i}`} style={{padding:mayor?"11px 14px":"9px 12px",borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontWeight:700}}>{w}</span>;
-
-  return <AssessmentTaskShell taskId="NF-E09" paciente={paciente} note="Lista original de NeuroFlex. Se realizan tres ensayos de aprendizaje, una lista interferente y evocación inmediata. La evocación diferida y el reconocimiento aparecerán después de otras tareas.">
-    {phase==="study" && <div style={{textAlign:"center"}}>
-      <Badge label={`APRENDIZAJE ${trial+1}/3`} color={COLORS.primary}/>
-      <p style={{fontWeight:700}}>Memoriza estas palabras.</p>
-      <div style={{display:"flex",flexWrap:"wrap",gap:9,justifyContent:"center",margin:"18px 0"}}>{targetWords.map(wordCard)}</div>
+  return <AssessmentTaskShell taskId="NF-E09" paciente={paciente}>
+    {phase==="study"&&<div style={{textAlign:"center"}}>
+      <Badge label={`Aprendizaje ${trial+1}/3`} color={COLORS.primary}/>
+      <p style={{fontWeight:750}}>Memoriza estas palabras.</p>
+      <div style={{display:"flex",flexWrap:"wrap",gap:11,justifyContent:"center",margin:"22px 0 26px"}}>{targetWords.map(wordCard)}</div>
       <BtnPrimary onClick={()=>{setInput("");setPhase("learningRecall")}}>Ya las memoricé</BtnPrimary>
     </div>}
-
-    {phase==="learningRecall" && <div>
-      <p style={{fontWeight:700}}>Escribe todas las palabras que recuerdes, separadas por espacios.</p>
-      <textarea value={input} onChange={e=>setInput(e.target.value)} rows={4} style={{width:"100%",boxSizing:"border-box",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,fontFamily:"inherit"}}/>
-      <BtnPrimary onClick={()=>registerRecall("learning")} style={{width:"100%",marginTop:10}}>Confirmar recuerdo</BtnPrimary>
+    {phase==="learningRecall"&&<div>
+      <p style={{fontWeight:750}}>Escribe todas las palabras que recuerdes, separadas por espacios.</p>
+      <textarea value={input} onChange={e=>setInput(e.target.value)} rows={4} style={{width:"100%",boxSizing:"border-box",padding:14,borderRadius:10,border:`1.5px solid ${COLORS.border}`,fontFamily:"inherit",fontSize:mayor?"1.08rem":"1rem"}}/>
+      <BtnPrimary onClick={()=>registerRecall("learning")} style={{width:"100%",marginTop:12}}>Confirmar recuerdo</BtnPrimary>
     </div>}
-
-    {phase==="interferenceStudy" && <div style={{textAlign:"center"}}>
-      <Badge label="LISTA INTERFERENTE" color={COLORS.warning}/>
-      <p style={{fontWeight:700}}>Ahora memoriza esta lista diferente.</p>
-      <div style={{display:"flex",flexWrap:"wrap",gap:9,justifyContent:"center",margin:"18px 0"}}>{interference.map(wordCard)}</div>
-      <BtnPrimary onClick={()=>{setInput("");setPhase("interferenceRecall")}}>Continuar</BtnPrimary>
+    {phase==="interferenceCalc"&&<div style={{textAlign:"center"}}>
+      <Badge label="Tarea intermedia" color={COLORS.warning}/>
+      <p style={{fontWeight:750}}>Ahora resuelve unas operaciones sencillas. No necesitas recordar los resultados.</p>
+      <div style={{maxWidth:520,margin:"26px auto"}}>
+        <div style={{fontSize:mayor?"2.2rem":"1.9rem",fontWeight:900,marginBottom:20}}>{calculations[calcIdx].q} = ?</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:11}}>
+          {calculations[calcIdx].o.map(n=><button key={n} onClick={()=>chooseCalc(n)} style={{minHeight:mayor?72:64,borderRadius:11,border:`1.5px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:850,fontSize:mayor?"1.15rem":"1rem"}}>{n}</button>)}
+        </div>
+        <div style={{fontSize:".75rem",color:COLORS.textMuted,marginTop:12}}>Operación {calcIdx+1}/{calculations.length}</div>
+      </div>
     </div>}
-
-    {phase==="interferenceRecall" && <div>
-      <p style={{fontWeight:700}}>Escribe las palabras de la lista que acabas de ver.</p>
-      <textarea value={input} onChange={e=>setInput(e.target.value)} rows={4} style={{width:"100%",boxSizing:"border-box",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,fontFamily:"inherit"}}/>
-      <BtnPrimary onClick={()=>registerRecall("interference")} style={{width:"100%",marginTop:10}}>Confirmar</BtnPrimary>
-    </div>}
-
-    {phase==="immediate" && <div>
-      <p style={{fontWeight:700}}>Sin volver a verla, recuerda ahora la <strong>primera lista</strong>.</p>
-      <textarea value={input} onChange={e=>setInput(e.target.value)} rows={4} style={{width:"100%",boxSizing:"border-box",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,fontFamily:"inherit"}}/>
-      <BtnPrimary onClick={()=>registerRecall("immediate")} style={{width:"100%",marginTop:10}}>Guardar y continuar</BtnPrimary>
+    {phase==="immediate"&&<div>
+      <p style={{fontWeight:750}}>Sin volver a verla, recuerda ahora la <strong>primera lista</strong>.</p>
+      <textarea value={input} onChange={e=>setInput(e.target.value)} rows={4} style={{width:"100%",boxSizing:"border-box",padding:14,borderRadius:10,border:`1.5px solid ${COLORS.border}`,fontFamily:"inherit",fontSize:mayor?"1.08rem":"1rem"}}/>
+      <BtnPrimary onClick={()=>registerRecall("immediate")} style={{width:"100%",marginTop:12}}>Guardar y continuar</BtnPrimary>
     </div>}
   </AssessmentTaskShell>;
 }
-
 function NFE09DelayedPhase({ paciente, memoryData, onDone }) {
   const [phase,setPhase]=useState("recall");
   const [input,setInput]=useState("");
@@ -6008,8 +6026,8 @@ function NFE09DelayedPhase({ paciente, memoryData, onDone }) {
     const correctLearn=learn.reduce((s,x)=>s+x.correct,0);
     const learningTotal=NF_E09_TARGETS.length*learn.length;
     const delayedCorrect=delayed?.correct || 0;
-    const totalIntrusions=learn.reduce((s,x)=>s+(x.intrusions||0),0)+(memoryData?.interference?.intrusions||0)+(memoryData?.immediate?.intrusions||0)+(delayed?.intrusions||0);
-    const totalPersev=learn.reduce((s,x)=>s+(x.perseverations||0),0)+(memoryData?.interference?.perseverations||0)+(memoryData?.immediate?.perseverations||0)+(delayed?.perseverations||0);
+    const totalIntrusions=learn.reduce((s,x)=>s+(x.intrusions||0),0)+(memoryData?.immediate?.intrusions||0)+(delayed?.intrusions||0);
+    const totalPersev=learn.reduce((s,x)=>s+(x.perseverations||0),0)+(memoryData?.immediate?.perseverations||0)+(delayed?.perseverations||0);
     onDone(nfTaskResult("NF-E09",{
       precision:pctSafe(hits, NF_E09_TARGETS.length + falseAlarms),
       correct:hits,
@@ -6366,8 +6384,10 @@ function NFNamingObject({ kind, size = 150 }) {
   </svg>;
 
   return <svg viewBox="0 0 160 160" style={style} role="img" aria-label="Objeto para denominar">
-    <path d="M42 35 V95 Q42 125 70 125 Q96 125 96 98 V35 M42 35 H62 V82 Q62 96 76 96 Q90 96 90 82 V35 H110" {...common}/>
-    <path d="M42 35 V22 H62 V35 M90 35 V22 H110 V35" {...common}/>
+    <path d="M40 38 V92 Q40 132 80 132 Q120 132 120 92 V38" {...common} strokeWidth="12"/>
+    <path d="M40 38 H64 V64 H40 Z M96 38 H120 V64 H96 Z" fill={COLORS.primary+"18"} stroke={stroke} strokeWidth="5"/>
+    <text x="52" y="57" textAnchor="middle" fontSize="15" fontWeight="800" fill={stroke} stroke="none">N</text>
+    <text x="108" y="57" textAnchor="middle" fontSize="15" fontWeight="800" fill={stroke} stroke="none">S</text>
   </svg>;
 }
 
@@ -6592,6 +6612,7 @@ function NFE14Fluency({ paciente, onDone }) {
 }
 
 function NFE15MatrixReasoning({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
   const items=[
     {grid:["●","○","●","○","●","?"],opts:["●","○","▲","■"],ans:1,rule:"alternancia"},
     {grid:["▲","▲▲","▲▲▲","■","■■","?"],opts:["■","▲▲▲","■■■","■■■■"],ans:2,rule:"incremento"},
@@ -6600,33 +6621,26 @@ function NFE15MatrixReasoning({ paciente, onDone }) {
     {grid:["□","□□","□□□","◇","◇◇","?"],opts:["□□□","◇◇◇","◇◇","□□□□"],ans:1,rule:"progresion"},
     {grid:["●○","○●","●○","○●","●○","?"],opts:["●●","○○","○●","●○"],ans:2,rule:"alternancia_pares"},
   ];
-  const [idx,setIdx]=useState(0);
-  const records=useRef([]);
-  const t=useRef(Date.now());
+  const [idx,setIdx]=useState(0);const records=useRef([]),t=useRef(Date.now()),locked=useRef(false);
   const pick=(i)=>{
+    if(locked.current)return;locked.current=true;
     records.current.push({correct:i===items[idx].ans,rt:Date.now()-t.current,rule:items[idx].rule});
     if(idx+1>=items.length){
       const rs=records.current,ok=rs.filter(r=>r.correct).length;
-      onDone(nfTaskResult("NF-E15",{
-        precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,
-        meanResponseMs:meanNum(rs.map(r=>r.rt)),medianResponseMs:medianNum(rs.map(r=>r.rt)),
-        responseVariabilityMs:sdNum(rs.map(r=>r.rt)),taskVersionAdministered:"NF-E15-2.0"
-      }));
-      return;
-    }
-    setIdx(i=>i+1);t.current=Date.now();
+      onDone(nfTaskResult("NF-E15",{precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,meanResponseMs:meanNum(rs.map(r=>r.rt)),medianResponseMs:medianNum(rs.map(r=>r.rt)),responseVariabilityMs:sdNum(rs.map(r=>r.rt)),taskVersionAdministered:"NF-E15-2.1"}));
+    }else setTimeout(()=>{setIdx(i=>i+1);t.current=Date.now();locked.current=false},260);
   };
-  return <AssessmentTaskShell taskId="NF-E15" paciente={paciente} note="Versión 2.0: matrices simbólicas originales NeuroFlex con posición de respuesta correcta distribuida; no son reactivos WAIS ni Raven.">
-    <p style={{fontWeight:700}}>Identifica qué opción completa mejor el patrón.</p>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:9,maxWidth:430,margin:"18px auto"}}>
-      {items[idx].grid.map((x,i)=><div key={i} style={{minHeight:70,borderRadius:10,border:`1px solid ${COLORS.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.45rem",fontWeight:850,background:i===5?COLORS.bg:"#fff"}}>{x}</div>)}
+  return <AssessmentTaskShell taskId="NF-E15" paciente={paciente}>
+    <p style={{fontWeight:750}}>Identifica qué opción completa mejor el patrón.</p>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:mayor?13:11,maxWidth:mayor?560:500,margin:"22px auto 34px"}}>
+      {items[idx].grid.map((x,i)=><div key={i} style={{minHeight:mayor?92:82,borderRadius:11,border:`1.5px solid ${COLORS.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:mayor?"1.85rem":"1.6rem",fontWeight:850,background:i===5?COLORS.bg:"#fff"}}>{x}</div>)}
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,maxWidth:500,margin:"0 auto"}}>
-      {items[idx].opts.map((o,i)=><button key={i} onClick={()=>pick(i)} style={{padding:15,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontSize:"1.25rem",fontWeight:800}}>{o}</button>)}
+    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Elige una respuesta</div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:mayor?12:10,maxWidth:mayor?620:560,margin:"0 auto"}}>
+      {items[idx].opts.map((o,i)=><button key={i} disabled={locked.current} onClick={()=>pick(i)} style={{minHeight:mayor?78:68,padding:15,borderRadius:11,border:`1.5px solid ${COLORS.border}`,background:"#fff",fontSize:mayor?"1.55rem":"1.35rem",fontWeight:800}}>{o}</button>)}
     </div>
   </AssessmentTaskShell>;
 }
-
 function NFE16Similarities({ paciente, onDone }) {
   const items=[
     {q:"¿Qué tienen en común un tren y un autobús?",opts:["Tienen exactamente el mismo tamaño","Son medios de transporte","Siempre viajan por rieles","Se usan solo de noche"],ans:1},
@@ -6840,614 +6854,69 @@ function NFE20MentalRotation({ paciente, onDone }) {
     fork:[[0,1],[1,0],[1,1],[1,2],[2,1]],
   };
   const items=[
-    {shape:"stair",baseRot:0,opts:[
-      {rotation:90,mirrored:false},{rotation:90,mirrored:true},{shape:"hook",rotation:90},{shape:"zig",rotation:180}
-    ],ans:0},
-    {shape:"hook",baseRot:0,opts:[
-      {shape:"chair",rotation:90},{rotation:180,mirrored:false},{rotation:180,mirrored:true},{shape:"corner",rotation:270}
-    ],ans:1},
-    {shape:"zig",baseRot:90,opts:[
-      {rotation:270,mirrored:true},{shape:"stair",rotation:180},{rotation:270,mirrored:false},{shape:"hook",rotation:90}
-    ],ans:2},
-    {shape:"chair",baseRot:180,opts:[
-      {shape:"fork",rotation:0},{rotation:90,mirrored:true},{shape:"corner",rotation:90},{rotation:90,mirrored:false}
-    ],ans:3},
-    {shape:"corner",baseRot:270,opts:[
-      {rotation:90,mirrored:false},{shape:"chair",rotation:270},{rotation:90,mirrored:true},{shape:"hook",rotation:180}
-    ],ans:0},
-    {shape:"fork",baseRot:0,opts:[
-      {shape:"corner",rotation:180},{rotation:180,mirrored:false},{shape:"zig",rotation:90},{rotation:90,mirrored:true}
-    ],ans:1},
+    {shape:"stair",baseRot:0,direction:"derecha",degrees:90,opts:[{rotation:90},{rotation:270},{shape:"hook",rotation:90},{rotation:90,mirrored:true}],ans:0},
+    {shape:"hook",baseRot:0,direction:"izquierda",degrees:90,opts:[{shape:"chair",rotation:270},{rotation:270},{rotation:90},{rotation:270,mirrored:true}],ans:1},
+    {shape:"zig",baseRot:90,direction:"derecha",degrees:180,opts:[{rotation:0},{shape:"stair",rotation:270},{rotation:270},{rotation:270,mirrored:true}],ans:2},
+    {shape:"chair",baseRot:180,direction:"izquierda",degrees:90,opts:[{shape:"fork",rotation:90},{rotation:0},{shape:"corner",rotation:90},{rotation:90}],ans:3},
+    {shape:"corner",baseRot:270,direction:"derecha",degrees:180,opts:[{rotation:90},{shape:"chair",rotation:90},{rotation:270},{rotation:90,mirrored:true}],ans:0},
+    {shape:"fork",baseRot:0,direction:"derecha",degrees:90,opts:[{shape:"corner",rotation:90},{rotation:90},{rotation:270},{rotation:90,mirrored:true}],ans:1},
   ];
-  const [idx,setIdx]=useState(0);
-  const rec=useRef([]);
-  const t=useRef(Date.now());
-
+  const [idx,setIdx]=useState(0);const rec=useRef([]),t=useRef(Date.now()),locked=useRef(false);
   const pick=(i)=>{
-    rec.current.push({correct:i===items[idx].ans,rt:Date.now()-t.current,selected:i});
+    if(locked.current)return;locked.current=true;
+    rec.current.push({correct:i===items[idx].ans,rt:Date.now()-t.current,selected:i,direction:items[idx].direction,degrees:items[idx].degrees});
     if(idx+1>=items.length){
       const rs=rec.current,ok=rs.filter(r=>r.correct).length;
-      onDone(nfTaskResult("NF-E20",{
-        precision:pctSafe(ok,rs.length),
-        correct:ok,total:rs.length,errors:rs.length-ok,
-        meanResponseMs:meanNum(rs.map(r=>r.rt)),
-        medianResponseMs:medianNum(rs.map(r=>r.rt)),
-        responseVariabilityMs:sdNum(rs.map(r=>r.rt)),
-        taskVersionAdministered:"NF-E20-2.0"
-      },{
-        notes:"Versión 2.0 con figuras de retícula dibujadas por NeuroFlex. La alternativa correcta conserva la configuración y cambia únicamente la rotación; los distractores introducen reflexión o cambio estructural."
-      }));
-    }else{
-      setIdx(i=>i+1);
-      t.current=Date.now();
-    }
+      onDone(nfTaskResult("NF-E20",{precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,meanResponseMs:meanNum(rs.map(r=>r.rt)),medianResponseMs:medianNum(rs.map(r=>r.rt)),responseVariabilityMs:sdNum(rs.map(r=>r.rt)),taskVersionAdministered:"NF-E20-2.1"},{notes:"La consigna especifica dirección y grados de giro. Las cuatro alternativas son estructural u orientacionalmente distintas."}));
+    }else setTimeout(()=>{setIdx(i=>i+1);t.current=Date.now();locked.current=false},260);
   };
-
-  const item=items[idx];
-  const baseCells=shapes[item.shape];
-  return <AssessmentTaskShell taskId="NF-E20" paciente={paciente} note="Versión 2.0: figuras geométricas propias construidas con una retícula visual. No utiliza caracteres Unicode ni reactivos de baterías comerciales.">
-    <p style={{fontWeight:700}}>¿Cuál opción representa exactamente la misma forma después de girarla?</p>
-    <div style={{padding:mayor?22:16,borderRadius:14,background:COLORS.bg,maxWidth:170,margin:"18px auto"}}>
-      <NFGridShape cells={baseCells} rotation={item.baseRot} size={mayor?138:118}/>
+  const item=items[idx],baseCells=shapes[item.shape];
+  const arrow=item.direction==="derecha"?"↻":"↺";
+  return <AssessmentTaskShell taskId="NF-E20" paciente={paciente}>
+    <p style={{fontWeight:750}}>Imagina que la figura gira <strong>{item.degrees}° hacia la {item.direction}</strong>. ¿Cómo quedaría?</p>
+    <div style={{textAlign:"center",margin:"20px auto 34px"}}>
+      <div style={{fontSize:mayor?"1.05rem":".9rem",fontWeight:850,color:COLORS.primary,marginBottom:10}}>{arrow} Giro de {item.degrees}° hacia la {item.direction}</div>
+      <div style={{padding:mayor?24:18,borderRadius:14,background:COLORS.bg,maxWidth:190,margin:"0 auto",border:`1px solid ${COLORS.border}`}}>
+        <NFGridShape cells={baseCells} rotation={item.baseRot} size={mayor?150:132}/>
+      </div>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(120px,1fr))",gap:10,maxWidth:560,margin:"0 auto"}}>
-      {item.opts.map((o,i)=>{
-        const cells=shapes[o.shape || item.shape];
-        return <button key={i} type="button" onClick={()=>pick(i)} style={{
-          padding:mayor?16:12,borderRadius:12,border:`1.5px solid ${COLORS.border}`,
-          background:"#fff",cursor:"pointer",minHeight:mayor?176:150
-        }}>
-          <NFGridShape cells={cells} rotation={o.rotation || 0} mirrored={!!o.mirrored} size={mayor?126:104}/>
-        </button>;
-      })}
+    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Elige el resultado del giro</div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(140px,1fr))",gap:mayor?14:12,maxWidth:650,margin:"0 auto"}}>
+      {item.opts.map((o,i)=>{const cells=shapes[o.shape || item.shape];return <button key={i} disabled={locked.current} type="button" onClick={()=>pick(i)} style={{padding:mayor?17:14,borderRadius:12,border:`1.5px solid ${COLORS.border}`,background:"#fff",cursor:"pointer",minHeight:mayor?190:168}}>
+        <NFGridShape cells={cells} rotation={o.rotation || 0} mirrored={!!o.mirrored} size={mayor?136:118}/>
+      </button>})}
     </div>
-    <p style={{fontSize:".68rem",color:COLORS.textMuted,textAlign:"center",marginTop:10}}>
-      Una figura reflejada como en un espejo no cuenta como la misma rotación.
-    </p>
+    <p style={{fontSize:mayor?".78rem":".7rem",color:COLORS.textMuted,textAlign:"center",marginTop:12}}>Una figura reflejada como en un espejo no es el resultado correcto de una rotación.</p>
   </AssessmentTaskShell>;
 }
-
 function NFE21ConstructionCore({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
   const patterns=[
     {target:[1,0,0,1],options:[[1,0,0,1],[1,1,0,0],[0,1,1,0],[1,0,1,0]],ans:0},
     {target:[1,1,0,1],options:[[0,1,1,1],[1,1,0,1],[1,0,1,1],[1,1,1,0]],ans:1},
     {target:[0,1,1,0],options:[[1,0,0,1],[0,1,1,0],[1,1,0,0],[0,0,1,1]],ans:1},
     {target:[1,0,1,1],options:[[1,1,1,0],[1,0,1,1],[0,1,1,1],[1,1,0,1]],ans:1},
   ];
-  const [idx,setIdx]=useState(0);const rec=useRef([]);const t=useRef(Date.now());
-  const mini=(arr)=><span style={{display:"grid",gridTemplateColumns:"repeat(2,22px)",gap:2,justifyContent:"center"}}>{arr.map((v,i)=><i key={i} style={{width:22,height:22,display:"block",border:`1px solid ${COLORS.border}`,background:v?COLORS.primary+"55":"#fff"}}/>)}</span>;
+  const [idx,setIdx]=useState(0);const rec=useRef([]),t=useRef(Date.now()),locked=useRef(false);
+  const mini=(arr,size=34)=><span style={{display:"grid",gridTemplateColumns:`repeat(2,${size}px)`,gap:4,justifyContent:"center"}}>{arr.map((v,i)=><i key={i} style={{width:size,height:size,display:"block",border:`2px solid ${v?COLORS.primary:COLORS.textMuted}`,background:v?COLORS.primary:"#fff",borderRadius:2}}/>)}</span>;
   const pick=(i)=>{
+    if(locked.current)return;locked.current=true;
     rec.current.push({correct:i===patterns[idx].ans,rt:Date.now()-t.current});
-    if(idx+1>=patterns.length){const rs=rec.current,ok=rs.filter(r=>r.correct).length;onDone(nfTaskResult("NF-E21",{precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,attempts:rs.length,meanResponseMs:meanNum(rs.map(r=>r.rt)),taskVersionAdministered:"NF-E21-1.0"},{notes:"Comparación visuoconstructiva digital original. No equivale a construcción manipulativa física."}))}
-    else{setIdx(i=>i+1);t.current=Date.now()}
+    if(idx+1>=patterns.length){const rs=rec.current,ok=rs.filter(r=>r.correct).length;onDone(nfTaskResult("NF-E21",{precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,attempts:rs.length,meanResponseMs:meanNum(rs.map(r=>r.rt)),taskVersionAdministered:"NF-E21-1.1"},{notes:"Comparación visuoconstructiva digital original. No equivale a construcción manipulativa física."}))}
+    else setTimeout(()=>{setIdx(i=>i+1);t.current=Date.now();locked.current=false},260);
   };
-  return <AssessmentTaskShell taskId="NF-E21" paciente={paciente} note="Configuraciones digitales originales inspiradas conceptualmente en tareas visuoconstructivas.">
-    <p style={{fontWeight:700}}>Observa el modelo y elige la construcción idéntica.</p>
-    <div style={{padding:20,borderRadius:12,background:COLORS.bg,maxWidth:120,margin:"16px auto"}}>{mini(patterns[idx].target)}</div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:9}}>{patterns[idx].options.map((o,i)=><button key={i} onClick={()=>pick(i)} style={{padding:14,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff"}}>{mini(o)}</button>)}</div>
-  </AssessmentTaskShell>;
-}
-
-function NFClosureStimulus({ kind, size = 190 }) {
-  const common={fill:"none",stroke:COLORS.primary,strokeWidth:7,strokeLinecap:"round",strokeLinejoin:"round"};
-  const svgStyle={display:"block",margin:"0 auto",width:size,height:size};
-  if(kind==="circle") return <svg viewBox="0 0 200 200" style={svgStyle} role="img" aria-label="Figura circular incompleta">
-    <path d="M100 24 A76 76 0 0 1 168 66" {...common}/>
-    <path d="M176 100 A76 76 0 0 1 134 168" {...common}/>
-    <path d="M100 176 A76 76 0 0 1 32 134" {...common}/>
-    <path d="M24 100 A76 76 0 0 1 66 32" {...common}/>
-  </svg>;
-  if(kind==="triangle") return <svg viewBox="0 0 200 200" style={svgStyle} role="img" aria-label="Figura triangular incompleta">
-    <path d="M100 25 L132 80" {...common}/><path d="M146 104 L174 153" {...common}/>
-    <path d="M162 166 L111 166" {...common}/><path d="M87 166 L37 166" {...common}/>
-    <path d="M28 151 L55 104" {...common}/><path d="M68 81 L100 25" {...common}/>
-  </svg>;
-  if(kind==="square") return <svg viewBox="0 0 200 200" style={svgStyle} role="img" aria-label="Figura cuadrada incompleta">
-    <path d="M34 34 H82" {...common}/><path d="M118 34 H166 V82" {...common}/>
-    <path d="M166 118 V166 H118" {...common}/><path d="M82 166 H34 V118" {...common}/>
-    <path d="M34 82 V58" {...common}/>
-  </svg>;
-  if(kind==="arrow") return <svg viewBox="0 0 200 200" style={svgStyle} role="img" aria-label="Figura de flecha incompleta">
-    <path d="M100 24 L146 72" {...common}/><path d="M163 90 L100 90" {...common}/>
-    <path d="M100 90 V164" {...common}/><path d="M78 164 V90" {...common}/>
-    <path d="M78 90 H38" {...common}/><path d="M52 72 L100 24" {...common}/>
-  </svg>;
-  return <svg viewBox="0 0 200 200" style={svgStyle} role="img" aria-label="Figura de estrella incompleta">
-    <path d="M100 24 L117 72" {...common}/><path d="M130 78 L181 80" {...common}/>
-    <path d="M163 98 L125 128" {...common}/><path d="M119 141 L132 178" {...common}/>
-    <path d="M107 157 L100 140 L91 164" {...common}/><path d="M72 178 L84 140" {...common}/>
-    <path d="M75 128 L39 100" {...common}/><path d="M20 80 L70 78" {...common}/>
-    <path d="M83 70 L100 24" {...common}/>
-  </svg>;
-}
-
-function NFE22VisualClosure({ paciente, onDone }) {
-  const mayor=esModoMayor(paciente);
-  const items=[
-    {kind:"circle",opts:["triángulo","círculo","flecha","cuadrado"],ans:1},
-    {kind:"triangle",opts:["círculo","estrella","triángulo","cuadrado"],ans:2},
-    {kind:"square",opts:["cuadrado","flecha","círculo","estrella"],ans:0},
-    {kind:"arrow",opts:["estrella","cuadrado","flecha","círculo"],ans:2},
-    {kind:"star",opts:["flecha","estrella","triángulo","círculo"],ans:1},
-  ];
-  const [idx,setIdx]=useState(0);
-  const rec=useRef([]);
-  const t=useRef(Date.now());
-
-  const pick=(i)=>{
-    rec.current.push({correct:i===items[idx].ans,rt:Date.now()-t.current,selected:i});
-    if(idx+1>=items.length){
-      const rs=rec.current,ok=rs.filter(r=>r.correct).length;
-      onDone(nfTaskResult("NF-E22",{
-        precision:pctSafe(ok,rs.length),
-        correct:ok,total:rs.length,errors:rs.length-ok,
-        meanResponseMs:meanNum(rs.map(r=>r.rt)),
-        medianResponseMs:medianNum(rs.map(r=>r.rt)),
-        responseVariabilityMs:sdNum(rs.map(r=>r.rt)),
-        taskVersionAdministered:"NF-E22-2.0"
-      },{
-        notes:"Versión 2.0 con figuras vectoriales incompletas propias de NeuroFlex. Los fragmentos se dibujan mediante SVG y no dependen de la fuente o símbolos instalados en el dispositivo."
-      }));
-    }else{
-      setIdx(i=>i+1);
-      t.current=Date.now();
-    }
-  };
-
-  const item=items[idx];
-  return <AssessmentTaskShell taskId="NF-E22" paciente={paciente} note="Versión 2.0: estímulos vectoriales propios con partes omitidas. La tarea describe cierre visual observado y no constituye diagnóstico de agnosia.">
-    <p style={{fontWeight:700}}>Observa los fragmentos. ¿Qué figura formarían si estuviera completa?</p>
-    <div style={{
-      padding:mayor?18:12,background:COLORS.bg,borderRadius:14,
-      maxWidth:mayor?260:230,margin:"18px auto",border:`1px solid ${COLORS.border}`
-    }}>
-      <NFClosureStimulus kind={item.kind} size={mayor?220:190}/>
+  return <AssessmentTaskShell taskId="NF-E21" paciente={paciente}>
+    <p style={{fontWeight:750}}>Observa el modelo y elige la construcción idéntica.</p>
+    <div style={{textAlign:"center",margin:"20px auto 34px"}}>
+      <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,marginBottom:10}}>Modelo</div>
+      <div style={{padding:22,borderRadius:14,background:COLORS.bg,maxWidth:150,margin:"0 auto",border:`1px solid ${COLORS.border}`}}>{mini(patterns[idx].target,mayor?42:38)}</div>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:9,maxWidth:520,margin:"0 auto"}}>
-      {item.opts.map((o,i)=><button key={i} onClick={()=>pick(i)} style={{
-        padding:mayor?16:13,borderRadius:10,border:`1px solid ${COLORS.border}`,
-        background:"#fff",fontWeight:700,fontSize:mayor?"1rem":".85rem",cursor:"pointer"
-      }}>{o}</button>)}
+    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Opciones</div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:mayor?14:12,maxWidth:720,margin:"0 auto"}}>
+      {patterns[idx].options.map((o,i)=><button key={i} disabled={locked.current} onClick={()=>pick(i)} style={{minHeight:mayor?130:112,padding:18,borderRadius:12,border:`1.5px solid ${COLORS.border}`,background:"#fff"}}>{mini(o,mayor?36:32)}</button>)}
     </div>
   </AssessmentTaskShell>;
 }
-
-function NFFigureGroundShape({ kind, size = 42, selected = false }) {
-  const stroke=selected?COLORS.primary:COLORS.textSecond;
-  const fill=selected?COLORS.primary+"18":"#fff";
-  const common={fill,stroke,strokeWidth:4,strokeLinecap:"round",strokeLinejoin:"round"};
-  const style={display:"block",width:size,height:size,margin:"0 auto"};
-  if(kind==="circle") return <svg viewBox="0 0 60 60" style={style} aria-hidden="true"><circle cx="30" cy="30" r="18" {...common}/></svg>;
-  if(kind==="triangle") return <svg viewBox="0 0 60 60" style={style} aria-hidden="true"><path d="M30 10 L50 47 H10 Z" {...common}/></svg>;
-  if(kind==="diamond") return <svg viewBox="0 0 60 60" style={style} aria-hidden="true"><path d="M30 8 L52 30 L30 52 L8 30 Z" {...common}/></svg>;
-  if(kind==="cross") return <svg viewBox="0 0 60 60" style={style} aria-hidden="true"><path d="M24 10 H36 V24 H50 V36 H36 V50 H24 V36 H10 V24 H24 Z" {...common}/></svg>;
-  if(kind==="ring") return <svg viewBox="0 0 60 60" style={style} aria-hidden="true"><circle cx="30" cy="30" r="19" {...common}/><circle cx="30" cy="30" r="8" fill="#fff" stroke={stroke} strokeWidth="3"/></svg>;
-  return <svg viewBox="0 0 60 60" style={style} aria-hidden="true"><path d="M12 18 H48 V42 H12 Z M21 9 V51 M39 9 V51" {...common}/></svg>;
-}
-
-function NFE23FigureGround({ paciente, onDone }) {
-  const mayor=esModoMayor(paciente);
-  const trials=[
-    {
-      target:"triangle",
-      grid:["circle","diamond","cross","triangle","ring","circle","diamond","cross","circle","ring","diamond","circle"],
-      count:1
-    },
-    {
-      target:"circle",
-      grid:["ring","circle","diamond","cross","circle","ring","cross","circle","diamond","ring","cross","diamond","circle","ring","diamond","cross"],
-      count:4
-    },
-    {
-      target:"diamond",
-      grid:["ring","cross","diamond","circle","ring","diamond","cross","circle","diamond","ring","cross","circle","ring","cross","diamond","circle","ring","cross","circle","diamond"],
-      count:5
-    },
-  ];
-  const labels={
-    circle:"círculo",
-    triangle:"triángulo",
-    diamond:"rombo",
-    cross:"cruz",
-    ring:"anillo",
-    grid:"rejilla",
-  };
-  const [idx,setIdx]=useState(0);
-  const [selected,setSelected]=useState([]);
-  const rec=useRef([]);
-  const t=useRef(Date.now());
-
-  const toggle=(i)=>{
-    setSelected(s=>s.includes(i)?s.filter(v=>v!==i):[...s,i]);
-  };
-
-  const finishTrial=()=>{
-    const tr=trials[idx];
-    const hits=selected.filter(i=>tr.grid[i]===tr.target).length;
-    const commissions=selected.filter(i=>tr.grid[i]!==tr.target).length;
-    const omissions=Math.max(0,tr.count-hits);
-    rec.current.push({
-      hits,commissions,omissions,
-      rt:Date.now()-t.current,
-      totalTargets:tr.count,
-      selectedCount:selected.length
-    });
-
-    if(idx+1>=trials.length){
-      const rs=rec.current;
-      const correct=rs.reduce((s,r)=>s+r.hits,0);
-      const targets=rs.reduce((s,r)=>s+r.totalTargets,0);
-      const comm=rs.reduce((s,r)=>s+r.commissions,0);
-      const om=rs.reduce((s,r)=>s+r.omissions,0);
-      onDone(nfTaskResult("NF-E23",{
-        precision:pctSafe(correct,targets+comm),
-        correct,
-        total:targets,
-        errors:comm+om,
-        omissions:om,
-        commissions:comm,
-        meanResponseMs:meanNum(rs.map(r=>r.rt)),
-        medianResponseMs:medianNum(rs.map(r=>r.rt)),
-        responseVariabilityMs:sdNum(rs.map(r=>r.rt)),
-        blockPerformance:rs.map(r=>pctSafe(r.hits,r.totalTargets+r.commissions)),
-        taskVersionAdministered:"NF-E23-2.0"
-      },{
-        notes:"Versión 2.0 con formas vectoriales propias de NeuroFlex. La búsqueda figura-fondo registra aciertos, omisiones, comisiones y tiempo por bloque. El desempeño integra percepción visual, exploración y atención selectiva."
-      }));
-    }else{
-      setIdx(i=>i+1);
-      setSelected([]);
-      t.current=Date.now();
-    }
-  };
-
-  const tr=trials[idx];
-  const cellSize=mayor?58:48;
-  return <AssessmentTaskShell taskId="NF-E23" paciente={paciente} note="Versión 2.0: la escena utiliza formas vectoriales dibujadas por NeuroFlex, evitando símbolos dependientes de fuentes o del sistema operativo.">
-    <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap",marginBottom:12}}>
-      <p style={{fontWeight:700,margin:0}}>Marca todas las figuras iguales al modelo:</p>
-      <div style={{padding:6,borderRadius:10,border:`2px solid ${COLORS.primary}`,background:COLORS.primary+"08"}}>
-        <NFFigureGroundShape kind={tr.target} size={mayor?54:44}/>
-      </div>
-      <span style={{fontSize:".72rem",color:COLORS.textMuted}}>({labels[tr.target]})</span>
-    </div>
-
-    <div style={{
-      display:"grid",
-      gridTemplateColumns:"repeat(4,1fr)",
-      gap:mayor?10:7,
-      maxWidth:mayor?510:440,
-      margin:"16px auto",
-      padding:mayor?12:9,
-      borderRadius:14,
-      background:COLORS.bg,
-      border:`1px solid ${COLORS.border}`
-    }}>
-      {tr.grid.map((kind,i)=>{
-        const active=selected.includes(i);
-        return <button
-          key={i}
-          type="button"
-          aria-pressed={active}
-          aria-label={`Figura ${i+1}`}
-          onClick={()=>toggle(i)}
-          style={{
-            minHeight:cellSize+18,
-            padding:8,
-            borderRadius:10,
-            border:`2px solid ${active?COLORS.primary:COLORS.border}`,
-            background:active?COLORS.primary+"0D":"#fff",
-            cursor:"pointer"
-          }}
-        >
-          <NFFigureGroundShape kind={kind} size={cellSize} selected={active}/>
-        </button>;
-      })}
-    </div>
-
-    <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",flexWrap:"wrap"}}>
-      <span style={{fontSize:".7rem",color:COLORS.textMuted}}>Seleccionadas: {selected.length}</span>
-      <BtnPrimary onClick={finishTrial}>Confirmar búsqueda</BtnPrimary>
-    </div>
-  </AssessmentTaskShell>;
-}
-
-function EvaluationV2Phase37Block({ paciente, onExit }) {
-  const [step,setStep]=useState(0);const [results,setResults]=useState([]);
-  const push=r=>{setResults(x=>[...x,r]);setStep(s=>s+1)};
-  if(step===0)return <NFE18PlanningRoute paciente={paciente} onDone={push}/>;
-  if(step===1)return <NFE19FunctionalSequence paciente={paciente} onDone={push}/>;
-  if(step===2)return <NFE20MentalRotation paciente={paciente} onDone={push}/>;
-  if(step===3)return <NFE21Construction paciente={paciente} onDone={push}/>;
-  if(step===4)return <NFE22VisualClosure paciente={paciente} onDone={push}/>;
-  if(step===5)return <NFE23FigureGround paciente={paciente} onDone={push}/>;
-  return <div style={{maxWidth:860,margin:"0 auto"}}><Card>
-    <div style={{fontSize:".7rem",fontWeight:800,color:COLORS.primary,letterSpacing:".06em"}}>FASE 37 · EJECUTIVO, VISUOESPACIAL Y GNÓSICO</div>
-    <h2 style={{margin:"6px 0"}}>NF-E18 a NF-E23 completados</h2>
-    <p style={{color:COLORS.textMuted,lineHeight:1.6,fontSize:".82rem"}}>Se registraron planificación, secuenciación, rotación mental, organización visuoconstructiva, cierre visual y figura-fondo. Este bloque sigue siendo de prueba y no se guarda todavía como línea base NF‑EVAL‑2.0.</p>
-    {results.map(r=><div key={r.taskId} style={{padding:"11px 0",borderBottom:`1px solid ${COLORS.border}`,display:"grid",gridTemplateColumns:"85px 1fr",gap:10}}><strong>{getAssessmentTaskDefinition(r.taskId)?.name || "Tarea completada"}</strong><span style={{fontSize:".78rem",color:COLORS.textSecond}}>Precisión: {r.metrics?.precision ?? "—"}% · Errores: {r.metrics?.errors ?? "—"}{r.metrics?.omissions!=null?` · Omisiones: ${r.metrics.omissions}`:""}{r.metrics?.commissions!=null?` · Comisiones: ${r.metrics.commissions}`:""}</span></div>)}
-    <BtnPrimary onClick={onExit} style={{width:"100%",marginTop:18}}>Volver a evaluación</BtnPrimary>
-  </Card></div>;
-}
-
-
-// ─── FASE 38 · NF-E24–NF-E27 · COGNICIÓN FUNCIONAL ─────────────────────────
-function NFE24OrganizeDay({ paciente, onDone }) {
-  const mayor=esModoMayor(paciente);
-  const scenarios=[
-    {
-      title:"Mañana con citas",
-      rules:["La cita médica es a las 10:00.","Debes desayunar antes de tomar el medicamento.","El trayecto hasta la cita tarda 30 minutos.","Debes llegar 15 minutos antes."],
-      options:[
-        "08:00 Desayunar → 08:30 medicamento → 09:15 salir → 09:45 llegar",
-        "09:30 salir → 10:00 desayunar → 10:15 cita → medicamento",
-        "08:30 medicamento → 09:00 desayunar → 09:45 salir → 10:15 llegar",
-        "09:45 salir → 09:50 desayunar → 10:00 cita → medicamento"
-      ],ans:0
-    },
-    {
-      title:"Tarde de diligencias",
-      rules:["El banco cierra a las 16:00.","La farmacia permanece abierta hasta las 20:00.","Debes recoger un documento antes de ir al banco.","Recoger el documento tarda 20 minutos."],
-      options:["Farmacia → banco → documento","Documento → banco → farmacia","Banco → farmacia → documento","Farmacia → documento → banco después de las 16:00"],ans:1
-    },
-    {
-      title:"Organizar una visita",
-      rules:["La visita llega a las 18:00.","La comida tarda 45 minutos en prepararse.","Quieres terminar de ordenar antes de cocinar.","Ordenar tarda 30 minutos."],
-      options:["17:30 ordenar → 18:00 cocinar","16:40 ordenar → 17:10 cocinar → 17:55 terminar","17:20 cocinar → 18:05 ordenar","18:00 ordenar → 18:30 cocinar"],ans:1
-    }
-  ];
-  const [idx,setIdx]=useState(0);
-  const rec=useRef([]);
-  const t=useRef(Date.now());
-
-  const pick=(i)=>{
-    const sc=scenarios[idx];
-    rec.current.push({correct:i===sc.ans,selectedIndex:i,correctIndex:sc.ans,rt:Date.now()-t.current});
-    if(idx+1>=scenarios.length){
-      const rs=rec.current,ok=rs.filter(r=>r.correct).length;
-      onDone(nfTaskResult("NF-E24",{
-        precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,
-        attempts:rs.length,selfCorrections:0,
-        meanResponseMs:meanNum(rs.map(r=>r.rt)),
-        medianResponseMs:medianNum(rs.map(r=>r.rt)),
-        taskVersionAdministered:"NF-E24-2.0"
-      },{notes:"Versión 2.0: cada escenario registra una única respuesta inicial y no ofrece retroalimentación correctiva durante la evaluación. Describe planificación funcional simulada dentro de NeuroFlex."}));
-    }else{
-      setIdx(i=>i+1);t.current=Date.now();
-    }
-  };
-  const sc=scenarios[idx];
-  return <AssessmentTaskShell taskId="NF-E24" paciente={paciente} note="Versión 2.0: se registra la primera elección en cada escenario, sin indicar durante la evaluación si fue correcta o incorrecta.">
-    <Badge label={`ESCENARIO ${idx+1}/${scenarios.length}`} color={COLORS.primary}/>
-    <h3 style={{margin:"12px 0 8px"}}>{sc.title}</h3>
-    <div style={{padding:mayor?16:13,borderRadius:10,background:COLORS.bg}}>
-      {sc.rules.map((r,i)=><div key={i} style={{margin:"5px 0",fontSize:mayor?".98rem":".82rem"}}>• {r}</div>)}
-    </div>
-    <p style={{fontWeight:700}}>¿Cuál plan cumple mejor todas las condiciones?</p>
-    <div style={{display:"grid",gap:8}}>{sc.options.map((o,i)=><button key={i} onClick={()=>pick(i)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",textAlign:"left",lineHeight:1.5,fontWeight:620}}>{o}</button>)}</div>
-  </AssessmentTaskShell>;
-}
-
-function NFE25SmartShopping({ paciente, onDone }) {
-  const cases=[
-    {budget:30,need:"1 pan, 2 leches y 1 fruta",options:[
-      {label:"Pan $8 + 2 leches de $9 + fruta $6",cost:32,valid:false},
-      {label:"Pan $6 + 1 leche $7 + fruta $5",cost:18,valid:false},
-      {label:"Pan $6 + 2 leches de $7 + fruta $5",cost:25,valid:true},
-      {label:"2 panes $12 + 2 leches $14 + fruta $7",cost:33,valid:false}],ans:2},
-    {budget:50,need:"2 productos de aseo y 1 alimento",options:[
-      {label:"Jabón $12 + arroz $10 + pasta $8",cost:30,valid:false},
-      {label:"Jabón $12 + champú $24 + arroz $10",cost:46,valid:true},
-      {label:"Champú $30 + crema $25 + arroz $10",cost:65,valid:false},
-      {label:"Arroz $10 + pasta $8 + pan $6",cost:24,valid:false}],ans:1},
-    {budget:40,need:"1 bebida, 1 alimento y conservar al menos $8",options:[
-      {label:"Bebida $14 + alimento $20",cost:34,valid:false},
-      {label:"Dos bebidas $18",cost:18,valid:false},
-      {label:"Alimento $25 + bebida $10",cost:35,valid:false},
-      {label:"Bebida $9 + alimento $18",cost:27,valid:true}],ans:3}
-  ];
-  const [idx,setIdx]=useState(0);
-  const rec=useRef([]);
-  const t=useRef(Date.now());
-
-  const pick=(i)=>{
-    const c=cases[idx],correct=i===c.ans;
-    rec.current.push({correct,rt:Date.now()-t.current,selectedIndex:i,correctIndex:c.ans});
-    if(idx+1>=cases.length){
-      const rs=rec.current,ok=rs.filter(r=>r.correct).length;
-      onDone(nfTaskResult("NF-E25",{
-        precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,
-        attempts:rs.length,
-        meanResponseMs:meanNum(rs.map(r=>r.rt)),
-        taskVersionAdministered:"NF-E25-2.0"
-      },{
-        notes:"Versión 2.0 con posiciones correctas balanceadas entre alternativas. Simulación con precios ficticios y restricciones originales NeuroFlex. No equivale a desempeño financiero cotidiano."
-      }));
-    }else{
-      setIdx(i=>i+1);
-      t.current=Date.now();
-    }
-  };
-
-  const c=cases[idx];
-  return <AssessmentTaskShell taskId="NF-E25" paciente={paciente} note="Versión 2.0: los precios son ficticios y la posición de la respuesta correcta varía entre casos para reducir sesgo por ubicación.">
-    <Badge label={`PRESUPUESTO FICTICIO $${c.budget}`} color={COLORS.info}/>
-    <p style={{fontWeight:750,lineHeight:1.6}}>Necesitas: {c.need}.</p>
-    <p style={{fontSize:".78rem",color:COLORS.textMuted}}>Elige la opción que cumple todas las condiciones sin superar el presupuesto.</p>
-    <div style={{display:"grid",gap:8}}>{c.options.map((o,i)=><button key={i} onClick={()=>pick(i)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",textAlign:"left",fontWeight:620}}>{o.label}</button>)}</div>
-  </AssessmentTaskShell>;
-}
-
-function NFE26FollowInstructionsCore({ paciente, onDone }) {
-  const mayor=esModoMayor(paciente);
-  const tasks=[
-    {instruction:"Primero toca CÍRCULO, después CUADRADO y al final TRIÁNGULO.",expected:["CÍRCULO","CUADRADO","TRIÁNGULO"],buttons:["TRIÁNGULO","CÍRCULO","CUADRADO"]},
-    {instruction:"Toca AZUL, luego VERDE, vuelve a AZUL y termina en ROJO.",expected:["AZUL","VERDE","AZUL","ROJO"],buttons:["ROJO","VERDE","AZUL"]},
-    {instruction:"Empieza por 2, continúa con 4, después 1 y termina con 3.",expected:["2","4","1","3"],buttons:["1","2","3","4"]}
-  ];
-  const [idx,setIdx]=useState(0);
-  const [seq,setSeq]=useState([]);
-  const [edits,setEdits]=useState(0);
-  const rec=useRef([]);
-  const t=useRef(Date.now());
-
-  const press=x=>setSeq(s=>s.length<tasks[idx].expected.length?[...s,x]:s);
-  const undo=()=>{
-    if(!seq.length)return;
-    setSeq(s=>s.slice(0,-1));
-    setEdits(e=>e+1);
-  };
-  const confirm=()=>{
-    const task=tasks[idx],exp=task.expected;
-    const omissions=Math.max(0,exp.length-seq.length);
-    const compareLen=Math.min(seq.length,exp.length);
-    const sequenceErrors=Array.from({length:compareLen},(_,i)=>seq[i]!==exp[i]?1:0).reduce((a,b)=>a+b,0);
-    const correct=omissions===0&&sequenceErrors===0;
-    rec.current.push({correct,sequenceErrors,omissions,selfCorrections:edits,rt:Date.now()-t.current});
-    if(idx+1>=tasks.length){
-      const rs=rec.current,ok=rs.filter(r=>r.correct).length;
-      onDone(nfTaskResult("NF-E26",{
-        precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,
-        sequenceErrors:rs.reduce((s,r)=>s+r.sequenceErrors,0),
-        omissions:rs.reduce((s,r)=>s+r.omissions,0),
-        selfCorrections:rs.reduce((s,r)=>s+r.selfCorrections,0),
-        meanResponseMs:meanNum(rs.map(r=>r.rt)),
-        medianResponseMs:medianNum(rs.map(r=>r.rt)),
-        taskVersionAdministered:"NF-E26-2.0"
-      },{notes:"Versión 2.0: registra secuencia confirmada, omisiones y autocorrecciones mediante deshacer. Los errores pueden relacionarse con comprensión, mantenimiento o ejecución y requieren interpretación profesional."}));
-    }else{
-      setIdx(i=>i+1);setSeq([]);setEdits(0);t.current=Date.now();
-    }
-  };
-  const task=tasks[idx];
-  return <AssessmentTaskShell taskId="NF-E26" paciente={paciente} note="Versión 2.0: construye la secuencia y confirma cuando hayas terminado. Puedes deshacer el último toque antes de confirmar.">
-    <Badge label={`INSTRUCCIÓN ${idx+1}/${tasks.length}`} color={COLORS.primary}/>
-    <div style={{padding:mayor?18:16,borderRadius:10,background:COLORS.bg,fontWeight:750,lineHeight:1.7,margin:"14px 0",fontSize:mayor?"1rem":".88rem"}}>{task.instruction}</div>
-    <div style={{display:"grid",gridTemplateColumns:`repeat(${Math.min(4,task.buttons.length)},1fr)`,gap:9}}>
-      {task.buttons.map(x=><button key={x} onClick={()=>press(x)} disabled={seq.length>=task.expected.length} style={{padding:15,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontWeight:800}}>{x}</button>)}
-    </div>
-    <div style={{margin:"14px 0",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,minHeight:48}}>
-      <div style={{fontSize:".7rem",color:COLORS.textMuted,marginBottom:5}}>Secuencia construida</div>
-      <strong>{seq.length?seq.join(" → "):"Aún no has seleccionado pasos"}</strong>
-    </div>
-    <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-      <BtnSecondary onClick={undo} disabled={!seq.length}>Deshacer último</BtnSecondary>
-      <BtnPrimary onClick={confirm}>Confirmar secuencia</BtnPrimary>
-    </div>
-    <p style={{fontSize:".72rem",color:COLORS.textMuted}}>Pasos seleccionados: {seq.length}/{task.expected.length} · autocorrecciones: {edits}</p>
-  </AssessmentTaskShell>;
-}
-
-function NFE27FunctionalProspectiveCore({ paciente, onDone }) {
-  const [phase,setPhase]=useState("encode");
-  const [confirmed,setConfirmed]=useState(false);
-  const [mini,setMini]=useState(0);
-  const encodedAt=useRef(null);
-  const eventStart=useRef(null);
-  const miniErrors=useRef(0);
-
-  const miniItems=[
-    {q:"Una cita es a las 15:00 y el trayecto tarda 20 minutos. ¿Cuál salida es más segura?",opts:["14:30","14:55"],ans:0},
-    {q:"Tienes $20 y compras algo de $12. ¿Cuánto queda?",opts:["$8","$10"],ans:0},
-    {q:"Si debes llamar después de terminar una tarea, ¿qué ocurre primero?",opts:["Terminar la tarea","Hacer la llamada"],ans:0}
-  ];
-
-  const chooseMini=(i)=>{
-    if(i!==miniItems[mini].ans){
-      miniErrors.current+=1;
-      return;
-    }
-    if(mini+1<miniItems.length)setMini(x=>x+1);
-    else{
-      setPhase("event");
-      eventStart.current=Date.now();
-    }
-  };
-
-  const finish=(spontaneous,cued=0)=>{
-    onDone(nfTaskResult("NF-E27",{
-      spontaneousRecall:spontaneous?1:0,
-      cuedRecall:cued,
-      correct:spontaneous||cued?1:0,total:1,errors:spontaneous||cued?0:1,
-      latencyMs:eventStart.current?Date.now()-eventStart.current:null,
-      taskVersionAdministered:"NF-E27-2.0"
-    },{
-      notes:`Versión 2.0. Intención mantenida durante ${encodedAt.current?Math.round((Date.now()-encodedAt.current)/1000):0} s. La señal de evento no mostró un botón textual con la respuesta. Errores en actividad intermedia: ${miniErrors.current}. La recuperación con clave verificó el contenido de la intención.`
-    }));
-  };
-
-  if(phase==="encode")return <AssessmentTaskShell taskId="NF-E27" paciente={paciente} note="Versión 2.0: se registra una intención antes de una actividad intermedia y se comprueba posteriormente sin mostrar el nombre de la acción en el evento.">
-    <div style={{textAlign:"center"}}>
-      <Badge label="PENDIENTE PARA DESPUÉS" color={COLORS.warning}/>
-      <p style={{fontWeight:750,lineHeight:1.7}}>Cuando más adelante aparezca un <strong>sobre ✉</strong>, recuerda <strong>tocar el sobre</strong> para registrar el pendiente.</p>
-      <label style={{display:"flex",justifyContent:"center",gap:8,margin:18}}><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/> Comprendí el pendiente</label>
-      <BtnPrimary disabled={!confirmed} onClick={()=>{encodedAt.current=Date.now();setPhase("distractor")}}>Continuar</BtnPrimary>
-    </div>
-  </AssessmentTaskShell>;
-
-  if(phase==="distractor"){
-    const m=miniItems[mini];
-    return <AssessmentTaskShell taskId="NF-E27" paciente={paciente} note="Actividad intermedia para mantener otra demanda mientras permanece una intención futura.">
-      <p style={{fontWeight:750}}>{m.q}</p>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
-        {m.opts.map((o,i)=><button key={i} onClick={()=>chooseMini(i)} style={{padding:14,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontWeight:700}}>{o}</button>)}
-      </div>
-    </AssessmentTaskShell>;
-  }
-
-  if(phase==="event")return <AssessmentTaskShell taskId="NF-E27" paciente={paciente} note="Se observa si la intención se ejecuta espontáneamente ante la señal prevista. El sobre es la señal y también el objetivo táctil; no aparece una etiqueta textual que revele la respuesta.">
-    <div style={{textAlign:"center"}}>
-      <p style={{fontWeight:700}}>Has terminado la actividad.</p>
-      <button
-        type="button"
-        aria-label="Sobre"
-        onClick={()=>finish(true,0)}
-        style={{display:"block",margin:"22px auto",fontSize:"4.2rem",background:"transparent",border:"none",cursor:"pointer",padding:14,borderRadius:16}}
-      >✉</button>
-      <BtnSecondary onClick={()=>setPhase("cue")}>Continuar</BtnSecondary>
-    </div>
-  </AssessmentTaskShell>;
-
-  if(phase==="cue")return <AssessmentTaskShell taskId="NF-E27" paciente={paciente} note="Primera clave general: pregunta si existía una intención, sin revelar su contenido.">
-    <div style={{textAlign:"center"}}>
-      <p style={{fontWeight:750}}>¿Había algo que debías hacer cuando apareciera una señal durante esta actividad?</p>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,maxWidth:420,margin:"18px auto"}}>
-        <BtnPrimary onClick={()=>setPhase("cue_content")}>Sí</BtnPrimary>
-        <BtnSecondary onClick={()=>finish(false,0)}>No</BtnSecondary>
-      </div>
-    </div>
-  </AssessmentTaskShell>;
-
-  return <AssessmentTaskShell taskId="NF-E27" paciente={paciente} note="La segunda comprobación verifica si la persona recuerda el contenido de la intención y no solo que existía un pendiente.">
-    <div style={{textAlign:"center"}}>
-      <p style={{fontWeight:750}}>¿Qué debías hacer cuando apareciera el sobre?</p>
-      <div style={{display:"grid",gap:9,maxWidth:460,margin:"18px auto"}}>
-        <BtnPrimary onClick={()=>finish(false,1)}>Tocar el sobre para registrar el pendiente</BtnPrimary>
-        <BtnSecondary onClick={()=>finish(false,0)}>Solo mirar el sobre</BtnSecondary>
-        <BtnSecondary onClick={()=>finish(false,0)}>Esperar sin hacer nada</BtnSecondary>
-      </div>
-    </div>
-  </AssessmentTaskShell>;
-}
-
-
-// Wrappers F61: mantienen intacto el motor puntuado y añaden preparación no puntuable.
-function NFE05Interference(props) {
-  return <F61EvaluationGate taskId="NF-E05" paciente={props.paciente}><NFE05InterferenceCore {...props}/></F61EvaluationGate>;
-}
-
-function NFE07ActiveSpan(props) {
-  return <F61EvaluationGate taskId="NF-E07" paciente={props.paciente}><NFE07ActiveSpanCore {...props}/></F61EvaluationGate>;
-}
-
-function NFE08SpatialSpan(props) {
-  return <F61EvaluationGate taskId="NF-E08" paciente={props.paciente}><NFE08SpatialSpanCore {...props}/></F61EvaluationGate>;
-}
-
-function NFE18PlanningRoute(props) {
-  return <F61EvaluationGate taskId="NF-E18" paciente={props.paciente}><NFE18PlanningRouteCore {...props}/></F61EvaluationGate>;
-}
-
 function NFE21Construction(props) {
   return <F61EvaluationGate taskId="NF-E21" paciente={props.paciente}><NFE21ConstructionCore {...props}/></F61EvaluationGate>;
 }
@@ -7614,20 +7083,23 @@ function makeFullAssessmentRecordV2({ taskResults, familiarization, pauses, inte
   };
 }
 
-function AssessmentPauseScreen({ number, total, onContinue }) {
+function AssessmentPauseScreen({ number, total, onContinue, onSaveForLater }) {
   const started=useRef(Date.now());
-  const [note,setNote]=useState("");
-  return <div style={{maxWidth:680,margin:"0 auto"}}><Card style={{textAlign:"center",padding:34}}>
+  const pauseData=()=>({
+    pauseNumber:number,
+    durationMs:Date.now()-started.current,
+    interruptionNote:"",
+    recordedAt:new Date().toISOString(),
+  });
+  return <div style={{maxWidth:700,margin:"0 auto"}}><Card style={{textAlign:"center",padding:38}}>
     <div className="nf-task-ready-mark"><NFIcon name="clock" size={26}/></div>
-    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,letterSpacing:".05em"}}>PAUSA {number}/{total}</div>
-    <h2 style={{margin:"7px 0"}}>Pausa entre bloques</h2>
-    <p style={{color:COLORS.textMuted,lineHeight:1.6,fontSize:".84rem"}}>Puedes descansar unos minutos. Cuando te sientas listo para continuar, pulsa el botón.</p>
-    <BtnPrimary onClick={()=>onContinue({
-      pauseNumber:number,
-      durationMs:Date.now()-started.current,
-      interruptionNote:note.trim() || "",
-      recordedAt:new Date().toISOString(),
-    })} style={{width:"100%",padding:13}}>Continuar evaluación</BtnPrimary>
+    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary}}>Pausa {number} de {total}</div>
+    <h2 style={{margin:"8px 0"}}>Pausa entre bloques</h2>
+    <p style={{color:COLORS.textMuted,lineHeight:1.7,fontSize:".9rem",maxWidth:560,margin:"0 auto 22px"}}>Puedes descansar y continuar hoy, o guardar el progreso para retomar la evaluación en la próxima cita.</p>
+    <div style={{display:"grid",gridTemplateColumns:onSaveForLater?"1fr 1fr":"1fr",gap:11}}>
+      {onSaveForLater&&<BtnSecondary onClick={()=>onSaveForLater(pauseData())} style={{padding:13}}>Guardar y continuar en otra cita</BtnSecondary>}
+      <BtnPrimary onClick={()=>onContinue(pauseData())} style={{padding:13}}>Continuar evaluación</BtnPrimary>
+    </div>
   </Card></div>;
 }
 
@@ -7784,12 +7256,40 @@ function NFE31SocialCognition({ paciente, onDone }) {
 }
 
 function NFE32Metacognition({ paciente, onDone }) {
-  const items=[{q:"Si todos los tulos son verdes y este objeto es un tulo, ¿es verde?",a:true},{q:"¿Cuál continúa? 2, 4, 6, 8, 11",a:false},{q:"Si hoy es martes, ¿pasado mañana es jueves?",a:true},{q:"¿15 es menor que 9?",a:false}];
-  const [idx,setIdx]=useState(0);const [answer,setAnswer]=useState(null);const rec=useRef([]);
-  const confidence=(c)=>{const ok=answer===items[idx].a;rec.current.push({ok,confidence:c});setAnswer(null);if(idx+1>=items.length){const rs=rec.current,correct=rs.filter(x=>x.ok).length;const calibration=Math.round(rs.reduce((a,x)=>a+Math.abs((x.ok?100:0)-x.confidence),0)/rs.length);onDone(nfTaskResult("NF-E32",{precision:pctSafe(correct,rs.length),correct,total:rs.length,errors:rs.length-correct,selfCorrections:0,taskVersionAdministered:"NF-E32-1.0"},{notes:`Error medio absoluto de calibración confianza-exactitud: ${calibration} puntos; descriptor interno, no normativo.`}))}else setIdx(i=>i+1)};
-  return <AssessmentTaskShell taskId="NF-E32" paciente={paciente}><p style={{fontWeight:700,textAlign:"center"}}>{items[idx].q}</p>{answer===null?<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:400,margin:"20px auto"}}><BtnSecondary onClick={()=>setAnswer(false)}>NO</BtnSecondary><BtnPrimary onClick={()=>setAnswer(true)}>SÍ</BtnPrimary></div>:<div><p style={{textAlign:"center",fontWeight:700}}>¿Qué tan seguro estás de tu respuesta?</p><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,maxWidth:480,margin:"0 auto"}}>{[[25,"Poco"],[60,"Bastante"],[95,"Muy seguro"]].map(([v,l])=><BtnSecondary key={v} onClick={()=>confidence(v)}>{l}</BtnSecondary>)}</div></div>}</AssessmentTaskShell>;
+  const mayor=esModoMayor(paciente);
+  const items=[
+    {q:"Si todos los tulos son verdes y este objeto es un tulo, ¿de qué color es?",opts:["Verde","Azul","No se puede saber"],a:0},
+    {q:"¿Cuál número continúa? 2, 4, 6, 8…",opts:["9","10","11"],a:1},
+    {q:"Si hoy es martes, ¿qué día será pasado mañana?",opts:["Miércoles","Jueves","Viernes"],a:1},
+    {q:"¿Cuál número es menor?",opts:["15","9","Son iguales"],a:1},
+  ];
+  const [idx,setIdx]=useState(0);const [answer,setAnswer]=useState(null);const rec=useRef([]),locked=useRef(false);
+  const confidence=(c)=>{
+    if(locked.current)return;locked.current=true;
+    const ok=answer===items[idx].a;rec.current.push({ok,confidence:c});
+    if(idx+1>=items.length){
+      const rs=rec.current,correct=rs.filter(x=>x.ok).length;
+      const calibration=Math.round(rs.reduce((a,x)=>a+Math.abs((x.ok?100:0)-x.confidence),0)/rs.length);
+      onDone(nfTaskResult("NF-E32",{precision:pctSafe(correct,rs.length),correct,total:rs.length,errors:rs.length-correct,selfCorrections:0,taskVersionAdministered:"NF-E32-1.1"},{notes:`Error medio absoluto de calibración confianza-exactitud: ${calibration} puntos; descriptor interno, no normativo.`}));
+    }else setTimeout(()=>{setAnswer(null);setIdx(i=>i+1);locked.current=false},250);
+  };
+  const item=items[idx];
+  return <AssessmentTaskShell taskId="NF-E32" paciente={paciente}>
+    {answer===null?<div>
+      <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:12}}>Primero responde la pregunta</div>
+      <p style={{fontWeight:750,textAlign:"center",fontSize:mayor?"1.18rem":"1.04rem"}}>{item.q}</p>
+      <div style={{display:"grid",gap:11,maxWidth:540,margin:"24px auto 0"}}>
+        {item.opts.map((o,i)=><button key={o} onClick={()=>setAnswer(i)} style={{minHeight:mayor?70:62,padding:13,borderRadius:11,border:`1.5px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:750,fontSize:mayor?"1rem":".9rem"}}>{o}</button>)}
+      </div>
+    </div>:<div>
+      <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:12}}>Ahora valora tu seguridad</div>
+      <p style={{textAlign:"center",fontWeight:750,fontSize:mayor?"1.15rem":"1rem"}}>¿Qué tan seguro estás de la respuesta que acabas de dar?</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:560,margin:"24px auto 0"}}>
+        {[[25,"Poco seguro"],[60,"Bastante seguro"],[95,"Muy seguro"]].map(([v,l])=><BtnSecondary disabled={locked.current} key={v} onClick={()=>confidence(v)}>{l}</BtnSecondary>)}
+      </div>
+    </div>}
+  </AssessmentTaskShell>;
 }
-
 function NFE33PraxiasProfessional({ paciente, onDone }) {
   const items=["Muestra cómo usarías un peine, sin tener uno en la mano.","Haz el gesto de despedirte de alguien.","Muestra con gestos cómo abrirías una puerta con una llave.","Representa en orden cómo prepararías y beberías una taza de café o té."];
   const [idx,setIdx]=useState(0);const [records,setRecords]=useState([]);
@@ -7798,15 +7298,54 @@ function NFE33PraxiasProfessional({ paciente, onDone }) {
 }
 
 function NFE34VisualLearning({ paciente, onDone }) {
-  const targets=["●▲","■◆","▲□","◆○","○■","□●"]; const distractors=["●■","■▲","▲◆","◆□","○▲","□◆"];
-  const [phase,setPhase]=useState("study1");const [seconds,setSeconds]=useState(7);const [selected,setSelected]=useState([]);const [blocks,setBlocks]=useState([]);
-  useEffect(()=>{if(!phase.startsWith("study"))return;const tm=setInterval(()=>setSeconds(x=>{if(x<=1){clearInterval(tm);setPhase(phase==="study1"?"recall1":"recognition");return 0}return x-1}),1000);return()=>clearInterval(tm)},[phase]);
-  const recall1=()=>{const hits=selected.filter(x=>targets.includes(x)).length;setBlocks([pctSafe(hits,targets.length)]);setSelected([]);setSeconds(7);setPhase("study2")};
-  const finish=()=>{const hits=selected.filter(x=>targets.includes(x)).length,fa=selected.filter(x=>distractors.includes(x)).length;onDone(nfTaskResult("NF-E34",{precision:pctSafe(hits,targets.length+fa),correct:hits,total:targets.length,errors:(targets.length-hits)+fa,falseAlarms:fa,blockPerformance:[...blocks,pctSafe(hits,targets.length)],retentionRate:pctSafe(hits,targets.length),taskVersionAdministered:"NF-E34-1.0"}))};
-  const pool=[...targets,...distractors];
-  return <AssessmentTaskShell taskId="NF-E34" paciente={paciente}>{phase.startsWith("study")?<div style={{textAlign:"center"}}><Badge label={`MEMORIZA · ${seconds}s`} color={COLORS.primary}/><p>Observa estas configuraciones.</p><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:430,margin:"20px auto"}}>{targets.map(x=><div key={x} style={{padding:18,border:`1px solid ${COLORS.border}`,borderRadius:10,fontSize:"1.8rem"}}>{x}</div>)}</div></div>:<div><p style={{textAlign:"center",fontWeight:700}}>{phase==="recall1"?"Selecciona las configuraciones que recuerdas.":"Selecciona únicamente las configuraciones que viste."}</p><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:9,maxWidth:460,margin:"15px auto"}}>{pool.map(x=><button key={x} onClick={()=>setSelected(a=>a.includes(x)?a.filter(y=>y!==x):[...a,x])} style={{padding:16,borderRadius:10,border:`2px solid ${selected.includes(x)?COLORS.primary:COLORS.border}`,background:"#fff",fontSize:"1.6rem"}}>{x}</button>)}</div><BtnPrimary onClick={phase==="recall1"?recall1:finish} style={{display:"block",margin:"12px auto"}}>Confirmar</BtnPrimary></div>}</AssessmentTaskShell>;
+  const mayor=esModoMayor(paciente);
+  const stages=[
+    {targets:["●▲","■◆","▲□"],distractors:["●■","■▲","▲◆"],seconds:7},
+    {targets:["●▲","■◆","▲□","◆○"],distractors:["●■","■▲","▲◆","◆□"],seconds:8},
+    {targets:["●▲","■◆","▲□","◆○","○■","□●"],distractors:["●■","■▲","▲◆","◆□","○▲","□◆"],seconds:9},
+  ];
+  const [stage,setStage]=useState(0),[phase,setPhase]=useState("study"),[seconds,setSeconds]=useState(stages[0].seconds),[selected,setSelected]=useState([]);
+  const blocks=useRef([]),doneRef=useRef(false);
+  const current=stages[stage];
+  useEffect(()=>{
+    if(phase!=="study")return;
+    const tm=setInterval(()=>setSeconds(x=>{if(x<=1){clearInterval(tm);setPhase("recognition");return 0}return x-1}),1000);
+    return()=>clearInterval(tm);
+  },[phase,stage]);
+  const confirm=()=>{
+    if(doneRef.current)return;
+    const hits=selected.filter(x=>current.targets.includes(x)).length;
+    const fa=selected.filter(x=>current.distractors.includes(x)).length;
+    blocks.current.push({stage:stage+1,targetCount:current.targets.length,hits,falseAlarms:fa,precision:pctSafe(hits,current.targets.length+fa)});
+    if(stage+1<stages.length){
+      setStage(x=>x+1);setSelected([]);setSeconds(stages[stage+1].seconds);setPhase("study");
+    }else{
+      doneRef.current=true;
+      const last=blocks.current[blocks.current.length-1],totalTargets=blocks.current.reduce((a,b)=>a+b.targetCount,0),totalHits=blocks.current.reduce((a,b)=>a+b.hits,0),totalFA=blocks.current.reduce((a,b)=>a+b.falseAlarms,0);
+      onDone(nfTaskResult("NF-E34",{precision:pctSafe(totalHits,totalTargets+totalFA),correct:totalHits,total:totalTargets,errors:(totalTargets-totalHits)+totalFA,falseAlarms:totalFA,blockPerformance:blocks.current.map(x=>x.precision),retentionRate:last?.precision??null,taskVersionAdministered:"NF-E34-1.1"},{notes:"Aprendizaje visual progresivo en tres niveles: 3, 4 y 6 configuraciones objetivo, con aumento gradual de carga visual y distractores."}));
+    }
+  };
+  const pool=[...current.targets,...current.distractors];
+  return <AssessmentTaskShell taskId="NF-E34" paciente={paciente}>
+    <div style={{textAlign:"center",marginBottom:12}}>
+      <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary}}>Nivel {stage+1} de {stages.length}</div>
+      <div style={{fontSize:".78rem",color:COLORS.textMuted,marginTop:3}}>{stage===0?"Empezamos con pocas figuras.":stage===1?"Ahora aumenta un poco la cantidad.":"Último nivel: mayor cantidad de información visual."}</div>
+    </div>
+    {phase==="study"?<div style={{textAlign:"center"}}>
+      <Badge label={`Memoriza · ${seconds}s`} color={COLORS.primary}/>
+      <p style={{fontWeight:750}}>Observa estas configuraciones.</p>
+      <div style={{display:"grid",gridTemplateColumns:current.targets.length<=4?"repeat(2,1fr)":"repeat(3,1fr)",gap:mayor?14:12,maxWidth:current.targets.length<=4?430:560,margin:"24px auto"}}>
+        {current.targets.map(x=><div key={x} style={{minHeight:mayor?92:80,padding:18,border:`1.5px solid ${COLORS.border}`,borderRadius:11,fontSize:mayor?"2rem":"1.8rem",display:"flex",alignItems:"center",justifyContent:"center"}}>{x}</div>)}
+      </div>
+    </div>:<div>
+      <p style={{textAlign:"center",fontWeight:750}}>Selecciona únicamente las configuraciones que viste.</p>
+      <div style={{display:"grid",gridTemplateColumns:pool.length<=8?"repeat(2,1fr)":"repeat(3,1fr)",gap:mayor?13:11,maxWidth:pool.length<=8?520:620,margin:"26px auto"}}>
+        {pool.map(x=><button key={x} onClick={()=>setSelected(a=>a.includes(x)?a.filter(y=>y!==x):[...a,x])} style={{minHeight:mayor?86:74,padding:16,borderRadius:11,border:`2px solid ${selected.includes(x)?COLORS.primary:COLORS.border}`,background:selected.includes(x)?COLORS.primary+"08":"#fff",fontSize:mayor?"1.85rem":"1.65rem"}}>{x}</button>)}
+      </div>
+      <BtnPrimary onClick={confirm} style={{display:"block",margin:"16px auto 0",minWidth:180}}>Confirmar</BtnPrimary>
+    </div>}
+  </AssessmentTaskShell>;
 }
-
 
 // ─── F62.2 · EVALUACIÓN PERSONALIZADA POR DOMINIOS ───────────────────────────
 const NEUROFLEX_PHASE62_2_PERSONALIZED = {
@@ -8643,7 +8182,7 @@ function PersonalizedAssessmentProtocolV2({ paciente, familiarization, selection
   return wrapper(<Comp paciente={paciente} onDone={pushResult}/>);
 }
 
-function EvaluationV2FullProtocol({ paciente, familiarization, onSave, onExit }) {
+function EvaluationV2FullProtocol({ paciente, familiarization, onSave, onExit, resumeDraft, onSaveDraft }) {
   const protocol=[
     {type:"task",id:"NF-E01"},
     {type:"task",id:"NF-E02"},
@@ -8725,14 +8264,14 @@ function EvaluationV2FullProtocol({ paciente, familiarization, onSave, onExit })
     "NF-E34":NFE34VisualLearning,
   };
 
-  const [step,setStep]=useState(0);
-  const [taskResults,setTaskResults]=useState([]);
-  const [verbalMemory,setVerbalMemory]=useState(null);
-  const [prospective,setProspective]=useState(null);
-  const [pauses,setPauses]=useState([]);
-  const [interruptions,setInterruptions]=useState([]);
+  const [step,setStep]=useState(()=>resumeDraft?.assessmentMode==="full"?Math.min(resumeDraft.step||0,protocol.length-1):0);
+  const [taskResults,setTaskResults]=useState(()=>resumeDraft?.assessmentMode==="full"?(resumeDraft.taskResults||[]):[]);
+  const [verbalMemory,setVerbalMemory]=useState(()=>resumeDraft?.assessmentMode==="full"?(resumeDraft.verbalMemory||null):null);
+  const [prospective,setProspective]=useState(()=>resumeDraft?.assessmentMode==="full"?(resumeDraft.prospective||null):null);
+  const [pauses,setPauses]=useState(()=>resumeDraft?.assessmentMode==="full"?(resumeDraft.pauses||[]):[]);
+  const [interruptions,setInterruptions]=useState(()=>resumeDraft?.assessmentMode==="full"?(resumeDraft.interruptions||[]):[]);
   const [finalRecord,setFinalRecord]=useState(null);
-  const startedAt=useRef(new Date().toISOString());
+  const startedAt=useRef(resumeDraft?.startedAt || new Date().toISOString());
 
   const advance=()=>setStep(s=>s+1);
   const pushResult=(r)=>{
@@ -8771,11 +8310,23 @@ function EvaluationV2FullProtocol({ paciente, familiarization, onSave, onExit })
   const progress=Math.round((completed/34)*100);
 
   if(current.type==="pause"){
-    return <AssessmentPauseScreen number={current.number} total={4} onContinue={(data)=>{
-      setPauses(p=>[...p,data]);
-      if(data.interruptionNote) setInterruptions(x=>[...x,{...data,type:"pause_interruption"}]);
-      advance();
-    }}/>;
+    return <AssessmentPauseScreen number={current.number} total={4}
+      onSaveForLater={onSaveDraft?async(data)=>{
+        const nextPauses=[...pauses,data];
+        await onSaveDraft({
+          version:"NF-EVAL-DRAFT-1.0",assessmentMode:"full",step:step+1,
+          taskResults,verbalMemory,prospective,pauses:nextPauses,interruptions,
+          familiarization:familiarization||null,startedAt:startedAt.current,
+          savedAt:new Date().toISOString(),completedTaskCount:taskResults.filter(Boolean).length,totalTaskCount:34
+        });
+        onExit?.();
+      }:null}
+      onContinue={(data)=>{
+        setPauses(p=>[...p,data]);
+        if(data.interruptionNote) setInterruptions(x=>[...x,{...data,type:"pause_interruption"}]);
+        advance();
+      }}
+    />;
   }
 
   const wrapper=(child)=><div>
@@ -11533,7 +11084,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 }
 
 // ─── EVALUACIÓN COGNITIVA ADULTOS ────────────────────────────────────────────
-function EvaluacionAdulto({ paciente, onFinish, onCancel }) {
+function EvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }) {
   const dominios = Object.keys(DOMINIOS_ADULTO);
   const [domIdx, setDomIdx] = useState(0);
   const [exIdx, setExIdx] = useState(0);
@@ -11612,6 +11163,10 @@ function EvaluacionAdulto({ paciente, onFinish, onCancel }) {
         <div style={{textAlign:"center"}}>
           <div className="nf-eval-intro-mark"><NFIcon name="brain" size={31}/></div>
           <div className="nf-eval-eyebrow" style={{marginBottom:6}}>Evaluación NeuroFlex</div>
+          {paciente?.evaluationDraft?.assessmentMode==="full" && <div style={{margin:"0 auto 16px",maxWidth:560,padding:"12px 14px",borderRadius:11,border:`1px solid ${COLORS.primary}35`,background:COLORS.primary+"08",textAlign:"left"}}>
+            <div style={{fontWeight:800,fontSize:".84rem",color:COLORS.primary}}>Evaluación completa pendiente</div>
+            <div style={{fontSize:".76rem",color:COLORS.textMuted,marginTop:3}}>Hay {paciente.evaluationDraft.completedTaskCount||0} de 34 tareas guardadas. Al elegir la evaluación completa se retomará desde el siguiente bloque.</div>
+          </div>}
           <h2 style={{ fontWeight: 700, fontSize: "1.35rem", marginBottom: 8 }}>Elige la ruta de evaluación</h2>
           <p style={{ color: COLORS.textMuted, margin:"0 0 6px" }}>Paciente: <strong>{paciente.nombre}</strong></p>
           <p style={{ color: COLORS.textMuted, margin:"0 auto 22px", lineHeight: 1.6, fontSize: ".78rem",maxWidth:600 }}>
@@ -11766,7 +11321,9 @@ function EvaluacionAdulto({ paciente, onFinish, onCancel }) {
     <EvaluationV2FullProtocol
       paciente={paciente}
       familiarization={familiarization}
+      resumeDraft={paciente?.evaluationDraft?.assessmentMode==="full" ? paciente.evaluationDraft : null}
       onSave={onFinish}
+      onSaveDraft={onSaveDraft}
       onExit={() => setPhase("intro")}
     />
   );
@@ -14388,6 +13945,17 @@ function PerfilPaciente({ paciente: pacienteInit, onVolver, profesionalUid, onIn
     { id: "reportes", label: "Reportes" },
   ];
 
+  const saveEvaluationDraft = async (draft) => {
+    try {
+      await updateDoc(doc(firestore, "pacientes", paciente.id), { evaluationDraft: draft });
+      setPac({...paciente,evaluationDraft:draft});
+    } catch(e) {
+      console.error("Error guardando progreso de evaluación:", e);
+      alert("No se pudo guardar el progreso de la evaluación.");
+      throw e;
+    }
+  };
+
   const saveEval = async (evalData) => {
     try {
       const previousHistory = getEvaluationHistory(paciente);
@@ -14407,12 +13975,14 @@ function PerfilPaciente({ paciente: pacienteInit, onVolver, profesionalUid, onIn
         eval: preserveBaseline ? paciente.eval : normalized,
         evaluationHistory: nextHistory,
         activeEvaluationId: preserveBaseline ? paciente.activeEvaluationId : normalized.evaluationId,
+        ...(normalized.assessmentMode==="full" ? {evaluationDraft:null} : {}),
       };
 
       await updateDoc(doc(firestore, "pacientes", paciente.id), {
         eval: preserveBaseline ? (paciente.eval || null) : normalized,
         evaluationHistory: nextHistory,
         activeEvaluationId: preserveBaseline ? (paciente.activeEvaluationId || null) : normalized.evaluationId,
+        ...(normalized.assessmentMode==="full" ? {evaluationDraft:null} : {}),
       });
 
       setPac(updated);
@@ -14437,6 +14007,7 @@ function PerfilPaciente({ paciente: pacienteInit, onVolver, profesionalUid, onIn
     <EvaluacionAdulto
       paciente={paciente}
       onFinish={saveEval}
+      onSaveDraft={saveEvaluationDraft}
       onCancel={() => setShowEval(false)}
     />
   );
