@@ -1425,6 +1425,8 @@ const NEUROFLEX_RUNTIME_FIX_VERSION = "NF-RUNTIME-1.0";
 const NEUROFLEX_SCREENING_UX_VERSION = "NF-SCREEN-UX-1.0";
 const NEUROFLEX_EVAL_OVERLAY_VERSION = "NF-EVAL-SAFE-1.1";
 const NEUROFLEX_EVAL_SKIP_VERSION = "NF-EVAL-SKIP-1.0";
+const NEUROFLEX_SCREENING_RUNTIME_VERSION = "NF-SCREEN-RUNTIME-1.1";
+const NEUROFLEX_FULL_EVAL_RUNTIME_VERSION = "NF-FULL-RUNTIME-1.1";
 const NEUROFLEX_ASSESSMENT_SCHEMA_VERSION = 1;
 
 const NF_EVALUATION_SKIP_REASONS = [
@@ -9363,6 +9365,7 @@ function NFScreeningWorkingMemoryTrial({ paciente, onDone }) {
 }
 
 function NFScreeningMemoryBlock({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
   const words=["CASA","LIMÓN","TREN","NUBE","LLAVE","JARDÍN"];
   const [phase,setPhase]=useState("study");
   const [seconds,setSeconds]=useState(12);
@@ -9393,6 +9396,7 @@ function NFScreeningMemoryBlock({ paciente, onDone }) {
 }
 
 function NFScreeningDelayedMemory({ encodedWords, paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
   const [selected,setSelected]=useState([]);
   const pool=["CASA","MESA","LIMÓN","TREN","PERRO","NUBE","LLAVE","LIBRO","JARDÍN","VASO"];
   const targets=new Set(encodedWords||[]);
@@ -9417,6 +9421,7 @@ function NFScreeningDelayedMemory({ encodedWords, paciente, onDone }) {
 }
 
 function NFScreeningVisualMemory({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
   const targets=["●▲","■◆","▲□","◆○"];
   const pool=["●▲","■◆","▲□","◆○","●■","■▲","○◆","□▲"];
   const [phase,setPhase]=useState("study"),[seconds,setSeconds]=useState(8),[selected,setSelected]=useState([]);
@@ -9430,6 +9435,7 @@ function NFScreeningVisualMemory({ paciente, onDone }) {
 }
 
 function NFScreeningPraxias({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
   const items=["Haz el gesto de despedirte.","Muestra cómo usarías un peine sin tenerlo en la mano.","Representa cómo abrirías una puerta con una llave.","Muestra en orden cómo prepararías una bebida caliente."];
   const [idx,setIdx]=useState(0),rec=useRef([]);
   const rate=pass=>{rec.current.push(pass);if(idx+1>=items.length)onDone({observations:rec.current.map((x,i)=>({domainId:"praxias",pass:x,valid:true,source:"Observación práxica breve",itemId:`praxis${i+1}`}))});else setIdx(i=>i+1)};
@@ -9455,8 +9461,8 @@ class NFScreeningErrorBoundary extends React.Component {
           <div className="nf-task-ready-mark"><NFIcon name="alert" size={26}/></div>
           <h2 style={{margin:"8px 0"}}>No pudimos continuar este bloque</h2>
           <p style={{fontSize:".76rem",lineHeight:1.6,color:COLORS.textMuted}}>
-            Se produjo un error técnico dentro del tamizaje. La aplicación evitó dejar la pantalla en blanco.
-            Sal del tamizaje y vuelve a iniciarlo después de revisar la incidencia.
+            Se produjo un error técnico dentro de este bloque del tamizaje. La aplicación evitó dejar la pantalla en blanco.
+            El problema debe corregirse antes de continuar; no debe interpretarse como desempeño del paciente.
           </p>
           <div style={{padding:9,borderRadius:9,background:COLORS.bg,fontSize:".65rem",color:COLORS.textMuted,margin:"12px 0"}}>
             Incidencia técnica: {this.state.errorMessage}
@@ -9619,6 +9625,29 @@ function PersonalizedAssessmentProtocolV2({ paciente, familiarization, selection
   const startedAt=useRef(new Date().toISOString());
   const advance=()=>setStep(x=>x+1);
   const pushResult=r=>{setTaskResults(prev=>[...prev.filter(x=>x?.taskId!==r?.taskId),r]);advance()};
+  const taskUnavailable=(taskId)=>taskResults.some(r=>r?.taskId===taskId && (r?.technicalIncident || r?.skipped));
+  const skipTechnicalTask=(taskId)=>{
+    const def=getAssessmentTaskDefinition(taskId);
+    const date=new Date().toISOString();
+    const technicalResult={
+      taskId,
+      taskVersion:def?.version || "1.0",
+      taskVersionId:`${taskId}-${def?.version || "1.0"}`,
+      assessmentVersion:NEUROFLEX_ASSESSMENT_VERSION,
+      primaryDomain:def?.primaryDomain || null,
+      secondaryDomains:[...(def?.secondaryDomains || [])],
+      processes:[...(def?.processes || [])],
+      metrics:normalizeAssessmentMetrics({taskVersionAdministered:`${taskId}-${def?.version || "1.0"}`}),
+      requiresProfessionalReview:true,
+      technicalIncident:true,
+      notes:"Tarea no administrada/completada por incidencia técnica. No debe interpretarse como desempeño cognitivo.",
+      startedAt:null,
+      completedAt:date,
+    };
+    setInterruptions(x=>[...x,{type:"technical_task_incident",taskId,date}]);
+    setTaskResults(prev=>[...prev.filter(x=>x?.taskId!==taskId),technicalResult]);
+    advance();
+  };
   const skipAssessmentTask=(taskId,skipInfo)=>{
     const skippedResult=makeSkippedAssessmentTaskResult(taskId,skipInfo);
     setInterruptions(x=>[...x,{type:"evaluation_task_skipped",taskId,reason:skipInfo.reason,detail:skipInfo.detail || "",date:new Date().toISOString()}]);
@@ -9648,12 +9677,32 @@ function PersonalizedAssessmentProtocolV2({ paciente, familiarization, selection
   if(current.type==="pause")return <AssessmentPauseScreen number={current.number} total={current.total || 1} onContinue={data=>{setPauses(p=>[...p,data]);if(data.interruptionNote)setInterruptions(x=>[...x,{...data,type:"pause_interruption"}]);advance()}}/>;
 
   const wrapper=(child,skipTaskId=null)=><div><div style={{maxWidth:760,margin:"0 auto 12px"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:".72rem",color:COLORS.textMuted,marginBottom:6}}><span>Evaluación personalizada · {completed}/{taskIds.length} tareas registradas</span><span>{progress}%</span></div><ProgressBar value={progress} color={COLORS.primary}/></div>{child}{skipTaskId && <div style={{maxWidth:760,margin:"12px auto 0",display:"flex",justifyContent:"flex-end"}}><button type="button" onClick={()=>setSkipRequest({taskId:skipTaskId,taskName:ASSESSMENT_TASKS_V2[skipTaskId]?.name || "Actividad"})} style={{border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.textSecond,borderRadius:9,padding:"7px 11px",fontWeight:700,fontSize:".72rem"}}>Saltar actividad</button></div>}{skipRequest && <NFEvaluationSkipDialog taskName={skipRequest.taskName} onCancel={()=>setSkipRequest(null)} onConfirm={info=>skipAssessmentTask(skipRequest.taskId,info)}/>}</div>;
-  if(current.id==="NF-E09-encode")return wrapper(<NFE09LearningPhase paciente={paciente} onEncoded={data=>{setVerbalMemory(data);advance()}}/>);
-  if(current.id==="NF-E11-encode")return wrapper(<NFE11ProspectiveEncode paciente={paciente} onEncoded={data=>{setProspective(data);advance()}}/>);
-  if(current.id==="NF-E09-delayed")return wrapper(<NFE09DelayedPhase paciente={paciente} memoryData={verbalMemory} onDone={pushResult}/>);
-  if(current.id==="NF-E11-retrieve")return wrapper(<NFE11ProspectiveRetrieve paciente={paciente} prospectiveData={prospective} onDone={pushResult}/>);
+  if(current.id==="NF-E09-encode")return wrapper(<NFFullAssessmentErrorBoundary taskKey={current.id} onTechnicalSkip={()=>skipTechnicalTask("NF-E09")}><NFE09LearningPhase paciente={paciente} onEncoded={data=>{setVerbalMemory(data);advance()}}/></NFFullAssessmentErrorBoundary>);
+  if(current.id==="NF-E11-encode")return wrapper(<NFFullAssessmentErrorBoundary taskKey={current.id} onTechnicalSkip={()=>skipTechnicalTask("NF-E11")}><NFE11ProspectiveEncode paciente={paciente} onEncoded={data=>{setProspective(data);advance()}}/></NFFullAssessmentErrorBoundary>);
+  if(current.id==="NF-E09-delayed"){
+    if(taskUnavailable("NF-E09") || !verbalMemory)return wrapper(<Card style={{maxWidth:720,margin:"0 auto",textAlign:"center",padding:28}}><h3 style={{margin:"0 0 8px"}}>Memoria verbal diferida no administrable</h3><p style={{color:COLORS.textMuted,lineHeight:1.6}}>La fase inicial no quedó disponible. Esta fase se omitirá sin puntuarla como error.</p><BtnPrimary onClick={advance}>Continuar evaluación</BtnPrimary></Card>);
+    return wrapper(<NFFullAssessmentErrorBoundary taskKey={current.id} onTechnicalSkip={()=>skipTechnicalTask("NF-E09")}><NFE09DelayedPhase paciente={paciente} memoryData={verbalMemory} onDone={pushResult}/></NFFullAssessmentErrorBoundary>);
+  }
+  if(current.id==="NF-E11-retrieve"){
+    if(taskUnavailable("NF-E11") || !prospective)return wrapper(<Card style={{maxWidth:720,margin:"0 auto",textAlign:"center",padding:28}}><h3 style={{margin:"0 0 8px"}}>Memoria prospectiva no administrable</h3><p style={{color:COLORS.textMuted,lineHeight:1.6}}>La intención inicial no quedó registrada. Esta fase se omitirá sin interpretarla como fallo cognitivo.</p><BtnPrimary onClick={advance}>Continuar evaluación</BtnPrimary></Card>);
+    return wrapper(<NFFullAssessmentErrorBoundary taskKey={current.id} onTechnicalSkip={()=>skipTechnicalTask("NF-E11")}><NFE11ProspectiveRetrieve paciente={paciente} prospectiveData={prospective} onDone={pushResult}/></NFFullAssessmentErrorBoundary>);
+  }
   const Comp=components[current.id];
-  return wrapper(<Comp paciente={paciente} onDone={pushResult}/>,current.id);
+  if(!Comp){
+    return wrapper(<Card style={{maxWidth:720,margin:"0 auto",textAlign:"center",padding:28}}>
+      <h3 style={{margin:"0 0 8px"}}>Esta tarea necesita revisión técnica</h3>
+      <p style={{color:COLORS.textMuted,margin:"0 0 14px",lineHeight:1.6}}>
+        NeuroFlex no encontró el componente correspondiente. Lo ya realizado permanece registrado.
+      </p>
+      <BtnPrimary onClick={()=>skipTechnicalTask(current.id)}>Registrar incidencia y continuar</BtnPrimary>
+    </Card>);
+  }
+  return wrapper(
+    <NFFullAssessmentErrorBoundary taskKey={current.id} onTechnicalSkip={()=>skipTechnicalTask(current.id)}>
+      <Comp key={current.id} paciente={paciente} onDone={pushResult}/>
+    </NFFullAssessmentErrorBoundary>,
+    current.id
+  );
 }
 
 
@@ -9849,6 +9898,7 @@ function EvaluationV2FullProtocol({ paciente, familiarization, onSave, onExit, r
   const startedAt=useRef(resumeDraft?.startedAt || new Date().toISOString());
 
   const advance=()=>setStep(s=>s+1);
+  const taskUnavailable=(taskId)=>taskResults.some(r=>r?.taskId===taskId && (r?.technicalIncident || r?.skipped));
   const pushResult=(r)=>{
     setTaskResults(prev=>[...prev.filter(x=>x?.taskId!==r?.taskId),r]);
     advance();
@@ -9974,9 +10024,27 @@ function EvaluationV2FullProtocol({ paciente, familiarization, onSave, onExit, r
     return wrapper(<NFFullAssessmentErrorBoundary taskKey={current.id} onTechnicalSkip={()=>skipTechnicalTask("NF-E11")}><NFE11ProspectiveEncode paciente={paciente} onEncoded={data=>{setProspective(data);advance()}}/></NFFullAssessmentErrorBoundary>);
   }
   if(current.id==="NF-E09-delayed"){
+    if(taskUnavailable("NF-E09") || !verbalMemory){
+      return wrapper(<Card style={{maxWidth:720,margin:"0 auto",textAlign:"center",padding:28}}>
+        <h3 style={{margin:"0 0 8px"}}>Memoria verbal diferida no administrable</h3>
+        <p style={{margin:"0 0 14px",color:COLORS.textMuted,lineHeight:1.6}}>
+          La fase inicial de memoria verbal no quedó disponible. Esta fase diferida se omitirá para evitar registrar un rendimiento artificialmente bajo.
+        </p>
+        <BtnPrimary onClick={advance}>Continuar evaluación</BtnPrimary>
+      </Card>);
+    }
     return wrapper(<NFFullAssessmentErrorBoundary taskKey={current.id} onTechnicalSkip={()=>skipTechnicalTask("NF-E09")}><NFE09DelayedPhase paciente={paciente} memoryData={verbalMemory} onDone={pushResult}/></NFFullAssessmentErrorBoundary>);
   }
   if(current.id==="NF-E11-retrieve"){
+    if(taskUnavailable("NF-E11") || !prospective){
+      return wrapper(<Card style={{maxWidth:720,margin:"0 auto",textAlign:"center",padding:28}}>
+        <h3 style={{margin:"0 0 8px"}}>Memoria prospectiva no administrable</h3>
+        <p style={{margin:"0 0 14px",color:COLORS.textMuted,lineHeight:1.6}}>
+          La intención prospectiva inicial no quedó registrada. La fase de recuperación se omitirá para evitar interpretar como fallo cognitivo una incidencia de administración.
+        </p>
+        <BtnPrimary onClick={advance}>Continuar evaluación</BtnPrimary>
+      </Card>);
+    }
     return wrapper(<NFFullAssessmentErrorBoundary taskKey={current.id} onTechnicalSkip={()=>skipTechnicalTask("NF-E11")}><NFE11ProspectiveRetrieve paciente={paciente} prospectiveData={prospective} onDone={pushResult}/></NFFullAssessmentErrorBoundary>);
   }
 
