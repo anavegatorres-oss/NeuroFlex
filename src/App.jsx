@@ -5717,6 +5717,161 @@ const NF_SESSION_VARIETY_PROFILE = {
   pa_sonido_objetivo:{modality:"auditiva",mechanic:"figura_fondo_auditiva",response:"deteccion"},
 };
 
+// ─── F76 · PERFIL ADAPTATIVO UNIFICADO DE LOS 59 EJERCICIOS ────────────────
+// Capa de metadatos clínicos. En esta fase NO modifica todavía la ejecución,
+// la dificultad ni la interfaz del paciente. Unifica información ya existente
+// para preparar ayudas graduadas, práctica guiada y adaptación multidimensional.
+const NEUROFLEX_EXERCISE_PROFILE_VERSION = "NF-EX-PROFILE-1.0";
+
+const NF_EXERCISE_DIFFICULTY_DIMENSIONS = {
+  digits_forward:["sequence_length","presentation_interval","trial_count"],
+  digits_backward:["sequence_length","presentation_interval","trial_count"],
+  letter_number:["sequence_length","reordering_load","stimulus_similarity"],
+  operation_span:["sequence_length","operation_complexity","dual_task_load"],
+  nback_1:["trial_count","stimulus_set_size","presentation_speed","stimulus_similarity"],
+  word_recall:["item_count","semantic_similarity","study_time","interference","delay"],
+  story_recall:["information_units","narrative_complexity","interference","delay"],
+  sustained_attention:["trial_count","target_density","distractor_similarity","presentation_speed"],
+  divided_attention:["trial_count","dual_task_load","numeric_range","presentation_speed"],
+  find_animal:["stimulus_count","distractor_similarity","visual_density","time_limit"],
+  verbal_fluency:["category_constraint","time_window","switching_demand"],
+  trail_making:["sequence_length","alternation_demand","visual_density"],
+  reaction_time:["trial_count","foreperiod_variability","distractor_presence"],
+  color_naming:["item_count","presentation_speed","interference"],
+  naming:["item_count","lexical_frequency","visual_complexity","cue_level"],
+  analogias_verbales:["item_count","semantic_abstraction","distractor_similarity"],
+  verbal_comprehension:["item_count","syntactic_complexity","semantic_complexity","distractor_similarity"],
+  visual_matching:["distractor_count","stimulus_similarity","trial_count"],
+  pe_rotacion:["rotation_angle","figure_complexity","distractor_similarity"],
+  pe_contar:["stimulus_count","visual_density","overlap","trial_count"],
+  pe_patron:["pattern_length","rule_count","rule_complexity"],
+  temporal_orientation:["support_level","contextual_cueing"],
+  spatial_orientation:["context_complexity","support_level"],
+  or_personas:["context_information","support_level"],
+  or_situacion:["context_complexity","support_level"],
+  ra_series:["rule_complexity","series_length","rule_count"],
+  ra_discordante:["conceptual_abstraction","distractor_similarity","item_count"],
+  ra_verdadero_falso:["premise_count","logical_complexity","inference_depth"],
+  calc_operaciones:["numeric_magnitude","operation_type","carry_borrow","step_count"],
+  calc_faltante:["step_count","unknown_position","operation_complexity"],
+  flex_regla:["rule_count","switch_frequency","stimulus_similarity","interference"],
+  flex_opuesto:["lexical_difficulty","interference","item_count"],
+  cp_inferencia:["text_length","inference_depth","implicitness","irrelevant_information"],
+  cp_texto:["text_length","syntactic_complexity","question_inference","time_limit"],
+  nf_inhibition_stop:["go_nogo_ratio","presentation_speed","predictability","trial_count"],
+  nf_prospective_event:["delay","distractor_load","event_count","concurrent_task_load"],
+  nf_visual_memory:["stimulus_count","stimulus_similarity","exposure_time","delay"],
+  nf_auditory_patterns:["sequence_length","stimulus_similarity","presentation_speed"],
+  nf_praxia_actions:["action_step_count","sequence_complexity","modeling_level"],
+  nf_social_inference:["cue_explicitness","context_complexity","ambiguity","irrelevant_information"],
+  nf_metacognitive_review:["reflection_depth","prediction_performance_comparison","confidence_discrimination"],
+  calc_problemas_cotidianos:["step_count","operation_count","irrelevant_information","numeric_magnitude"],
+  calc_encadenado:["operation_count","working_memory_load","numeric_magnitude","presentation_speed"],
+  calc_estimacion:["numeric_range","option_proximity","context_complexity"],
+  calc_dinero_cambio:["item_count","numeric_magnitude","denomination_combinations","step_count"],
+  ra_deduccion:["premise_count","inference_depth","logical_complexity"],
+  ra_orden_logico:["element_count","constraint_count","relational_complexity"],
+  ra_matriz_logica:["rule_count","visual_complexity","distractor_similarity"],
+  cp_idea_principal:["text_length","distractor_similarity","abstraction"],
+  cp_secuencia_historia:["event_count","causal_complexity","temporal_similarity"],
+  cp_info_relevante:["text_length","irrelevant_information","selection_load"],
+  cp_lectura_funcional:["document_complexity","step_count","irrelevant_information","time_pressure"],
+  pv_detecta_cambio:["change_subtlety","exposure_time","delay","visual_complexity"],
+  pv_cierre_visual:["occlusion_level","figure_complexity","distractor_similarity"],
+  pv_figura_fondo:["visual_density","overlap","target_count","distractor_similarity"],
+  pa_igual_diferente:["acoustic_similarity","presentation_speed","trial_count"],
+  pa_agudo_grave:["frequency_proximity","presentation_speed","trial_count"],
+  pa_orden_sonidos:["sequence_length","presentation_speed","stimulus_similarity"],
+  pa_sonido_objetivo:["signal_noise_ratio","distractor_density","target_frequency","presentation_speed"],
+};
+
+const NF_EXERCISE_PREPARATION_PRACTICE = new Set(["calc_encadenado", "cp_info_relevante", "cp_secuencia_historia", "divided_attention", "flex_regla", "letter_number", "nback_1", "nf_auditory_patterns", "nf_inhibition_stop", "nf_praxia_actions", "nf_prospective_event", "nf_visual_memory", "operation_span", "pa_orden_sonidos", "pa_sonido_objetivo", "pv_figura_fondo", "ra_deduccion", "ra_matriz_logica", "ra_orden_logico", "sustained_attention", "trail_making"]);
+const NF_EXERCISE_PREPARATION_TEACHING = new Set(["calc_dinero_cambio", "cp_lectura_funcional"]);
+const NF_EXERCISE_FUNCTIONAL = new Set(["calc_dinero_cambio", "calc_estimacion", "calc_problemas_cotidianos", "cp_info_relevante", "cp_lectura_funcional", "nf_praxia_actions", "nf_prospective_event", "nf_social_inference", "or_personas", "or_situacion", "spatial_orientation", "temporal_orientation"]);
+const NF_EXERCISE_COMMUNICATION = new Set(["analogias_verbales", "cp_idea_principal", "cp_inferencia", "cp_secuencia_historia", "cp_texto", "naming", "verbal_comprehension", "verbal_fluency"]);
+const NF_EXERCISE_SUPPORT_CONTAMINATION_RISK = new Set(["digits_backward", "digits_forward", "letter_number", "naming", "nback_1", "nf_auditory_patterns", "nf_prospective_event", "nf_social_inference", "nf_visual_memory", "operation_span", "or_personas", "or_situacion", "pa_agudo_grave", "pa_igual_diferente", "pa_orden_sonidos", "pa_sonido_objetivo", "reaction_time", "spatial_orientation", "story_recall", "temporal_orientation", "verbal_fluency", "word_recall"]);
+
+function nfExercisePreparationRecommendation(exId){
+  if(NF_EXERCISE_PREPARATION_TEACHING.has(exId)) return "teaching";
+  if(NF_EXERCISE_PREPARATION_PRACTICE.has(exId)) return "practice";
+  return "direct";
+}
+
+function nfExerciseFunctionalRelevance(exId){
+  if(NF_EXERCISE_FUNCTIONAL.has(exId)) return "daily_functioning";
+  if(NF_EXERCISE_COMMUNICATION.has(exId)) return "communication_comprehension";
+  return "cognitive_training";
+}
+
+function nfExerciseSupportProfile(exId, responseType){
+  const contaminationRisk=NF_EXERCISE_SUPPORT_CONTAMINATION_RISK.has(exId);
+  const observed=responseType==="ejecucion_observada" || responseType==="oral_registro" || responseType==="oral_apoyo";
+  return {
+    levels:["independent","instruction_repeat","general_cue","specific_cue","modeling"],
+    trackInstructionRepeat:true,
+    trackCueLevel:true,
+    trackModeling:true,
+    contaminationRisk,
+    professionalObservationRecommended:observed,
+    rule:contaminationRisk
+      ? "Las ayudas deben registrarse porque pueden modificar la demanda cognitiva o la independencia observada."
+      : "Las ayudas pueden graduarse y deben registrarse para interpretar autonomía y desempeño.",
+  };
+}
+
+const NF_EXERCISE_ADAPTIVE_PROFILE = Object.fromEntries(
+  Object.keys(NF_SESSION_VARIETY_PROFILE).map(exId=>{
+    const legacy=METADATA_EJERCICIOS?.[exId] || {};
+    const variety=NF_SESSION_VARIETY_PROFILE[exId] || {};
+    const quality=EXERCISE_QUALITY_PROFILE?.[exId] || {};
+    const processes=F63_EXERCISE_PROCESS_TAGS?.[exId] || [];
+    const adaptiveSpec=ADAPTIVE_EXERCISE_SPECS?.[exId] || null;
+    const availableMetrics=[...new Set([
+      ...(legacy.metricas || []),
+      "adaptive_level","support_level","autonomy","effective_load"
+    ])];
+    return [exId,{
+      id:exId,
+      version:NEUROFLEX_EXERCISE_PROFILE_VERSION,
+      subcomponent:legacy.subcomponente || quality.principal || processes[0] || null,
+      processes:[...processes],
+      secondaryDemands:[...(legacy.demandasSecundarias || quality.secundaria || [])],
+      modality:variety.modality || legacy.modalidad || "mixta",
+      mechanic:variety.mechanic || "general",
+      response:variety.response || quality.respuesta || "seleccion",
+      baseDifficulty:clampAdaptiveLevel(legacy.dificultadBase || 2),
+      difficultyDimensions:[...(NF_EXERCISE_DIFFICULTY_DIMENSIONS[exId] || [])],
+      availableMetrics,
+      supportCapabilities:nfExerciseSupportProfile(exId,variety.response),
+      preparationMode:nfExercisePreparationRecommendation(exId),
+      functionalRelevance:nfExerciseFunctionalRelevance(exId),
+      modes:[...(legacy.modos || ["adulto","adulto_mayor","rehabilitacion"])],
+      requiresProfessionalReview:!!legacy.requiereValoracionProfesional || quality.interpretacion==="requiere revisión profesional",
+      adaptiveSpec,
+      adaptiveSpecImplemented:!!adaptiveSpec,
+      interpretation:quality.interpretacion || "descriptiva",
+    }];
+  })
+);
+
+function getNFExerciseAdaptiveProfile(exId){
+  return NF_EXERCISE_ADAPTIVE_PROFILE[exId] || null;
+}
+
+function getNFExerciseAdaptiveArchitectureSummary(){
+  const rows=Object.values(NF_EXERCISE_ADAPTIVE_PROFILE);
+  return {
+    version:NEUROFLEX_EXERCISE_PROFILE_VERSION,
+    exercises:rows.length,
+    withDifficultyDimensions:rows.filter(x=>x.difficultyDimensions.length>0).length,
+    withLegacyAdaptiveSpec:rows.filter(x=>x.adaptiveSpecImplemented).length,
+    withProfessionalReview:rows.filter(x=>x.requiresProfessionalReview).length,
+    preparation:rows.reduce((acc,x)=>{acc[x.preparationMode]=(acc[x.preparationMode]||0)+1;return acc;},{}),
+    relevance:rows.reduce((acc,x)=>{acc[x.functionalRelevance]=(acc[x.functionalRelevance]||0)+1;return acc;},{}),
+  };
+}
+
+
 function nfSessionVarietyProfile(exId){return NF_SESSION_VARIETY_PROFILE[exId]||{modality:"mixta",mechanic:"general",response:"seleccion"}}
 function nfRecentSessionResults(paciente,maxSessions=3){
   return [...(paciente?.sesiones||[])].filter(Boolean).sort((a,b)=>(a.numero||0)-(b.numero||0)).slice(-maxSessions).flatMap((ses,sessionIndex)=>(ses.results||[]).map(r=>({...r,_sessionIndex:sessionIndex})));
