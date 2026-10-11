@@ -3011,10 +3011,11 @@ const EX_ADULTO = {
       id: "digits_forward",
       nombre: "Dígitos en orden",
       instruccion: "Observa y escucha la secuencia completa. Cuando desaparezca, reconstruye los números en el mismo orden.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
         const M=!!modoMayor;
         const L=clampAdaptiveLevel(difficultyLevel);
-        const len=[0,3,4,5,6,7][L];
+        const len=nfDifficultyValue(difficultyProfile,"sequence_length",[0,3,4,5,6,7][L]);
+        const presentationMs=nfDifficultyValue(difficultyProfile,"presentation_interval",850);
         const [seq]=useState(()=>Array.from({length:len},()=>Math.floor(Math.random()*9)+1));
         const [phase,setPhase]=useState("show");
         const [visibleIdx,setVisibleIdx]=useState(0);
@@ -3030,14 +3031,14 @@ const EX_ADULTO = {
                 setTimeout(()=>{
                   const u=new SpeechSynthesisUtterance(String(n));
                   u.lang="es-CO";u.rate=.8;window.speechSynthesis.speak(u);
-                },i*850);
+                },i*presentationMs);
               });
             }
           }catch(e){}
           const tm=setInterval(()=>setVisibleIdx(i=>{
             if(i+1>=seq.length){clearInterval(tm);setTimeout(()=>setPhase("answer"),450);return i}
             return i+1;
-          }),850);
+          }),presentationMs);
           return()=>clearInterval(tm);
         },[phase,seq]);
 
@@ -3066,9 +3067,10 @@ const EX_ADULTO = {
       id: "digits_backward",
       nombre: "Dígitos al revés",
       instruccion: "Observa y escucha toda la secuencia. Cuando desaparezca, reconstruye los números comenzando por el último.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
-        const len=[0,2,3,4,5,6][L];
+        const len=nfDifficultyValue(difficultyProfile,"sequence_length",[0,2,3,4,5,6][L]);
+        const presentationMs=nfDifficultyValue(difficultyProfile,"presentation_interval",850);
         const [seq]=useState(()=>Array.from({length:len},()=>Math.floor(Math.random()*9)+1));
         const [phase,setPhase]=useState("show"),[visibleIdx,setVisibleIdx]=useState(0),[answer,setAnswer]=useState([]);
         const t0=useRef(Date.now());
@@ -3084,7 +3086,7 @@ const EX_ADULTO = {
           const tm=setInterval(()=>setVisibleIdx(i=>{
             if(i+1>=seq.length){clearInterval(tm);setTimeout(()=>setPhase("answer"),450);return i}
             return i+1;
-          }),850);
+          }),presentationMs);
           return()=>clearInterval(tm);
         },[phase,seq]);
 
@@ -3114,15 +3116,16 @@ const EX_ADULTO = {
       id: "letter_number",
       nombre: "Secuencia letras y números",
       instruccion: "Observa y escucha la secuencia. Cuando desaparezca, coloca primero los números de menor a mayor y después las letras en orden alfabético.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+        const maxSequence=nfDifficultyValue(difficultyProfile,"sequence_length",[0,4,4,5,6,6][L]);
         const bank=[
           {seq:["A","3","B","1"],correct:["1","3","A","B"]},
           {seq:["C","7","A","2"],correct:["2","7","A","C"]},
           {seq:["B","4","D","1","A"],correct:["1","4","A","B","D"]},
           {seq:["E","3","B","9","A","1"],correct:["1","3","9","A","B","E"]},
         ];
-        const allowed=bank.filter(x=>x.seq.length<=([0,4,4,5,6,6][L]));
+        const allowed=bank.filter(x=>x.seq.length<=maxSequence);
         const [item]=useState(()=>allowed[Math.floor(Math.random()*allowed.length)]||bank[0]);
         const [phase,setPhase]=useState("show"),[visibleIdx,setVisibleIdx]=useState(0),[answer,setAnswer]=useState([]);
         const t0=useRef(Date.now());
@@ -3168,9 +3171,10 @@ const EX_ADULTO = {
       id: "operation_span",
       nombre: "Cálculo y memoria",
       instruccion: "Resuelve cada operación mentalmente y toca el resultado. Recuerda cada resultado porque al final deberás reconstruir la secuencia tocando los números en el mismo orden.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
-        const count=[0,3,3,4,4,5][L];
+        const count=nfDifficultyValue(difficultyProfile,"sequence_length",[0,3,3,4,4,5][L]);
+        const operationComplexity=nfDifficultyValue(difficultyProfile,"operation_complexity",L);
         const [ops]=useState(()=>shuffle([
           {op:"3 + 4",ans:7},{op:"8 − 3",ans:5},{op:"6 × 2",ans:12},
           {op:"15 − 7",ans:8},{op:"4 + 9",ans:13},{op:"20 ÷ 4",ans:5},
@@ -3259,11 +3263,12 @@ const EX_ADULTO = {
       id: "nback_1",
       nombre: "¿Es igual al anterior?",
       instruccion: "Observa una imagen a la vez. Desde la segunda, decide si es igual o diferente a la imagen inmediatamente anterior.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
         const ALL=NF_NBACK_OBJECTS;
-        const EMOJIS=ALL.slice(0,[0,4,5,6,8,10][L]);
-        const LEN=[0,7,8,10,12,14][L];
+        const setSize=nfDifficultyValue(difficultyProfile,"stimulus_set_size",[0,4,5,6,8,10][L]);
+        const EMOJIS=ALL.slice(0,setSize);
+        const LEN=nfDifficultyValue(difficultyProfile,"trial_count",[0,7,8,10,12,14][L]);
         const repeatProbability=[0,.48,.44,.40,.36,.32][L];
         const [seq]=useState(()=>{
           const arr=[];
@@ -3318,13 +3323,14 @@ const EX_ADULTO = {
       id: "word_recall",
       nombre: "Recuerdo de palabras",
       instruccion: "Observa y memoriza las palabras. Después de una breve distracción, selecciona entre varias opciones únicamente las palabras que viste.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
-        const wordCount=[0,5,6,8,9,10][L];
-        const studySeconds=[0,25,22,20,17,15][L];
+        const wordCount=nfDifficultyValue(difficultyProfile,"item_count",[0,5,6,8,9,10][L]);
+        const studySeconds=nfDifficultyValue(difficultyProfile,"study_time",[0,25,22,20,17,15][L]);
+        const delaySeconds=nfDifficultyValue(difficultyProfile,"delay",15);
         const BANK=["MANZANA","CAMISA","RÍO","SILLA","PERRO","LIBRO","MESA","FLOR","LLAVE","NUBE","PAN","ZAPATO","VASO","RELOJ","ÁRBOL","VENTANA","CAFÉ","LÁPIZ","TREN","PLAYA"];
         const [WORDS]=useState(()=>shuffle(BANK).slice(0,wordCount));
-        const [phase,setPhase]=useState("study"),[tl,setTl]=useState(studySeconds),[distTl,setDistTl]=useState(15),[selected,setSelected]=useState(new Set());
+        const [phase,setPhase]=useState("study"),[tl,setTl]=useState(studySeconds),[distTl,setDistTl]=useState(delaySeconds),[selected,setSelected]=useState(new Set());
         const [recognition]=useState(()=>[]);
         const t0=useRef(Date.now());
 
@@ -3392,8 +3398,8 @@ const EX_ADULTO = {
       id: "story_recall",
       nombre: "Recuerdo de historia",
       instruccion: "Lee la historia con atención. Cuando termines, toca “Responder preguntas” y contesta según lo que recuerdes.",
-      Component: ({ onDone, modoMayor }) => {
-        const M = modoMayor || false;
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M = modoMayor || false; const L=clampAdaptiveLevel(difficultyLevel); const informationUnits=nfDifficultyValue(difficultyProfile,"information_units",4); const narrativeComplexity=nfDifficultyValue(difficultyProfile,"narrative_complexity",L);
         const STORIES = [
           {
             texto: "Ana Rodríguez, una maestra de 67 años de Medellín, fue al mercado el martes por la mañana. Compró 3 kilos de tomates y 2 pollos. Al salir, encontró a su vecino Carlos y le prestó 5.000 pesos para el bus.",
@@ -3414,7 +3420,7 @@ const EX_ADULTO = {
             ]
           }
         ];
-        const [story] = useState(() => STORIES[Math.floor(Math.random() * STORIES.length)]);
+        const [story] = useState(() => { const source=narrativeComplexity<=2?STORIES.slice(0,1):STORIES; const base=source[Math.floor(Math.random()*source.length)]; const qCount=Math.max(2,Math.min(base.preguntas.length,informationUnits)); return {...base,preguntas:base.preguntas.slice(0,qCount)}; });
         const [phase, setPhase] = useState("read");
         const [cur, setCur] = useState(0);
         const [score, setScore] = useState(0);
@@ -3472,13 +3478,15 @@ const EX_ADULTO = {
       id: "sustained_attention",
       nombre: "Atención sostenida",
       instruccion: "Mantén la búsqueda durante varios paneles. En cada panel toca únicamente los números 3, ignora los demás y luego continúa.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+        const totalTrials=nfDifficultyValue(difficultyProfile,"trial_count",[0,24,45,54,80,96][L]);
         const panelCount=[0,2,3,3,4,4][L];
-        const panelSize=[0,12,15,18,20,24][L];
+        const panelSize=Math.max(8,Math.round(totalTrials/panelCount));
+        const targetDensity=nfDifficultyValue(difficultyProfile,"target_density",.18);
         const cols=M?4:(L<=2?5:6);
         const [panels]=useState(()=>Array.from({length:panelCount},()=> {
-          const count=Math.max(2,Math.round(panelSize*.18));
+          const count=Math.max(2,Math.round(panelSize*targetDensity));
           const arr=[
             ...Array.from({length:count},()=>3),
             ...Array.from({length:panelSize-count},()=>{
@@ -3554,12 +3562,13 @@ const EX_ADULTO = {
       id: "divided_attention",
       nombre: "Atención dividida",
       instruccion: "Vigila dos estímulos al mismo tiempo. En la izquierda identifica números pares; en la derecha identifica círculos. Responde si el objetivo aparece a la izquierda, derecha, en ambos lados o en ninguno.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
-        const rounds=[0,6,8,10,12,14][L];
+        const rounds=nfDifficultyValue(difficultyProfile,"trial_count",[0,6,8,10,12,14][L]);
+        const numericRange=nfDifficultyValue(difficultyProfile,"numeric_range",[0,10,14,18,22,26][L]);
         const shapes=["●","▲","■","◆"];
         const [trials]=useState(()=>Array.from({length:rounds},(_,i)=>{
-          const left=Math.floor(Math.random()*9)+1;
+          const left=Math.floor(Math.random()*Math.max(9,numericRange))+1;
           const right=shapes[Math.floor(Math.random()*shapes.length)];
           const leftTarget=left%2===0;
           const rightTarget=right==="●";
@@ -3626,8 +3635,9 @@ const EX_ADULTO = {
       id: "find_animal",
       nombre: "Encuentra los animales",
       instruccion: "Busca visualmente y toca únicamente los animales. Ignora objetos, alimentos, símbolos y otros distractores. Cuando termines, confirma tu búsqueda.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+        const multidimStimulusCount=nfDifficultyValue(difficultyProfile,"stimulus_count",[0,9,12,15,18,20][L]);
         const ANIMALS=["dog","cat","bird","fish","rabbit","butterfly","turtle","cow","elephant","frog","penguin","bee"];
         const OTHERS=["flower","car","house","book","clock","balloon","apple","scissors","moon","key","umbrella","ball","puzzle","lemon","phone","gift"];
         const targetCount=[0,3,4,5,6,7][L];
@@ -3692,12 +3702,12 @@ const EX_ADULTO = {
       id: "verbal_fluency",
       nombre: "Fluidez verbal semántica",
       instruccion: "Di en voz alta todas las palabras que puedas de la categoría durante 60 segundos. No necesitas escribir: registra cada respuesta con los botones.",
-      Component: ({ onDone, modoMayor }) => {
-        const M=!!modoMayor;
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const timeWindow=nfDifficultyValue(difficultyProfile,"time_window",60); const categoryConstraint=nfDifficultyValue(difficultyProfile,"category_constraint",L);
         const CATS=["animales","frutas","herramientas","prendas de ropa","países"];
-        const [cat]=useState(()=>CATS[Math.floor(Math.random()*CATS.length)]);
+        const [cat]=useState(()=>CATS[Math.min(CATS.length-1,Math.floor(Math.random()*Math.max(2,categoryConstraint+1)))]);
         const [phase,setPhase]=useState("ready");
-        const [valid,setValid]=useState(0),[invalid,setInvalid]=useState(0),[tl,setTl]=useState(60);
+        const [valid,setValid]=useState(0),[invalid,setInvalid]=useState(0),[tl,setTl]=useState(timeWindow);
         const timerRef=useRef(null),taskStart=useRef(Date.now());
 
         const finish=(v=valid,iv=invalid)=>{
@@ -3840,9 +3850,9 @@ const EX_ADULTO = {
       id: "reaction_time",
       nombre: "Tiempo de reacción",
       instruccion: "Espera sin tocar. Cuando el círculo cambie a verde y aparezca “TOCA”, presiónalo lo más rápido posible. Si tocas antes, se registra como anticipación.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
-        const ROUNDS=[0,5,6,7,8,9][L];
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const multidimRounds=nfDifficultyValue(difficultyProfile,"trial_count",[0,5,6,7,8,9][L]); const foreperiod=nfDifficultyValue(difficultyProfile,"foreperiod_variability",L);
+        const ROUNDS=multidimRounds;
         const [phase,setPhase]=useState("wait");
         const [round,setRound]=useState(0);
         const [times,setTimes]=useState([]);
@@ -3856,7 +3866,7 @@ const EX_ADULTO = {
           setPhase("wait");
           setFeedback("");
           const minWait=[0,1700,1500,1300,1150,1000][L];
-          const extra=[0,2200,2000,1800,1600,1500][L];
+          const extra=Math.max(800,2300-foreperiod*220);
           timerRef.current=setTimeout(()=>{
             stimulusAt.current=Date.now();
             setPhase("go");
@@ -3945,14 +3955,14 @@ const EX_ADULTO = {
       id: "color_naming",
       nombre: "Nombrar colores",
       instruccion: "Lee el nombre del color que aparece. Luego toca únicamente la muestra de color correspondiente. Las opciones no tendrán palabras escritas.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const multidimItems=nfDifficultyValue(difficultyProfile,"item_count",[0,8,10,12,14,16][L]); const interference=nfDifficultyValue(difficultyProfile,"interference",L);
         const COLORS_MAP=[
           {name:"ROJO",bg:"#EF4444"},{name:"AZUL",bg:"#3B82F6"},{name:"VERDE",bg:"#22C55E"},
           {name:"AMARILLO",bg:"#EAB308"},{name:"NARANJA",bg:"#F97316"},{name:"MORADO",bg:"#8B5CF6"}
         ];
-        const ROUNDS=[0,8,10,12,14,16][L];
-        const optionCount=[0,3,3,4,5,6][L];
+        const ROUNDS=multidimItems;
+        const optionCount=Math.min(COLORS_MAP.length,Math.max(3,2+interference));
         const [items]=useState(()=>Array.from({length:ROUNDS},()=>{
           const target=COLORS_MAP[Math.floor(Math.random()*COLORS_MAP.length)];
           const distractors=shuffle(COLORS_MAP.filter(c=>c.name!==target.name)).slice(0,optionCount-1);
@@ -4021,8 +4031,8 @@ const EX_ADULTO = {
       id: "naming",
       nombre: "Denominación",
       instruccion: "Observa el elemento y di su nombre en voz alta. Si no lo recuerdas, puedes pedir opciones y seleccionar la palabra correcta. No necesitas escribir.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const itemCount=nfDifficultyValue(difficultyProfile,"item_count",[0,4,5,6,7,8][L]); const lexicalFrequency=nfDifficultyValue(difficultyProfile,"lexical_frequency",3);
         const EASY=[
           {kind:"clock",label:"reloj"},{kind:"scissors",label:"tijeras"},{kind:"key",label:"llave"},{kind:"cactus",label:"cactus"}
         ];
@@ -4030,8 +4040,8 @@ const EX_ADULTO = {
           {kind:"thermometer",label:"termómetro"},{kind:"anchor",label:"ancla"},{kind:"violin",label:"violín"},
           {kind:"otter",label:"nutria"},{kind:"magnet",label:"imán"},{kind:"accordion",label:"acordeón"}
         ];
-        const count=[0,4,5,6,7,8][L];
-        const source=L<=2?[...EASY,...HARD.slice(0,2)]:L===3?[...EASY,...HARD]:[...HARD,...EASY];
+        const count=itemCount;
+        const source=lexicalFrequency>=4?[...EASY,...HARD.slice(0,2)]:lexicalFrequency>=3?[...EASY,...HARD]:[...HARD,...EASY];
         const [ITEMS]=useState(()=>shuffle(source).slice(0,count));
         const LABELS=[...EASY,...HARD].map(x=>x.label);
         const [cur,setCur]=useState(0),[mode,setMode]=useState("spontaneous"),[spontaneous,setSpontaneous]=useState(0),[supported,setSupported]=useState(0),[missed,setMissed]=useState(0),[locked,setLocked]=useState(false);
@@ -4096,8 +4106,8 @@ const EX_ADULTO = {
       id: "analogias_verbales",
       nombre: "Analogías verbales",
       instruccion: "Lee o escucha la relación entre las palabras y toca la opción que complete correctamente la analogía.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const itemCount=nfDifficultyValue(difficultyProfile,"item_count",[0,3,4,5,6,7][L]); const abstraction=nfDifficultyValue(difficultyProfile,"semantic_abstraction",L);
         const EASY=[
           {enunciado:"El médico cura enfermos; el maestro ___",opts:["cocina","enseña","construye","maneja"],ans:"enseña"},
           {enunciado:"El pájaro tiene alas; el pez tiene ___",opts:["patas","escamas","aletas","plumas"],ans:"aletas"},
@@ -4110,8 +4120,8 @@ const EX_ADULTO = {
           {enunciado:"Brújula es a dirección como termómetro es a ___",opts:["distancia","temperatura","peso","velocidad"],ans:"temperatura"},
           {enunciado:"Semilla es a planta como huevo es a ___",opts:["nido","ave","pluma","árbol"],ans:"ave"}
         ];
-        const count=[0,3,4,5,6,7][L];
-        const pool=L<=2?EASY:L===3?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
+        const count=itemCount;
+        const pool=abstraction<=2?EASY:abstraction===3?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
         const [ITEMS]=useState(()=>shuffle(pool).slice(0,Math.min(count,pool.length)));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const times=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now());
@@ -4145,8 +4155,8 @@ const EX_ADULTO = {
       id: "verbal_comprehension",
       nombre: "Comprensión verbal",
       instruccion: "Lee o escucha la oración y toca la palabra que mejor la complete.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const itemCount=nfDifficultyValue(difficultyProfile,"item_count",[0,3,4,5,6,7][L]); const semanticComplexity=nfDifficultyValue(difficultyProfile,"semantic_complexity",L);
         const EASY=[
           {oracion:"El sol sale por el ___.",ans:"este",opts:["norte","sur","este","oeste"]},
           {oracion:"El hijo de mi hermana es mi ___.",ans:"sobrino",opts:["primo","sobrino","nieto","cuñado"]},
@@ -4159,8 +4169,8 @@ const EX_ADULTO = {
           {oracion:"Una persona prudente suele actuar con ___.",ans:"cautela",opts:["prisa","cautela","enojo","azar"]},
           {oracion:"Si una explicación es ambigua, puede resultar ___.",ans:"confusa",opts:["exacta","confusa","breve","visible"]}
         ];
-        const count=[0,3,4,5,6,7][L];
-        const pool=L<=2?EASY:L===3?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
+        const count=itemCount;
+        const pool=semanticComplexity<=2?EASY:semanticComplexity===3?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
         const [ITEMS]=useState(()=>shuffle(pool).slice(0,Math.min(count,pool.length)));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const t0=useRef(Date.now()),trialT0=useRef(Date.now()),times=useRef([]);
@@ -4199,11 +4209,11 @@ const EX_ADULTO = {
       id: "visual_matching",
       nombre: "Emparejamiento visual",
       instruccion: "Observa con atención la figura modelo y toca la opción exactamente igual. Fíjate en la forma y en si está rellena o vacía.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
         const SHAPES=NF_SHAPE_IDS;
-        const ROUNDS=[0,4,5,6,7,8][L];
-        const optionCount=[0,3,4,4,5,6][L];
+        const ROUNDS=nfDifficultyValue(difficultyProfile,"trial_count",[0,4,5,6,7,8][L]);
+        const optionCount=Math.max(3,nfDifficultyValue(difficultyProfile,"distractor_count",[0,2,3,3,4,5][L])+1);
         const [data]=useState(()=>Array.from({length:ROUNDS},()=>{
           const target=SHAPES[Math.floor(Math.random()*SHAPES.length)];
           const opts=shuffle([target,...shuffle(SHAPES.filter(x=>x!==target)).slice(0,optionCount-1)]);
@@ -4259,7 +4269,7 @@ const EX_ADULTO = {
       id: "pe_rotacion",
       nombre: "¿Igual o diferente?",
       instruccion: "Compara las dos figuras. Una puede estar girada. Toca “Misma figura” si conserva la misma forma aunque cambie de orientación; toca “Diferente” si la forma cambia.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
         const SHAPES=[
           {id:"arrow",glyph:"➤"},
@@ -4269,7 +4279,7 @@ const EX_ADULTO = {
           {id:"chevron",glyph:"❯"}
         ];
         const ROUNDS=[0,6,7,8,9,10][L];
-        const angles=[0,90,180,270];
+        const maxAngle=nfDifficultyValue(difficultyProfile,"rotation_angle",180); const angles=[0,45,60,90,135,180,270].filter(a=>a===0||a<=maxAngle||a===270);
         const [PARES]=useState(()=>Array.from({length:ROUNDS},()=>{
           const same=Math.random()>.45;
           const a=SHAPES[Math.floor(Math.random()*SHAPES.length)];
@@ -4339,11 +4349,11 @@ const EX_ADULTO = {
       id: "pe_contar",
       nombre: "¿Cuántos hay?",
       instruccion: "Observa la figura modelo, busca únicamente las figuras exactamente iguales dentro de la cuadrícula y toca la cantidad correcta.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
         const POOL=NF_SHAPE_IDS;
-        const ROUNDS=[0,4,5,6,7,8][L];
-        const totalStimuli=[0,10,12,16,20,24][L];
+        const ROUNDS=nfDifficultyValue(difficultyProfile,"trial_count",[0,4,5,6,7,8][L]);
+        const totalStimuli=nfDifficultyValue(difficultyProfile,"stimulus_count",[0,10,12,16,20,24][L]);
         const [data]=useState(()=>Array.from({length:ROUNDS},()=>{
           const target=POOL[Math.floor(Math.random()*POOL.length)];
           const similar=POOL.filter(p=>p!==target);
@@ -4403,8 +4413,8 @@ const EX_ADULTO = {
       id: "pe_patron",
       nombre: "¿Qué sigue?",
       instruccion: "Observa la secuencia visual, descubre la regla y toca la figura que debería aparecer en el espacio vacío.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const ruleComplexity=nfDifficultyValue(difficultyProfile,"rule_complexity",L); const patternLength=nfDifficultyValue(difficultyProfile,"pattern_length",5);
         const EASY=[
           {seq:["circle_f","circle_o","circle_f","circle_o","circle_f"],ans:"circle_o",opts:["circle_o","circle_f","triangle_o","square_o"],type:"AB"},
           {seq:["triangle_f","triangle_f","square_f","triangle_f","triangle_f"],ans:"square_f",opts:["square_f","triangle_f","circle_f","diamond_f"],type:"AAB"},
@@ -4417,8 +4427,8 @@ const EX_ADULTO = {
           {seq:["diamond_f","circle_f","square_o","diamond_f","circle_f"],ans:"square_o",opts:["square_o","diamond_f","circle_f","diamond_o"],type:"ABC"}
         ];
         const count=[0,4,5,6,7,8][L];
-        const pool=L<=2?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
-        const [PATRONES]=useState(()=>Array.from({length:count},()=>shuffle(pool)[0]));
+        const pool=ruleComplexity<=2?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
+        const [PATRONES]=useState(()=>Array.from({length:count},()=>{const p=shuffle(pool)[0];return {...p,seq:p.seq.slice(0,Math.min(p.seq.length,patternLength))}}));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now()),locked=useRef(false);
         const p=PATRONES[cur];
@@ -4469,12 +4479,13 @@ const EX_ADULTO = {
       id: "temporal_orientation",
       nombre: "Orientación temporal",
       instruccion: "Responde según la fecha actual. Lee o escucha la pregunta y toca la opción correcta.",
-      Component: ({ onDone, modoMayor }) => {
-        const M=!!modoMayor;
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const contextualCueing=nfDifficultyValue(difficultyProfile,"contextual_cueing",2);
         const now=new Date();
         const MESES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
         const DIAS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
         const correctYear=now.getFullYear(),correctMonth=MESES[now.getMonth()],correctDate=now.getDate(),correctDay=DIAS[now.getDay()];
+        const orientationCue=contextualCueing>=3?"Puedes apoyarte en referencias visibles del entorno si lo necesitas.":contextualCueing>=1?"Piensa en las referencias actuales antes de responder.":null;
         const QUESTIONS=[
           {q:"¿En qué año estamos?",answer:String(correctYear),opts:shuffle([correctYear-1,correctYear,correctYear+1,correctYear-2].map(String))},
           {q:"¿En qué mes estamos?",answer:correctMonth,opts:shuffle([correctMonth,MESES[(now.getMonth()+11)%12],MESES[(now.getMonth()+1)%12],MESES[(now.getMonth()+6)%12]])},
@@ -4496,7 +4507,7 @@ const EX_ADULTO = {
               const rs=records.current;
               onDone({
                 correct:ns,total:QUESTIONS.length,errors:QUESTIONS.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),
-                specificMetrics:{temporalOrientation:true,noTyping:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),clinicalProcess:"orientación temporal"}
+                specificMetrics:{contextualCueing,temporalOrientation:true,noTyping:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),clinicalProcess:"orientación temporal"}
               });
             }else{
               setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false;trialT0.current=Date.now();
@@ -4530,8 +4541,8 @@ const EX_ADULTO = {
       id: "spatial_orientation",
       nombre: "Orientación espacial",
       instruccion: "Responde en voz alta según el lugar en el que te encuentras ahora. No necesitas escribir. Después registra si la respuesta fue adecuada o si requiere revisión.",
-      Component: ({ onDone, modoMayor }) => {
-        const M=!!modoMayor;
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const contextComplexity=nfDifficultyValue(difficultyProfile,"context_complexity",L);
         const QUESTIONS=[
           "¿En qué ciudad estás ahora?",
           "¿En qué país estás ahora?",
@@ -4540,7 +4551,7 @@ const EX_ADULTO = {
         ];
         const [cur,setCur]=useState(0),[adequate,setAdequate]=useState(0),[review,setReview]=useState(0),[locked,setLocked]=useState(false);
         const records=useRef([]),t0=useRef(Date.now());
-        const q=QUESTIONS[cur];
+        const activeQuestions=QUESTIONS.slice(0,Math.max(2,Math.min(activeQuestions.length,Math.round(2+contextComplexity/2)))); const q=activeQuestions[cur];
 
         const record=(ok)=>{
           if(locked)return;
@@ -4549,9 +4560,9 @@ const EX_ADULTO = {
           records.current.push({question:q,status:ok?"adequate":"review"});
           if(ok)setAdequate(na);else setReview(nr);
           setTimeout(()=>{
-            if(cur+1>=QUESTIONS.length){
+            if(cur+1>=activeQuestions.length){
               onDone({
-                correct:na,total:QUESTIONS.length,errors:nr,requiresReview:nr>0,
+                correct:na,total:activeQuestions.length,errors:nr,requiresReview:nr>0,
                 seconds:Math.round((Date.now()-t0.current)/1000),
                 specificMetrics:{spatialOrientation:true,oralResponse:true,noTyping:true,adequateResponses:na,responsesForReview:nr,clinicalProcess:"orientación espacial",professionalObservation:true},
                 answers:records.current
@@ -4562,7 +4573,7 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <Badge label={`${cur+1}/${QUESTIONS.length}`} color={COLORS.info}/>
+            <Badge label={`${cur+1}/${activeQuestions.length}`} color={COLORS.info}/>
             <NFAudioReadButton text={q} label="Escuchar pregunta" mayor={modoMayor}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
@@ -4582,8 +4593,8 @@ const EX_ADULTO = {
       id: "or_personas",
       nombre: "Orientación personal",
       instruccion: "Responde en voz alta preguntas sobre ti y personas cercanas. No necesitas escribir. Registra si cada respuesta fue adecuada o requiere revisión.",
-      Component: ({ onDone, modoMayor }) => {
-        const M=!!modoMayor;
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const contextInformation=nfDifficultyValue(difficultyProfile,"context_information",L);
         const QUESTIONS=[
           "¿Cuál es tu nombre completo?",
           "¿Cuántos años tienes?",
@@ -4592,7 +4603,7 @@ const EX_ADULTO = {
         ];
         const [cur,setCur]=useState(0),[adequate,setAdequate]=useState(0),[review,setReview]=useState(0),[locked,setLocked]=useState(false);
         const records=useRef([]),t0=useRef(Date.now());
-        const q=QUESTIONS[cur];
+        const activeQuestions=QUESTIONS.slice(0,Math.max(2,Math.min(activeQuestions.length,Math.round(2+contextInformation/2)))); const q=activeQuestions[cur];
 
         const record=(ok)=>{
           if(locked)return;
@@ -4601,9 +4612,9 @@ const EX_ADULTO = {
           records.current.push({question:q,status:ok?"adequate":"review"});
           if(ok)setAdequate(na);else setReview(nr);
           setTimeout(()=>{
-            if(cur+1>=QUESTIONS.length){
+            if(cur+1>=activeQuestions.length){
               onDone({
-                correct:na,total:QUESTIONS.length,errors:nr,requiresReview:nr>0,
+                correct:na,total:activeQuestions.length,errors:nr,requiresReview:nr>0,
                 seconds:Math.round((Date.now()-t0.current)/1000),
                 specificMetrics:{personalOrientation:true,oralResponse:true,noTyping:true,adequateResponses:na,responsesForReview:nr,clinicalProcess:"orientación personal",professionalObservation:true},
                 answers:records.current
@@ -4614,7 +4625,7 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <Badge label={`${cur+1}/${QUESTIONS.length}`} color={COLORS.info}/>
+            <Badge label={`${cur+1}/${activeQuestions.length}`} color={COLORS.info}/>
             <NFAudioReadButton text={q} label="Escuchar pregunta" mayor={modoMayor}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
@@ -4634,8 +4645,8 @@ const EX_ADULTO = {
       id: "or_situacion",
       nombre: "Situación general",
       instruccion: "Responde en voz alta preguntas sobre tu situación actual. No necesitas escribir. Después registra si la respuesta es coherente con el contexto o requiere revisión.",
-      Component: ({ onDone, modoMayor }) => {
-        const M=!!modoMayor;
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const contextComplexity=nfDifficultyValue(difficultyProfile,"context_complexity",L);
         const QUESTIONS=[
           "¿Por qué estás aquí hoy?",
           "¿Qué actividad estás realizando en este momento?",
@@ -4644,7 +4655,7 @@ const EX_ADULTO = {
         ];
         const [cur,setCur]=useState(0),[adequate,setAdequate]=useState(0),[review,setReview]=useState(0),[locked,setLocked]=useState(false);
         const records=useRef([]),t0=useRef(Date.now());
-        const q=QUESTIONS[cur];
+        const activeQuestions=QUESTIONS.slice(0,Math.max(2,Math.min(activeQuestions.length,Math.round(2+contextComplexity/2)))); const q=activeQuestions[cur];
 
         const record=(ok)=>{
           if(locked)return;
@@ -4653,9 +4664,9 @@ const EX_ADULTO = {
           records.current.push({question:q,status:ok?"adequate":"review"});
           if(ok)setAdequate(na);else setReview(nr);
           setTimeout(()=>{
-            if(cur+1>=QUESTIONS.length){
+            if(cur+1>=activeQuestions.length){
               onDone({
-                correct:na,total:QUESTIONS.length,errors:nr,requiresReview:nr>0,
+                correct:na,total:activeQuestions.length,errors:nr,requiresReview:nr>0,
                 seconds:Math.round((Date.now()-t0.current)/1000),
                 specificMetrics:{situationalOrientation:true,oralResponse:true,noTyping:true,adequateResponses:na,responsesForReview:nr,clinicalProcess:"orientación situacional",professionalObservation:true},
                 answers:records.current
@@ -4666,7 +4677,7 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <Badge label={`${cur+1}/${QUESTIONS.length}`} color={COLORS.info}/>
+            <Badge label={`${cur+1}/${activeQuestions.length}`} color={COLORS.info}/>
             <NFAudioReadButton text={q} label="Escuchar pregunta" mayor={modoMayor}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
@@ -4688,8 +4699,8 @@ const EX_ADULTO = {
       id: "ra_series",
       nombre: "Series numéricas",
       instruccion: "Observa la serie, descubre la regla y toca el número que debería seguir.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const ruleComplexity=nfDifficultyValue(difficultyProfile,"rule_complexity",L); const seriesLength=nfDifficultyValue(difficultyProfile,"series_length",4);
         const EASY=[
           {seq:[2,4,6,8],ans:10,opts:[9,10,11,12],rule:"+2"},
           {seq:[10,8,6,4],ans:2,opts:[0,1,2,3],rule:"-2"},
@@ -4707,8 +4718,8 @@ const EX_ADULTO = {
           {seq:[3,6,12,24],ans:48,opts:[36,42,48,52],rule:"x2"},
           {seq:[20,17,13,8],ans:2,opts:[1,2,3,4],rule:"-3,-4,-5,-6"}
         ];
-        const pool=L<=1?EASY:L===2?[...EASY,...MEDIUM]:L===3?MEDIUM:[...MEDIUM,...HARD];
-        const [SERIES]=useState(()=>shuffle(pool).slice(0,[0,4,5,6,7,8][L]).map(x=>({...x,stableOpts:shuffle(x.opts)})));
+        const pool=ruleComplexity<=1?EASY:ruleComplexity===2?[...EASY,...MEDIUM]:ruleComplexity===3?MEDIUM:[...MEDIUM,...HARD];
+        const [SERIES]=useState(()=>shuffle(pool).slice(0,[0,4,5,6,7,8][L]).map(x=>({...x,seq:x.seq.slice(0,Math.min(x.seq.length,seriesLength)),stableOpts:shuffle(x.opts)})));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now()),locked=useRef(false);
         const item=SERIES[cur];
@@ -4759,8 +4770,8 @@ const EX_ADULTO = {
       id: "ra_discordante",
       nombre: "El elemento diferente",
       instruccion: "Observa o escucha los elementos y toca el que no pertenece al mismo grupo que los demás.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const abstraction=nfDifficultyValue(difficultyProfile,"conceptual_abstraction",L); const itemCount=nfDifficultyValue(difficultyProfile,"item_count",[0,4,5,6,6,7][L]);
         const EASY=[
           {items:["Perro","Gato","Mariposa","Carro"],ans:"Carro",razon:"Los demás son animales"},
           {items:["Manzana","Naranja","Zanahoria","Limón"],ans:"Zanahoria",razon:"Los demás son frutas"},
@@ -4774,8 +4785,8 @@ const EX_ADULTO = {
           {items:["Triángulo","Cuadrado","Círculo","Pentágono"],ans:"Círculo",razon:"Los demás son polígonos"},
           {items:["Kilómetro","Metro","Litro","Centímetro"],ans:"Litro",razon:"Los demás miden longitud"}
         ];
-        const count=[0,4,5,6,6,7][L];
-        const pool=L<=2?[...EASY,...HARD.slice(0,1)]:L===3?[...EASY,...HARD]:[...HARD,...EASY];
+        const count=itemCount;
+        const pool=abstraction<=2?[...EASY,...HARD.slice(0,1)]:abstraction===3?[...EASY,...HARD]:[...HARD,...EASY];
         const [GRUPOS]=useState(()=>shuffle(pool).slice(0,count));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now()),locked=useRef(false);
@@ -4822,8 +4833,8 @@ const EX_ADULTO = {
       id: "ra_verdadero_falso",
       nombre: "Verdadero o falso",
       instruccion: "Lee o escucha cada afirmación y toca “Verdadero” o “Falso”.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const logicalComplexity=nfDifficultyValue(difficultyProfile,"logical_complexity",L); const premiseCount=nfDifficultyValue(difficultyProfile,"premise_count",1);
         const EASY=[
           {afirmacion:"Todos los perros son animales.",ans:true},
           {afirmacion:"Todos los animales son perros.",ans:false},
@@ -4838,8 +4849,8 @@ const EX_ADULTO = {
           {afirmacion:"Si ningún cuadrado es un círculo y esta figura es un cuadrado, entonces no puede ser un círculo.",ans:true}
         ];
         const count=[0,4,5,6,7,8][L];
-        const pool=L<=2?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
-        const [ITEMS]=useState(()=>shuffle(pool).slice(0,count));
+        const pool=logicalComplexity<=2?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
+        const [ITEMS]=useState(()=>shuffle(pool).slice(0,count).map(x=>({...x,afirmacion:premiseCount>=3?`${x.afirmacion} Evalúa la conclusión usando todas las premisas.`:x.afirmacion})));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now()),locked=useRef(false);
         const item=ITEMS[cur];
@@ -4887,8 +4898,8 @@ const EX_ADULTO = {
       id: "ra_deduccion",
       nombre: "¿Qué se puede concluir?",
       instruccion: "Lee o escucha las premisas y toca únicamente la conclusión que se deduce de la información presentada.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const logicalComplexity=nfDifficultyValue(difficultyProfile,"logical_complexity",L); const premiseCount=nfDifficultyValue(difficultyProfile,"premise_count",2);
         const pool=[
           {p:"Todos los tulipanes son flores. Este objeto es un tulipán.",ans:"Es una flor",opts:["Es una flor","Es un árbol","No es una planta","No se puede saber si es un tulipán"]},
           {p:"Ningún vehículo de la zona A puede estacionar hoy. El automóvil de Luis está en la zona A.",ans:"El automóvil de Luis no puede estacionar hoy",opts:["Puede estacionar","No puede estacionar hoy","Luis no tiene automóvil","La zona A está cerrada"]},
@@ -4897,7 +4908,7 @@ const EX_ADULTO = {
           {p:"Si el informe está aprobado, aparece una marca verde. Este informe no tiene marca verde.",ans:"Con esta regla, no puede afirmarse que esté aprobado",opts:["Está aprobado","Con esta regla, no puede afirmarse que esté aprobado","Está incompleto","Fue rechazado ayer"]},
           {p:"Todos los cursos avanzados requieren inscripción previa. Marta está en un curso avanzado.",ans:"Marta necesitó inscripción previa",opts:["Marta necesitó inscripción previa","Marta es profesora","El curso es gratuito","Marta no se inscribió"]},
         ];
-        const [items]=useState(()=>shuffle(pool).slice(0,Math.min(pool.length,[0,3,4,5,6,6][L])).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
+        const [items]=useState(()=>shuffle(pool.slice(0,Math.min(pool.length,Math.max(3,2+logicalComplexity)))).slice(0,Math.min(pool.length,[0,3,4,5,6,6][L])).map(x=>({...x,p:premiseCount>=3?`${x.p} Considera todas las premisas antes de concluir.`:x.p,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"razonamiento deductivo / inferencia lógica",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},430)};
         return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text={`${item.p} ¿Qué se puede concluir? Opciones: ${item.opts.join(". ")}.`} label="Escuchar problema" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><p style={{fontSize:M?"1.18rem":"1rem",fontWeight:800,lineHeight:1.7,margin:0,maxWidth:720}}>{item.p}</p></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} style={{minHeight:M?82:70,padding:12,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:750,lineHeight:1.4}}>{v}</button>)}</div></div>;
       }
@@ -4906,8 +4917,8 @@ const EX_ADULTO = {
       id: "ra_orden_logico",
       nombre: "Orden lógico",
       instruccion: "Usa las pistas para determinar el orden correcto. Toca la respuesta que cumple todas las relaciones.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const relationalComplexity=nfDifficultyValue(difficultyProfile,"relational_complexity",L); const constraintCount=nfDifficultyValue(difficultyProfile,"constraint_count",2);
         const pool=[
           {p:"Marta llegó antes que Carlos. Carlos llegó antes que Julia.",q:"¿Quién llegó primero?",ans:"Marta",opts:["Marta","Carlos","Julia","No se sabe"]},
           {p:"El libro rojo está a la izquierda del azul. El azul está a la izquierda del verde.",q:"¿Cuál está en el centro?",ans:"Azul",opts:["Rojo","Azul","Verde","No se sabe"]},
@@ -4916,7 +4927,7 @@ const EX_ADULTO = {
           {p:"El consultorio 2 está encima del 1. El 3 está debajo del 1.",q:"¿Cuál está más arriba?",ans:"Consultorio 2",opts:["Consultorio 1","Consultorio 2","Consultorio 3","Todos igual"]},
           {p:"Sofía terminó después de Elena pero antes de Diego.",q:"¿Quién terminó en segundo lugar entre los tres?",ans:"Sofía",opts:["Elena","Sofía","Diego","No se sabe"]},
         ];
-        const [items]=useState(()=>shuffle(pool).slice(0,Math.min(pool.length,[0,3,4,5,6,6][L])).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
+        const [items]=useState(()=>shuffle(pool.slice(0,Math.min(pool.length,Math.max(3,2+relationalComplexity)))).slice(0,Math.min(pool.length,[0,3,4,5,6,6][L])).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"razonamiento relacional / ordenamiento lógico",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},430)};
         return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text={`${item.p} ${item.q} Opciones: ${item.opts.join(", ")}.`} label="Escuchar pistas" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div><p style={{fontSize:M?"1.15rem":".98rem",fontWeight:750,lineHeight:1.65,margin:"0 0 12px"}}>{item.p}</p><strong style={{fontSize:M?"1.2rem":"1.02rem"}}>{item.q}</strong></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:650,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} style={{minHeight:68,padding:11,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800}}>{v}</button>)}</div></div>;
       }
@@ -4925,10 +4936,10 @@ const EX_ADULTO = {
       id: "ra_matriz_logica",
       nombre: "Matriz lógica",
       instruccion: "Observa cómo cambian las figuras y descubre la regla. Toca la opción que completa la secuencia.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L];
-        const shapes=["circle","square","triangle"];
-        const make=()=>{const start=Math.floor(Math.random()*3),seq=[0,1,2].map(i=>shapes[(start+i)%3]),ans=shapes[start],opts=shuffle(shapes);return{seq,ans,opts}};
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],visualComplexity=nfDifficultyValue(difficultyProfile,"visual_complexity",L),ruleCount=nfDifficultyValue(difficultyProfile,"rule_count",1);
+        const shapes=["circle","square","triangle","diamond","star"].slice(0,Math.min(5,3+Math.floor((visualComplexity-1)/2)));
+        const make=()=>{const start=Math.floor(Math.random()*shapes.length),step=ruleCount>=2?2:1,seq=[0,1,2].map(i=>shapes[(start+i*step)%shapes.length]),ans=shapes[(start+3*step)%shapes.length],opts=shuffle(shapes);return{seq,ans,opts}};
         const [items]=useState(()=>Array.from({length:count},make)),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"razonamiento no verbal / matrices lógicas",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
         return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa la secuencia de figuras y elige cuál continúa la regla." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div style={{display:"flex",gap:16,alignItems:"center"}}>{item.seq.map((x,i)=><div key={i} style={{width:M?88:72,height:M?88:72,border:`2px solid ${COLORS.border}`,borderRadius:12,display:"grid",placeItems:"center"}}><NFStimulusShape shape={x} size={M?58:48}/></div>)}<div style={{width:M?88:72,height:M?88:72,border:`2px dashed ${COLORS.primary}`,borderRadius:12,display:"grid",placeItems:"center",fontWeight:900,fontSize:"1.5rem",color:COLORS.primary}}>?</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,maxWidth:500,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} aria-label="Opción de figura" style={{minHeight:M?92:78,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape shape={v} size={M?56:46}/></button>)}</div></div>;
@@ -4940,8 +4951,8 @@ const EX_ADULTO = {
       id: "calc_operaciones",
       nombre: "Operaciones mentales",
       instruccion: "Resuelve cada operación mentalmente y toca el resultado correcto. No necesitas escribir.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const numericMagnitude=nfDifficultyValue(difficultyProfile,"numeric_magnitude",[0,20,30,45,70,100][L]); const operationType=nfDifficultyValue(difficultyProfile,"operation_type",[0,1,2,3,4,4][L]);
         const makeOptions=(ans)=>{
           const delta=Math.max(1,Math.round(Math.abs(ans)*0.08));
           const candidates=[...new Set([
@@ -5012,8 +5023,8 @@ const EX_ADULTO = {
       id: "calc_faltante",
       nombre: "Número faltante",
       instruccion: "Calcula qué número falta para que la operación sea correcta y toca la respuesta.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const operationComplexity=nfDifficultyValue(difficultyProfile,"operation_complexity",L);
         const EASY=[
           {expr:"? + 4 = 10",ans:6},{expr:"12 − ? = 7",ans:5},
           {expr:"? + 8 = 15",ans:7},{expr:"20 − ? = 12",ans:8}
@@ -5036,7 +5047,7 @@ const EX_ADULTO = {
           ])].filter(x=>x!==ans);
           return shuffle([ans,...shuffle(candidates).slice(0,3)]);
         };
-        const pool=L<=1?EASY:L===2?[...EASY,...MEDIUM]:L===3?MEDIUM:[...MEDIUM,...HARD];
+        const pool=operationComplexity<=1?EASY:operationComplexity===2?[...EASY,...MEDIUM]:operationComplexity===3?MEDIUM:[...MEDIUM,...HARD];
         const [ITEMS]=useState(()=>shuffle(pool).slice(0,[0,4,5,6,7,8][L]).map(x=>({...x,opts:makeOpts(x.ans)})));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now()),locked=useRef(false);
@@ -5086,8 +5097,8 @@ const EX_ADULTO = {
       id: "calc_problemas_cotidianos",
       nombre: "Problemas cotidianos",
       instruccion: "Lee o escucha la situación, identifica los datos necesarios y toca la respuesta correcta.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const operationCount=nfDifficultyValue(difficultyProfile,"operation_count",L); const irrelevantInfo=nfDifficultyValue(difficultyProfile,"irrelevant_information",0);
         const POOLS=[
           {q:"En una compra pagas $20.000 por un producto de $13.500. ¿Cuánto cambio recibes?",ans:6500,opts:[5500,6500,7500,8500],kind:"dinero"},
           {q:"Una cita inicia a las 3:20 p. m. y dura 40 minutos. ¿A qué hora termina?",ans:"4:00 p. m.",opts:["3:50 p. m.","4:00 p. m.","4:10 p. m.","4:20 p. m."],kind:"tiempo"},
@@ -5098,8 +5109,8 @@ const EX_ADULTO = {
           {q:"Una receta para 2 personas usa 4 huevos. Si preparas la misma cantidad para 4 personas, ¿cuántos huevos necesitas?",ans:8,opts:[6,8,10,12],kind:"proporcion"},
           {q:"En una caja hay 36 unidades. Se utilizan 15. ¿Cuántas quedan?",ans:21,opts:[19,20,21,22],kind:"cantidad"},
         ];
-        const count=[0,4,5,6,7,8][L];
-        const [items]=useState(()=>shuffle(POOLS).slice(0,count).map(x=>({...x,opts:shuffle(x.opts)})));
+        const count=Math.min(POOLS.length,3+Math.min(5,operationCount));
+        const [items]=useState(()=>shuffle(POOLS).slice(0,count).map(x=>({...x,q:irrelevantInfo>=2?`${x.q} Considera solo los datos necesarios para resolverlo.`:x.q,opts:shuffle(x.opts)})));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const t0=useRef(Date.now()),trial=useRef(Date.now()),records=useRef([]),locked=useRef(false);
         const item=items[cur];
@@ -5120,9 +5131,9 @@ const EX_ADULTO = {
       id: "calc_encadenado",
       nombre: "Cálculo encadenado",
       instruccion: "Empieza con el número indicado y aplica cada operación en orden. Mantén el resultado mentalmente hasta llegar al final.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),steps=L<=2?2:L<=4?3:4,count=[0,4,5,6,7,8][L];
-        const make=()=>{let start=Math.floor(Math.random()*12)+4,v=start,ops=[];for(let i=0;i<steps;i++){const add=Math.floor(Math.random()*7)+2;if(Math.random()<.55){v+=add;ops.push(`+ ${add}`)}else{const sub=Math.min(add,Math.max(1,v-1));v-=sub;ops.push(`− ${sub}`)}}const opts=shuffle([...new Set([v,v+1,Math.max(0,v-1),v+2])]).slice(0,4);return{start,ops,ans:v,opts:opts.includes(v)?opts:shuffle([v,...opts.slice(0,3)])}};
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),steps=nfDifficultyValue(difficultyProfile,"operation_count",L<=2?2:L<=4?3:4),count=[0,4,5,6,7,8][L],numericMagnitude=nfDifficultyValue(difficultyProfile,"numeric_magnitude",20);
+        const make=()=>{let start=Math.floor(Math.random()*Math.max(8,numericMagnitude-4))+4,v=start,ops=[];for(let i=0;i<steps;i++){const add=Math.floor(Math.random()*Math.max(4,Math.round(numericMagnitude/8)))+2;if(Math.random()<.55){v+=add;ops.push(`+ ${add}`)}else{const sub=Math.min(add,Math.max(1,v-1));v-=sub;ops.push(`− ${sub}`)}}const opts=shuffle([...new Set([v,v+1,Math.max(0,v-1),v+2])]).slice(0,4);return{start,ops,ans:v,opts:opts.includes(v)?opts:shuffle([v,...opts.slice(0,3)])}};
         const [items]=useState(()=>Array.from({length:count},make)),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{steps,clinicalProcess:"cálculo secuencial / memoria de trabajo",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
         const spoken=`Empieza en ${item.start}. ${item.ops.map(x=>x.replace("−","menos").replace("+","más")).join(". ")}. ¿Resultado final?`;
@@ -5133,8 +5144,8 @@ const EX_ADULTO = {
       id: "calc_estimacion",
       nombre: "Estimación y comparación",
       instruccion: "Sin hacer un cálculo exacto cuando no sea necesario, identifica el resultado más razonable o compara cantidades.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const optionProximity=nfDifficultyValue(difficultyProfile,"option_proximity",L); const contextComplexity=nfDifficultyValue(difficultyProfile,"context_complexity",L);
         const pool=[
           {q:"49 + 52 está más cerca de…",ans:100,opts:[50,75,100,150],kind:"estimacion"},
           {q:"¿Cuál operación da el resultado mayor?",ans:"38 + 27",opts:["38 + 27","52 − 9","6 × 8","90 ÷ 2"],kind:"comparacion"},
@@ -5143,7 +5154,7 @@ const EX_ADULTO = {
           {q:"¿Cuál cantidad es menor?",ans:0.25,opts:[0.25,0.5,0.75,1],kind:"comparacion"},
           {q:"97 − 51 está más cerca de…",ans:50,opts:[25,50,75,100],kind:"estimacion"},
         ];
-        const [items]=useState(()=>shuffle(pool).slice(0,Math.min(pool.length,[0,3,4,5,6,6][L])).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
+        const [items]=useState(()=>shuffle(pool.slice(0,Math.min(pool.length,Math.max(3,2+contextComplexity)))).slice(0,Math.min(pool.length,[0,3,4,5,6,6][L])).map(x=>{const wanted=optionProximity<=2?3:4;const ds=x.opts.filter(o=>o!==x.ans);return {...x,opts:shuffle([x.ans,...shuffle(ds).slice(0,wanted-1)])}})),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"estimación numérica / comparación cuantitativa",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
         return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text={`${item.q} Opciones: ${item.opts.join(", ")}.`} label="Escuchar pregunta" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={210}><p style={{fontSize:M?"1.25rem":"1.05rem",fontWeight:850,lineHeight:1.6,margin:0}}>{item.q}</p></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:580,margin:"0 auto"}}>{item.opts.map(v=><button key={String(v)} onClick={()=>pick(v)} disabled={locked.current} style={{minHeight:66,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:850}}>{v}</button>)}</div></div>;
       }
@@ -5152,8 +5163,8 @@ const EX_ADULTO = {
       id: "calc_dinero_cambio",
       nombre: "Dinero y cambio",
       instruccion: "Resuelve situaciones de compra y manejo de dinero. Toca la cantidad correcta.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const itemCount=nfDifficultyValue(difficultyProfile,"item_count",[0,3,4,5,6,6][L]); const stepCount=nfDifficultyValue(difficultyProfile,"step_count",L<=2?1:2);
         const pool=[
           {q:"Pagas $10.000 por una compra de $7.500. ¿Cambio?",ans:2500,opts:[1500,2000,2500,3500]},
           {q:"Compras dos productos de $12.000 cada uno. ¿Total?",ans:24000,opts:[12000,22000,24000,26000]},
@@ -5162,7 +5173,7 @@ const EX_ADULTO = {
           {q:"Pagas $100.000 por $68.500. ¿Cuánto cambio recibes?",ans:31500,opts:[30500,31500,32500,41500]},
           {q:"Tres entradas cuestan $18.000 cada una. ¿Total?",ans:54000,opts:[36000,48000,54000,56000]},
         ];
-        const [items]=useState(()=>shuffle(pool).slice(0,Math.min(pool.length,[0,3,4,5,6,6][L])).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
+        const [items]=useState(()=>shuffle(stepCount>=2?pool:pool.slice(0,4)).slice(0,Math.min(pool.length,itemCount)).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"cálculo funcional / manejo de dinero",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
         return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text={`${item.q} Opciones: ${item.opts.map(v=>v.toLocaleString("es-CO")).join(", ")} pesos.`} label="Escuchar situación" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={210}><p style={{fontSize:M?"1.2rem":"1rem",fontWeight:850,lineHeight:1.6,margin:0}}>{item.q}</p></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:580,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} style={{minHeight:66,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:850}}>${v.toLocaleString("es-CO")}</button>)}</div></div>;
       }
@@ -5173,10 +5184,11 @@ const EX_ADULTO = {
       id: "flex_regla",
       nombre: "Cambio de regla",
       instruccion: "La regla puede cambiar entre COLOR y FORMA. Observa primero la regla activa, luego el estímulo y responde según esa regla.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
         const RONDAS=[0,8,9,10,12,14][L];
-        const switchProbability=[0,.18,.25,.35,.45,.55][L];
+        const switchFrequency=nfDifficultyValue(difficultyProfile,"switch_frequency",L);
+        const switchProbability=Math.min(.65,.12+switchFrequency*.085);
         const ITEMS=[
           {shape:"circle",hex:"#DC4C4C",color:"rojo",forma:"círculo"},
           {shape:"circle",hex:"#3D6FBD",color:"azul",forma:"círculo"},
@@ -5253,15 +5265,15 @@ const EX_ADULTO = {
       id: "flex_opuesto",
       nombre: "Di lo contrario",
       instruccion: "Responde con la opción opuesta a lo que ves. Si aparece ARRIBA toca ABAJO; si aparece IZQUIERDA toca DERECHA, y viceversa.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const itemCount=nfDifficultyValue(difficultyProfile,"item_count",[0,6,8,10,12,14][L]); const interference=nfDifficultyValue(difficultyProfile,"interference",L);
         const pairs=[
           {stim:"ARRIBA",answer:"ABAJO",group:["ARRIBA","ABAJO"],icon:"↑"},
           {stim:"ABAJO",answer:"ARRIBA",group:["ARRIBA","ABAJO"],icon:"↓"},
           {stim:"IZQUIERDA",answer:"DERECHA",group:["IZQUIERDA","DERECHA"],icon:"←"},
           {stim:"DERECHA",answer:"IZQUIERDA",group:["IZQUIERDA","DERECHA"],icon:"→"},
         ];
-        const count=[0,6,8,10,12,14][L];
+        const count=itemCount;
         const [trials]=useState(()=>Array.from({length:count},()=>pairs[Math.floor(Math.random()*pairs.length)]));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[feedback,setFeedback]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now());
@@ -5311,8 +5323,8 @@ const EX_ADULTO = {
       id: "cp_inferencia",
       nombre: "Inferencias",
       instruccion: "Lee o escucha cada situación y toca la conclusión más razonable. La respuesta debe apoyarse en la información presentada, no en suposiciones extremas.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const inferenceDepth=nfDifficultyValue(difficultyProfile,"inference_depth",L); const implicitness=nfDifficultyValue(difficultyProfile,"implicitness",L);
         const EASY=[
           {contexto:"Al salir de casa, Laura vio la calle mojada y a varias personas cerrando sus paraguas.",pregunta:"¿Qué es razonable inferir?",opts:["Había llovido recientemente","Lavaron todas las calles","Era de noche","Había mucho viento"],ans:"Había llovido recientemente",type:"causal"},
           {contexto:"Pedro entró a la cocina con las manos llenas de harina y colocó una bandeja de masa junto al horno.",pregunta:"¿Qué actividad probablemente estaba realizando?",opts:["Preparaba algo para hornear","Reparaba una bicicleta","Regaba plantas","Pintaba una pared"],ans:"Preparaba algo para hornear",type:"causal"},
@@ -5381,8 +5393,8 @@ const EX_ADULTO = {
       id: "cp_texto",
       nombre: "Comprensión de texto",
       instruccion: "Lee o escucha el texto a tu ritmo. Después responde preguntas literales e inferenciales. Puedes volver a consultar el texto si lo necesitas.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const targetLength=nfDifficultyValue(difficultyProfile,"text_length",130); const questionInference=nfDifficultyValue(difficultyProfile,"question_inference",L);
         const TEXTOS=[
           {
             titulo:"Una mañana de mercado",
@@ -5415,7 +5427,7 @@ const EX_ADULTO = {
             ]
           }
         ];
-        const [texto]=useState(()=>TEXTOS[Math.floor(Math.random()*TEXTOS.length)]);
+        const [texto]=useState(()=>{const ordered=[...TEXTOS].sort((a,b)=>a.texto.length-b.texto.length);const candidates=targetLength<110?ordered.slice(0,Math.max(1,Math.ceil(ordered.length/2))):targetLength>160?ordered.slice(Math.floor(ordered.length/2)):ordered;return candidates[Math.floor(Math.random()*candidates.length)]});
         const questionCount=[0,2,3,4,4,4][L];
         const [questions]=useState(()=>{
           const literals=shuffle(texto.preguntas.filter(q=>q.type==="literal"));
@@ -5507,8 +5519,8 @@ const EX_ADULTO = {
       id: "cp_idea_principal",
       nombre: "Idea principal",
       instruccion: "Lee o escucha el texto y selecciona la opción que expresa mejor su idea principal, sin confundirla con un detalle.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 2 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const targetLength=nfDifficultyValue(difficultyProfile,"text_length",60); const distractorSimilarity=nfDifficultyValue(difficultyProfile,"distractor_similarity",L);
         const pool=[
           {texto:"El centro comunitario abrió nuevos talleres de cocina, lectura y actividad física. Las inscripciones estarán disponibles durante toda la semana y las actividades comenzarán el próximo lunes.",ans:"El centro comunitario ofrece nuevos talleres",opts:["El centro comunitario ofrece nuevos talleres","Solo habrá un taller de cocina","Las inscripciones terminaron","Las actividades comenzaron ayer"]},
           {texto:"Dormir de forma regular favorece la atención durante el día. Mantener horarios parecidos para acostarse y levantarse puede ayudar a organizar el descanso.",ans:"La regularidad del sueño puede favorecer el funcionamiento diario",opts:["La regularidad del sueño puede favorecer el funcionamiento diario","Dormir siempre elimina el cansancio","Levantarse tarde mejora la atención","Los horarios no influyen en el descanso"]},
@@ -5517,8 +5529,8 @@ const EX_ADULTO = {
           {texto:"Antes de viajar, Camilo revisó el estado del vehículo, confirmó la ruta y guardó los documentos necesarios. También salió con tiempo adicional por posibles retrasos.",ans:"Camilo se preparó con anticipación para el viaje",opts:["Camilo se preparó con anticipación para el viaje","Camilo decidió cancelar el viaje","El vehículo estaba averiado","Camilo olvidó sus documentos"]},
           {texto:"Una alimentación variada incluye diferentes grupos de alimentos y cantidades adecuadas. No depende de un único producto, sino del equilibrio general de las elecciones habituales.",ans:"Una alimentación variada depende del equilibrio entre diferentes alimentos",opts:["Una alimentación variada depende del equilibrio entre diferentes alimentos","Un solo alimento es suficiente","Todos deben comer exactamente lo mismo","La variedad significa comer más cantidad"]},
         ];
-        const count=Math.min(pool.length,[0,3,4,5,6,6][L]);
-        const [items]=useState(()=>shuffle(pool).slice(0,count).map(x=>({...x,opts:shuffle(x.opts)})));
+        const count=Math.min(pool.length,[0,3,4,5,6,6][L]); const ordered=[...pool].sort((a,b)=>a.texto.length-b.texto.length); const candidatePool=targetLength<70?ordered.slice(0,4):targetLength>95?ordered.slice(-4):ordered;
+        const [items]=useState(()=>shuffle(candidatePool).slice(0,count).map(x=>{const wanted=distractorSimilarity<=2?3:4;const ds=x.opts.filter(o=>o!==x.ans);return {...x,opts:shuffle([x.ans,...shuffle(ds).slice(0,wanted-1)])}}));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const t0=useRef(Date.now()),locked=useRef(false),records=useRef([]); const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);records.current.push({ok});setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,mainIdea:true,audioSupportAvailable:true,clinicalProcess:"comprensión global / identificación de idea principal",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},450)};
@@ -5529,8 +5541,8 @@ const EX_ADULTO = {
       id: "cp_secuencia_historia",
       nombre: "Ordena la historia",
       instruccion: "Lee o escucha los acontecimientos y ordénalos según ocurrieron. Toca cada tarjeta en el orden correcto.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const eventCount=nfDifficultyValue(difficultyProfile,"event_count",L<=2?3:4);
         const stories=[
           ["Lucía recibió una receta médica.","Fue a la farmacia.","Entregó la receta al farmacéutico.","Recibió el medicamento."],
           ["Andrés eligió una receta de cocina.","Reunió los ingredientes.","Preparó la mezcla.","Colocó la preparación en el horno."],
@@ -5538,7 +5550,7 @@ const EX_ADULTO = {
           ["Julián buscó un libro en el catálogo.","Anotó la ubicación.","Fue hasta la sección indicada.","Tomó el libro del estante."],
           ["Elena recibió una factura.","Revisó el valor y la fecha.","Realizó el pago.","Guardó el comprobante."],
         ];
-        const wanted=L<=2?3:4;
+        const wanted=Math.max(3,Math.min(4,eventCount));
         const [target]=useState(()=>{const st=stories[Math.floor(Math.random()*stories.length)];return st.slice(0,wanted)});
         const [choices]=useState(()=>shuffle(target)),[picked,setPicked]=useState([]);const t0=useRef(Date.now()),locked=useRef(false);
         const choose=v=>{if(locked.current||picked.includes(v))return;const next=[...picked,v];setPicked(next);if(next.length===target.length){locked.current=true;const correct=next.reduce((n,x,i)=>n+(x===target[i]?1:0),0);setTimeout(()=>onDone({correct,total:target.length,errors:target.length-correct,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,eventSequencing:true,audioSupportAvailable:true,clinicalProcess:"comprensión temporal / secuenciación de acontecimientos",noTyping:true}}),500)}};
@@ -5550,8 +5562,8 @@ const EX_ADULTO = {
       id: "cp_info_relevante",
       nombre: "Información relevante",
       instruccion: "Lee o escucha la situación y selecciona únicamente los datos necesarios para resolver la pregunta.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const irrelevantInfo=nfDifficultyValue(difficultyProfile,"irrelevant_information",1); const selectionLoad=nfDifficultyValue(difficultyProfile,"selection_load",L);
         const pool=[
           {contexto:"Carolina tiene una cita a las 10:30. El consultorio queda a 25 minutos de su casa. Le gusta escuchar música en el trayecto y hoy lleva una chaqueta azul. Quiere llegar 10 minutos antes.",q:"¿Qué datos necesita para decidir a qué hora salir?",facts:["Hora de la cita","Duración del trayecto","Tiempo de anticipación","Color de la chaqueta","Música que escucha"],ans:["Hora de la cita","Duración del trayecto","Tiempo de anticipación"]},
           {contexto:"Pedro comprará 4 cuadernos. Cada uno cuesta $8.000. La papelería tiene paredes verdes y abre desde las 8. Pedro quiere saber cuánto pagará.",q:"¿Qué información necesita para calcular el total?",facts:["Cantidad de cuadernos","Precio de cada cuaderno","Color de las paredes","Hora de apertura"],ans:["Cantidad de cuadernos","Precio de cada cuaderno"]},
@@ -5559,7 +5571,7 @@ const EX_ADULTO = {
           {contexto:"Un medicamento debe tomarse cada 8 horas. La primera dosis fue a las 6:00 a. m. La caja es blanca y fue comprada ayer.",q:"¿Qué datos permiten calcular la hora de la siguiente dosis?",facts:["Hora de la primera dosis","Intervalo entre dosis","Color de la caja","Día de compra"],ans:["Hora de la primera dosis","Intervalo entre dosis"]},
         ];
         const count=Math.min(pool.length,[0,2,3,4,4,4][L]);
-        const [items]=useState(()=>shuffle(pool).slice(0,count).map(x=>({...x,facts:shuffle(x.facts)}))),[cur,setCur]=useState(0),[selected,setSelected]=useState([]),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
+        const [items]=useState(()=>shuffle(pool).slice(0,count).map(x=>{const irrelevant=x.facts.filter(f=>!x.ans.includes(f));const extras=shuffle(irrelevant).slice(0,Math.min(irrelevant.length,Math.max(0,irrelevantInfo)));const more=selectionLoad>=4?shuffle(irrelevant.filter(f=>!extras.includes(f))).slice(0,1):[];return {...x,facts:shuffle([...new Set([...x.ans,...extras,...more])])}})),[cur,setCur]=useState(0),[selected,setSelected]=useState([]),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const toggle=v=>{if(locked.current)return;setSelected(a=>a.includes(v)?a.filter(x=>x!==v):[...a,v])};
         const confirm=()=>{if(locked.current||!selected.length)return;locked.current=true;const exact=selected.length===item.ans.length&&item.ans.every(x=>selected.includes(x));const ns=score+(exact?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,relevanceSelection:true,audioSupportAvailable:true,clinicalProcess:"selección de información relevante / comprensión funcional",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSelected([]);locked.current=false}},500)};
         return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.contexto} label="Escuchar situación" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><p style={{margin:0,maxWidth:740,textAlign:"left",fontSize:M?"1.1rem":".94rem",lineHeight:1.8}}>{item.contexto}</p></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:720,margin:"0 auto 10px",gap:8}}><strong style={{textAlign:"left"}}>{item.q}</strong><NFAudioReadButton text={item.q} label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.facts.map(v=><button key={v} disabled={locked.current} onClick={()=>toggle(v)} style={{minHeight:66,padding:11,borderRadius:12,border:`2px solid ${selected.includes(v)?COLORS.primary:COLORS.border}`,background:selected.includes(v)?COLORS.primary+"0D":"#fff",fontFamily:"inherit",fontWeight:760}}>{v}</button>)}</div><div style={{maxWidth:420,margin:"12px auto 0"}}><BtnPrimary onClick={confirm} disabled={!selected.length||locked.current} style={{width:"100%"}}>Confirmar selección</BtnPrimary></div></div>;
@@ -5569,8 +5581,8 @@ const EX_ADULTO = {
       id: "cp_lectura_funcional",
       nombre: "Lectura funcional",
       instruccion: "Lee o escucha un mensaje, aviso, horario o instrucción cotidiana y responde usando la información disponible.",
-      Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
-        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+      Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
+        const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const documentComplexity=nfDifficultyValue(difficultyProfile,"document_complexity",L); const stepCount=nfDifficultyValue(difficultyProfile,"step_count",1);
         const pool=[
           {kind:"mensaje",title:"Mensaje",text:"Hola, Marta. La reunión de mañana cambió de las 9:00 a las 10:30. Será en la sala 3. Por favor lleva el informe impreso.",q:"¿A qué hora será la reunión?",ans:"10:30",opts:["9:00","9:30","10:00","10:30"]},
           {kind:"aviso",title:"Aviso",text:"Por mantenimiento, el ascensor estará fuera de servicio de 2:00 p. m. a 4:00 p. m. Durante ese periodo utilice las escaleras.",q:"¿Qué debe hacer una persona que necesita subir a las 3:00 p. m.?",ans:"Usar las escaleras",opts:["Esperar dentro del ascensor","Usar las escaleras","Volver a las 2:00","Llamar al mantenimiento"]},
@@ -5580,7 +5592,7 @@ const EX_ADULTO = {
           {kind:"correo",title:"Correo breve",text:"El plazo para enviar el formulario termina el viernes a las 5:00 p. m. Los documentos enviados después de esa hora se revisarán la semana siguiente.",q:"¿Qué ocurre si se envía después de las 5:00 p. m. del viernes?",ans:"Se revisará la semana siguiente",opts:["Se elimina automáticamente","Se revisará la semana siguiente","Se revisa el mismo viernes","No necesita revisión"]},
         ];
         const count=Math.min(pool.length,[0,3,4,5,6,6][L]);
-        const [items]=useState(()=>shuffle(pool).slice(0,count).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
+        const [items]=useState(()=>shuffle(pool.slice(0,Math.min(pool.length,Math.max(3,2+documentComplexity)))).slice(0,count).map(x=>({...x,text:stepCount>=2?`${x.text} Revisa toda la información antes de responder.`:x.text,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,functionalReading:true,audioSupportAvailable:true,clinicalProcess:"comprensión lectora funcional / aplicación de información",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},450)};
         return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.text} label={`Escuchar ${item.kind}`} mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={245}><div style={{maxWidth:720,textAlign:"left",width:"100%"}}><div style={{fontSize:".68rem",fontWeight:850,color:COLORS.primary,marginBottom:9}}>{item.title.toUpperCase()}</div><p style={{margin:0,fontSize:M?"1.12rem":".96rem",lineHeight:1.85}}>{item.text}</p></div></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:720,margin:"0 auto 10px",gap:8}}><strong style={{textAlign:"left"}}>{item.q}</strong><NFAudioReadButton text={item.q} label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?82:70,padding:12,textAlign:"left",borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:760,lineHeight:1.45}}>{v}</button>)}</div></div>;
       }
@@ -5740,6 +5752,13 @@ const NEUROFLEX_EXERCISE_PROFILE_VERSION = "NF-EX-PROFILE-1.0";
 
 const NEUROFLEX_SUPPORT_SYSTEM_VERSION = "NF-SUPPORT-2.0";
 const NEUROFLEX_INSTRUCTION_HIERARCHY_VERSION = "NF-INSTRUCTION-1.0";
+const NEUROFLEX_TASK_PREPARATION_VERSION = "NF-PREP-2.0";
+const NEUROFLEX_MULTIDIMENSIONAL_DIFFICULTY_VERSION = "NF-DIFF-MULTI-1.0";
+const NEUROFLEX_MULTIDIMENSIONAL_CONNECTION_VERSION = "NF-DIFF-CONNECT-1.1";
+const NEUROFLEX_MULTIDIMENSIONAL_CLOSURE_VERSION = "NF-DIFF-CLOSE-1.0";
+const NEUROFLEX_NORMALIZED_METRICS_VERSION = "NF-METRICS-1.0";
+const NEUROFLEX_CONTEXTUAL_PROGRESS_VERSION = "NF-PROGRESS-CONTEXT-1.0";
+const NEUROFLEX_REPORT_METRICS_VERSION = "NF-REPORT-METRICS-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -5968,6 +5987,360 @@ function getNFExerciseAdaptiveArchitectureSummary(){
 }
 
 
+// ─── FASE D · DIFICULTAD MULTIDIMENSIONAL ────────────────────────────────────
+// Traduce el nivel adaptativo 1–5 en variables cognitivas concretas.
+// El nivel sigue siendo una referencia clínica general; los parámetros efectivos
+// quedan registrados por ejercicio para permitir comparaciones más transparentes.
+
+const NF_DIFFICULTY_DIMENSION_PRESETS = {
+  sequence_length:{min:2,max:7,unit:"elementos",direction:"up"},
+  trial_count:{min:4,max:14,unit:"ensayos",direction:"up"},
+  item_count:{min:4,max:10,unit:"ítems",direction:"up"},
+  stimulus_count:{min:8,max:28,unit:"estímulos",direction:"up"},
+  stimulus_set_size:{min:4,max:10,unit:"estímulos distintos",direction:"up"},
+  presentation_interval:{min:1150,max:720,unit:"ms",direction:"down"},
+  presentation_speed:{min:1300,max:650,unit:"ms",direction:"down"},
+  study_time:{min:25,max:12,unit:"s",direction:"down"},
+  exposure_time:{min:18,max:7,unit:"s",direction:"down"},
+  time_limit:{min:90,max:40,unit:"s",direction:"down"},
+  time_window:{min:60,max:45,unit:"s",direction:"down"},
+  delay:{min:5,max:25,unit:"s",direction:"up"},
+  distractor_count:{min:2,max:6,unit:"distractores",direction:"up"},
+  distractor_similarity:{min:1,max:5,unit:"nivel",direction:"up"},
+  stimulus_similarity:{min:1,max:5,unit:"nivel",direction:"up"},
+  semantic_similarity:{min:1,max:5,unit:"nivel",direction:"up"},
+  acoustic_similarity:{min:1,max:5,unit:"nivel",direction:"up"},
+  frequency_proximity:{min:1,max:5,unit:"nivel",direction:"up"},
+  visual_density:{min:1,max:5,unit:"nivel",direction:"up"},
+  distractor_density:{min:1,max:5,unit:"nivel",direction:"up"},
+  overlap:{min:0,max:4,unit:"nivel",direction:"up"},
+  interference:{min:0,max:4,unit:"nivel",direction:"up"},
+  irrelevant_information:{min:0,max:4,unit:"nivel",direction:"up"},
+  rule_count:{min:1,max:3,unit:"reglas",direction:"up"},
+  switch_frequency:{min:1,max:5,unit:"nivel",direction:"up"},
+  rule_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  operation_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  operation_type:{min:1,max:4,unit:"nivel",direction:"up"},
+  operation_count:{min:1,max:5,unit:"operaciones",direction:"up"},
+  step_count:{min:1,max:5,unit:"pasos",direction:"up"},
+  numeric_magnitude:{min:10,max:100,unit:"rango",direction:"up"},
+  numeric_range:{min:10,max:30,unit:"rango",direction:"up"},
+  working_memory_load:{min:1,max:5,unit:"nivel",direction:"up"},
+  dual_task_load:{min:1,max:5,unit:"nivel",direction:"up"},
+  reordering_load:{min:1,max:5,unit:"nivel",direction:"up"},
+  alternation_demand:{min:1,max:5,unit:"nivel",direction:"up"},
+  inference_depth:{min:1,max:5,unit:"nivel",direction:"up"},
+  logical_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  relational_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  syntactic_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  semantic_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  semantic_abstraction:{min:1,max:5,unit:"nivel",direction:"up"},
+  conceptual_abstraction:{min:1,max:5,unit:"nivel",direction:"up"},
+  abstraction:{min:1,max:5,unit:"nivel",direction:"up"},
+  narrative_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  context_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  context_information:{min:1,max:5,unit:"nivel",direction:"up"},
+  visual_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  figure_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  document_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  causal_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  temporal_similarity:{min:1,max:5,unit:"nivel",direction:"up"},
+  implicitness:{min:1,max:5,unit:"nivel",direction:"up"},
+  ambiguity:{min:1,max:5,unit:"nivel",direction:"up"},
+  cue_explicitness:{min:5,max:1,unit:"nivel",direction:"down"},
+  cue_level:{min:0,max:4,unit:"nivel",direction:"up"},
+  support_level:{min:0,max:4,unit:"nivel",direction:"up"},
+  contextual_cueing:{min:4,max:0,unit:"nivel",direction:"down"},
+  modeling_level:{min:0,max:4,unit:"nivel",direction:"up"},
+  action_step_count:{min:2,max:6,unit:"pasos",direction:"up"},
+  event_count:{min:2,max:6,unit:"eventos",direction:"up"},
+  element_count:{min:3,max:8,unit:"elementos",direction:"up"},
+  constraint_count:{min:1,max:5,unit:"restricciones",direction:"up"},
+  information_units:{min:3,max:9,unit:"unidades",direction:"up"},
+  premise_count:{min:2,max:6,unit:"premisas",direction:"up"},
+  pattern_length:{min:3,max:8,unit:"elementos",direction:"up"},
+  series_length:{min:4,max:9,unit:"elementos",direction:"up"},
+  rotation_angle:{min:45,max:180,unit:"°",direction:"up"},
+  target_count:{min:1,max:5,unit:"objetivos",direction:"up"},
+  target_density:{min:.22,max:.10,unit:"proporción",direction:"down"},
+  go_nogo_ratio:{min:.75,max:.55,unit:"proporción go",direction:"down"},
+  predictability:{min:5,max:1,unit:"nivel",direction:"down"},
+  foreperiod_variability:{min:1,max:5,unit:"nivel",direction:"up"},
+  distractor_presence:{min:0,max:1,unit:"presencia",direction:"up"},
+  carry_borrow:{min:0,max:1,unit:"presencia",direction:"up"},
+  unknown_position:{min:1,max:4,unit:"nivel",direction:"up"},
+  lexical_difficulty:{min:1,max:5,unit:"nivel",direction:"up"},
+  lexical_frequency:{min:5,max:1,unit:"frecuencia relativa",direction:"down"},
+  category_constraint:{min:1,max:5,unit:"nivel",direction:"up"},
+  switching_demand:{min:1,max:5,unit:"nivel",direction:"up"},
+  question_inference:{min:1,max:5,unit:"nivel",direction:"up"},
+  selection_load:{min:1,max:5,unit:"nivel",direction:"up"},
+  concurrent_task_load:{min:1,max:5,unit:"nivel",direction:"up"},
+  distractor_load:{min:1,max:5,unit:"nivel",direction:"up"},
+  signal_noise_ratio:{min:5,max:1,unit:"nivel",direction:"down"},
+  target_frequency:{min:1,max:4,unit:"nivel",direction:"up"},
+  change_subtlety:{min:1,max:5,unit:"nivel",direction:"up"},
+  occlusion_level:{min:.2,max:.65,unit:"proporción",direction:"up"},
+  option_proximity:{min:1,max:5,unit:"nivel",direction:"up"},
+  denomination_combinations:{min:1,max:5,unit:"nivel",direction:"up"},
+  reflection_depth:{min:1,max:5,unit:"nivel",direction:"up"},
+  text_length:{min:45,max:130,unit:"palabras",direction:"up"},
+  time_pressure:{min:90,max:45,unit:"s",direction:"down"},
+  sequence_complexity:{min:1,max:5,unit:"nivel",direction:"up"},
+  prediction_performance_comparison:{min:1,max:5,unit:"nivel",direction:"up"},
+  confidence_discrimination:{min:1,max:5,unit:"nivel",direction:"up"},
+};
+
+const NF_EXERCISE_DIFFICULTY_OVERRIDES = {
+  digits_forward:{
+    sequence_length:[3,4,5,6,7],
+    presentation_interval:[1100,1000,900,820,750],
+    trial_count:[1,1,1,1,1],
+  },
+  digits_backward:{
+    sequence_length:[2,3,4,5,6],
+    presentation_interval:[1150,1050,950,880,800],
+    trial_count:[1,1,1,1,1],
+  },
+  letter_number:{
+    sequence_length:[4,4,5,6,6],
+    reordering_load:[1,2,3,4,5],
+    stimulus_similarity:[1,2,3,4,5],
+  },
+  operation_span:{
+    sequence_length:[3,3,4,4,5],
+    operation_complexity:[1,2,3,4,5],
+    dual_task_load:[1,2,3,4,5],
+  },
+  nback_1:{
+    trial_count:[7,8,10,12,14],
+    stimulus_set_size:[4,5,6,8,10],
+    presentation_speed:[1250,1125,1000,875,750],
+    stimulus_similarity:[1,2,3,4,5],
+  },
+  word_recall:{
+    item_count:[5,6,8,9,10],
+    study_time:[25,22,20,17,15],
+    delay:[12,14,15,17,20],
+    semantic_similarity:[1,2,3,4,5],
+    interference:[1,2,3,4,5],
+  },
+  sustained_attention:{
+    trial_count:[24,45,54,80,96],
+    target_density:[.20,.19,.18,.16,.14],
+    distractor_similarity:[1,2,3,4,5],
+    presentation_speed:[1300,1150,1000,850,750],
+  },
+  divided_attention:{
+    trial_count:[6,8,10,12,14],
+    dual_task_load:[1,2,3,4,5],
+    numeric_range:[10,14,18,22,26],
+    presentation_speed:[1400,1250,1100,950,800],
+  },
+  find_animal:{
+    stimulus_count:[9,12,15,18,20],
+    distractor_similarity:[1,2,3,4,5],
+    visual_density:[1,2,3,4,5],
+    time_limit:[90,80,70,60,50],
+  },
+  trail_making:{
+    sequence_length:[6,8,10,12,14],
+    alternation_demand:[1,2,3,4,5],
+    visual_density:[1,2,3,4,5],
+  },
+  visual_matching:{
+    distractor_count:[2,3,3,4,5],
+    stimulus_similarity:[1,2,3,4,5],
+    trial_count:[4,5,6,7,8],
+  },
+  pe_rotacion:{
+    rotation_angle:[45,60,90,135,180],
+    figure_complexity:[1,2,3,4,5],
+    distractor_similarity:[1,2,3,4,5],
+  },
+  pe_contar:{
+    stimulus_count:[10,12,16,20,24],
+    visual_density:[1,2,3,4,5],
+    overlap:[0,1,2,3,4],
+    trial_count:[4,5,6,7,8],
+  },
+  calc_operaciones:{
+    numeric_magnitude:[20,30,45,70,100],
+    operation_type:[1,2,3,4,4],
+    carry_borrow:[0,0,1,1,1],
+    step_count:[1,1,1,2,2],
+  },
+  flex_regla:{
+    rule_count:[2,2,2,3,3],
+    switch_frequency:[1,2,3,4,5],
+    stimulus_similarity:[1,2,3,4,5],
+    interference:[1,2,3,4,5],
+  },
+  nf_inhibition_stop:{
+    go_nogo_ratio:[.75,.70,.65,.60,.55],
+    presentation_speed:[1450,1300,1150,1000,850],
+    predictability:[5,4,3,2,1],
+    trial_count:[8,10,12,14,16],
+  },
+  nf_visual_memory:{
+    stimulus_count:[4,5,6,7,8],
+    stimulus_similarity:[1,2,3,4,5],
+    exposure_time:[18,15,12,10,8],
+    delay:[4,6,8,10,12],
+  },
+  pa_orden_sonidos:{
+    sequence_length:[2,2,3,3,4],
+    presentation_speed:[500,460,420,370,330],
+    stimulus_similarity:[1,2,3,4,5],
+  },
+  pa_sonido_objetivo:{
+    signal_noise_ratio:[5,4,3,2,1],
+    distractor_density:[1,2,3,4,5],
+    target_frequency:[1,2,2,3,4],
+    presentation_speed:[520,470,420,360,320],
+  },
+  calc_problemas_cotidianos:{step_count:[1,1,2,2,3],operation_count:[1,1,2,2,3],irrelevant_information:[0,1,1,2,2],numeric_magnitude:[20,35,50,80,120]},
+  calc_encadenado:{operation_count:[2,2,3,3,4],working_memory_load:[1,2,3,4,5],numeric_magnitude:[15,20,30,45,60],presentation_speed:[1400,1250,1100,950,800]},
+  calc_estimacion:{numeric_range:[50,100,250,500,1000],option_proximity:[1,2,3,4,5],context_complexity:[1,2,3,4,5]},
+  calc_dinero_cambio:{item_count:[3,4,5,6,6],numeric_magnitude:[10000,25000,50000,80000,100000],denomination_combinations:[1,2,3,4,5],step_count:[1,1,2,2,3]},
+  ra_deduccion:{premise_count:[2,2,2,3,3],inference_depth:[1,2,3,4,5],logical_complexity:[1,2,3,4,5]},
+  ra_orden_logico:{element_count:[3,3,3,4,4],constraint_count:[2,2,3,3,4],relational_complexity:[1,2,3,4,5]},
+  ra_matriz_logica:{rule_count:[1,1,2,2,3],visual_complexity:[1,2,3,4,5],distractor_similarity:[1,2,3,4,5]},
+  cp_idea_principal:{text_length:[45,60,75,95,120],distractor_similarity:[1,2,3,4,5],abstraction:[1,2,3,4,5]},
+  cp_secuencia_historia:{event_count:[3,3,4,4,4],causal_complexity:[1,2,3,4,5],temporal_similarity:[1,2,3,4,5]},
+  cp_info_relevante:{text_length:[45,60,75,95,115],irrelevant_information:[0,1,1,2,2],selection_load:[1,2,3,4,5]},
+  cp_lectura_funcional:{document_complexity:[1,2,3,4,5],step_count:[1,1,2,2,3],irrelevant_information:[0,1,1,2,2],time_pressure:[90,80,70,60,50]},
+  pv_detecta_cambio:{change_subtlety:[1,2,3,4,5],exposure_time:[18,15,12,10,8],delay:[1,2,3,4,5],visual_complexity:[1,2,3,4,5]},
+  pv_cierre_visual:{occlusion_level:[.20,.30,.40,.52,.65],figure_complexity:[1,2,3,4,5],distractor_similarity:[1,2,3,4,5]},
+  pv_figura_fondo:{visual_density:[1,2,3,4,5],overlap:[0,1,2,3,4],target_count:[2,3,3,4,5],distractor_similarity:[1,2,3,4,5]},
+  pa_igual_diferente:{acoustic_similarity:[1,2,3,4,5],presentation_speed:[520,470,420,370,330],trial_count:[4,5,6,7,8]},
+  pa_agudo_grave:{frequency_proximity:[1,2,3,4,5],presentation_speed:[520,470,420,370,330],trial_count:[4,5,6,7,8]},
+  nf_prospective_event:{delay:[2,3,4,5,6],distractor_load:[1,2,3,4,5],event_count:[3,4,4,5,5],concurrent_task_load:[1,2,3,4,5]},
+  nf_visual_memory:{stimulus_count:[4,5,6,7,8],stimulus_similarity:[1,2,3,4,5],exposure_time:[14,12,10,8,6],delay:[0,1,2,3,4]},
+  story_recall:{information_units:[3,4,5,6,7],narrative_complexity:[1,2,3,4,5],interference:[0,1,2,3,4],delay:[5,8,12,16,20]},
+  reaction_time:{trial_count:[5,6,7,8,9],foreperiod_variability:[1,2,3,4,5],distractor_presence:[0,0,0,1,1]},
+  color_naming:{item_count:[8,10,12,14,16],presentation_speed:[1500,1350,1200,1050,900],interference:[0,1,2,3,4]},
+  verbal_fluency:{category_constraint:[1,2,3,4,5],time_window:[60,60,55,50,45],switching_demand:[1,1,2,3,4]},
+  naming:{item_count:[4,5,6,7,8],lexical_frequency:[5,4,3,2,1],visual_complexity:[1,2,3,4,5],cue_level:[1,1,2,2,3]},
+  analogias_verbales:{item_count:[3,4,5,6,7],semantic_abstraction:[1,2,3,4,5],distractor_similarity:[1,2,3,4,5]},
+  verbal_comprehension:{item_count:[3,4,5,6,7],syntactic_complexity:[1,2,3,4,5],semantic_complexity:[1,2,3,4,5],distractor_similarity:[1,2,3,4,5]},
+  pe_patron:{pattern_length:[4,5,5,6,6],rule_count:[1,1,2,2,3],rule_complexity:[1,2,3,4,5]},
+  temporal_orientation:{support_level:[2,2,1,1,0],contextual_cueing:[4,3,2,1,0]},
+  spatial_orientation:{context_complexity:[1,2,3,4,5],support_level:[2,2,1,1,0]},
+  or_personas:{context_information:[1,2,3,4,5],support_level:[2,2,1,1,0]},
+  or_situacion:{context_complexity:[1,2,3,4,5],support_level:[2,2,1,1,0]},
+  ra_series:{rule_complexity:[1,2,3,4,5],series_length:[4,4,5,5,6],rule_count:[1,1,1,2,2]},
+  ra_discordante:{conceptual_abstraction:[1,2,3,4,5],distractor_similarity:[1,2,3,4,5],item_count:[4,5,6,6,7]},
+  ra_verdadero_falso:{premise_count:[1,1,2,2,3],logical_complexity:[1,2,3,4,5],inference_depth:[1,2,3,4,5]},
+  calc_faltante:{step_count:[1,1,1,2,2],unknown_position:[1,2,3,4,4],operation_complexity:[1,2,3,4,5]},
+  flex_opuesto:{lexical_difficulty:[1,2,3,4,5],interference:[1,2,3,4,5],item_count:[6,8,10,12,14]},
+  cp_inferencia:{text_length:[35,45,60,75,95],inference_depth:[1,2,3,4,5],implicitness:[1,2,3,4,5],irrelevant_information:[0,1,1,2,2]},
+  cp_texto:{text_length:[80,100,130,160,200],syntactic_complexity:[1,2,3,4,5],question_inference:[1,2,3,4,5],time_limit:[0,0,0,90,75]},
+  nf_auditory_patterns:{sequence_length:[2,2,3,3,4],stimulus_similarity:[1,2,3,4,5],presentation_speed:[520,470,420,370,330]},
+  nf_praxia_actions:{action_step_count:[1,2,2,3,4],sequence_complexity:[1,2,3,4,5],modeling_level:[2,2,1,1,0]},
+  nf_social_inference:{cue_explicitness:[5,4,3,2,1],context_complexity:[1,2,3,4,5],ambiguity:[1,2,3,4,5],irrelevant_information:[0,0,1,1,2]},
+  nf_metacognitive_review:{reflection_depth:[1,2,3,4,5],prediction_performance_comparison:[1,2,3,4,5],confidence_discrimination:[1,2,3,4,5]},
+};
+
+function nfDifficultyInterpolate(min,max,level){
+  const L=clampAdaptiveLevel(level);
+  const t=(L-1)/4;
+  return min+(max-min)*t;
+}
+
+function nfRoundDifficultyValue(value,unit){
+  if(unit==="proporción") return Math.round(value*100)/100;
+  if(unit==="ms"||unit==="s"||unit==="elementos"||unit==="ensayos"||unit==="ítems"||unit==="estímulos"||unit==="distractores"||unit==="reglas"||unit==="operaciones"||unit==="pasos"||unit==="eventos"||unit==="restricciones"||unit==="premisas"||unit==="°"||unit==="rango"||unit==="objetivos"||unit==="estímulos distintos"||unit==="unidades") return Math.round(value);
+  return Math.round(value*10)/10;
+}
+
+function nfDifficultyDimensionValue(exId,dimension,level){
+  const L=clampAdaptiveLevel(level);
+  const override=NF_EXERCISE_DIFFICULTY_OVERRIDES?.[exId]?.[dimension];
+  if(Array.isArray(override) && override.length>=5) return override[L-1];
+  const preset=NF_DIFFICULTY_DIMENSION_PRESETS[dimension];
+  if(!preset) return L;
+  return nfRoundDifficultyValue(
+    nfDifficultyInterpolate(preset.min,preset.max,L),
+    preset.unit
+  );
+}
+
+function nfDifficultyDimensionLabel(dimension){
+  const labels={
+    sequence_length:"Longitud de secuencia",
+    trial_count:"Cantidad de ensayos",
+    item_count:"Cantidad de ítems",
+    stimulus_count:"Cantidad de estímulos",
+    stimulus_set_size:"Variedad de estímulos",
+    presentation_interval:"Intervalo de presentación",
+    presentation_speed:"Velocidad de presentación",
+    study_time:"Tiempo de estudio",
+    exposure_time:"Tiempo de exposición",
+    time_limit:"Tiempo disponible",
+    delay:"Demora",
+    distractor_count:"Cantidad de distractores",
+    distractor_similarity:"Semejanza de distractores",
+    stimulus_similarity:"Semejanza entre estímulos",
+    semantic_similarity:"Semejanza semántica",
+    interference:"Interferencia",
+    visual_density:"Densidad visual",
+    dual_task_load:"Carga de doble tarea",
+    reordering_load:"Carga de reorganización",
+    rule_count:"Número de reglas",
+    switch_frequency:"Frecuencia de cambio de regla",
+    operation_complexity:"Complejidad de operaciones",
+    numeric_magnitude:"Magnitud numérica",
+    step_count:"Número de pasos",
+    inference_depth:"Profundidad inferencial",
+    logical_complexity:"Complejidad lógica",
+    rotation_angle:"Ángulo de rotación",
+    target_density:"Densidad de objetivos",
+    overlap:"Solapamiento",
+    signal_noise_ratio:"Relación señal/ruido",
+  };
+  return labels[dimension] || dimension.replaceAll("_"," ");
+}
+
+function nfBuildExerciseDifficultyProfile(exId,level=2){
+  const adaptive=getNFExerciseAdaptiveProfile(exId);
+  const L=clampAdaptiveLevel(level);
+  const dimensions=adaptive?.difficultyDimensions || [];
+  const values={};
+  const descriptors=[];
+  dimensions.forEach(d=>{
+    const value=nfDifficultyDimensionValue(exId,d,L);
+    const unit=NF_DIFFICULTY_DIMENSION_PRESETS[d]?.unit || "nivel";
+    values[d]=value;
+    descriptors.push({
+      id:d,
+      label:nfDifficultyDimensionLabel(d),
+      value,
+      unit,
+    });
+  });
+  return {
+    version:NEUROFLEX_MULTIDIMENSIONAL_DIFFICULTY_VERSION,
+    exerciseId:exId,
+    level:L,
+    dimensions:[...dimensions],
+    values,
+    descriptors,
+    legacySpec:adaptive?.adaptiveSpec || null,
+  };
+}
+
+function nfDifficultyValue(profile,key,fallback){
+  const v=profile?.values?.[key];
+  return (v===undefined||v===null||Number.isNaN(v))?fallback:v;
+}
+
+function nfDifficultyPublicSummary(profile){
+  if(!profile?.descriptors?.length)return [];
+  return profile.descriptors.slice(0,4).map(d=>`${d.label}: ${d.value}${d.unit&&d.unit!=="nivel"?` ${d.unit}`:""}`);
+}
+
+
 function nfSessionVarietyProfile(exId){return NF_SESSION_VARIETY_PROFILE[exId]||{modality:"mixta",mechanic:"general",response:"seleccion"}}
 function nfRecentSessionResults(paciente,maxSessions=3){
   return [...(paciente?.sesiones||[])].filter(Boolean).sort((a,b)=>(a.numero||0)-(b.numero||0)).slice(-maxSessions).flatMap((ses,sessionIndex)=>(ses.results||[]).map(r=>({...r,_sessionIndex:sessionIndex})));
@@ -6035,8 +6408,11 @@ function nfF63CoverageAudit(){
   });
 }
 
-function NF63InhibitionStop({onDone,modoMayor,difficultyLevel=3}){
+function NF63InhibitionStop({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
   const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+  const multidimTrials=nfDifficultyValue(difficultyProfile,"trial_count",[0,8,10,12,14,16][L]);
+  const goRatio=nfDifficultyValue(difficultyProfile,"go_nogo_ratio",.65);
+  const responseWindow=nfDifficultyValue(difficultyProfile,"presentation_speed",1150);
   const total=[0,10,12,14,16,18][L];
   const stopProbability=[0,.25,.28,.30,.33,.36][L];
   const [items]=useState(()=>Array.from({length:total},()=>{
@@ -6080,8 +6456,8 @@ function NF63InhibitionStop({onDone,modoMayor,difficultyLevel=3}){
     timerRef.current=setTimeout(()=>{
       stimT0.current=Date.now();
       setPhase("stimulus");
-      const responseWindow=M?1550:[0,1600,1450,1300,1150,1000][L];
-      timerRef.current=setTimeout(()=>finishTrial(false,null),responseWindow);
+      const trialResponseWindow=M?Math.max(responseWindow,1250):responseWindow;
+      timerRef.current=setTimeout(()=>finishTrial(false,null),trialResponseWindow);
     },wait);
     return()=>clearTimeout(timerRef.current);
   },[idx,phase]);
@@ -6117,8 +6493,8 @@ function NF63InhibitionStop({onDone,modoMayor,difficultyLevel=3}){
   </div>;
 }
 
-function NF63ProspectiveEvent({onDone,modoMayor}){
-  const M=!!modoMayor;
+function NF63ProspectiveEvent({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const eventCount=nfDifficultyValue(difficultyProfile,"event_count",5);
   const [phase,setPhase]=useState("encode");
   const [idx,setIdx]=useState(0);
   const [taskScore,setTaskScore]=useState(0);
@@ -6133,22 +6509,22 @@ function NF63ProspectiveEvent({onDone,modoMayor}){
     {cue:"TRANSPORTE",p:"¿Cuál de estas opciones es un medio de transporte?",opts:["Bus","Mesa"],a:0,target:true},
     {cue:"FORMAS",p:"¿Cuál tiene tres lados?",opts:["Triángulo","Círculo"],a:0,target:false},
   ];
-  const item=items[idx];
+  const activeItems=items.slice(0,Math.max(3,Math.min(items.length,eventCount))); const item=activeItems[idx];
 
   const finish=(finalTaskScore,hit=false,fa=false)=>{
     const pHit=hit||prospectiveHit;
     const fAlarms=falseAlarms+(fa?1:0);
     const correct=finalTaskScore+(pHit?1:0);
-    const total=items.length+1;
+    const total=activeItems.length+1;
     onDone({
-      correct,total,errors:(items.length-finalTaskScore)+(pHit?0:1)+fAlarms,
+      correct,total,errors:(activeItems.length-finalTaskScore)+(pHit?0:1)+fAlarms,
       seconds:Math.round((Date.now()-t0.current)/1000),
-      specificMetrics:{prospectiveHit:pHit?1:0,falseAlarms:fAlarms,ongoingTaskCorrect:finalTaskScore,ongoingTaskTotal:items.length,clinicalProcess:"memoria prospectiva basada en evento",errorProfile:{prospectiveOmission:pHit?0:1,falseAlarms:fAlarms}}
+      specificMetrics:{prospectiveHit:pHit?1:0,falseAlarms:fAlarms,ongoingTaskCorrect:finalTaskScore,ongoingTaskTotal:activeItems.length,clinicalProcess:"memoria prospectiva basada en evento",errorProfile:{prospectiveOmission:pHit?0:1,falseAlarms:fAlarms}}
     });
   };
 
   const advance=(newScore)=>{
-    if(idx+1>=items.length)finish(newScore);
+    if(idx+1>=activeItems.length)finish(newScore);
     else{setIdx(i=>i+1);setLocked(false)}
   };
 
@@ -6210,12 +6586,12 @@ function NF63ProspectiveEvent({onDone,modoMayor}){
   </div>;
 }
 
-function NF63VisualMemory({onDone,modoMayor}){
-  const M=!!modoMayor;
+function NF63VisualMemory({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const stimulusCount=nfDifficultyValue(difficultyProfile,"stimulus_count",6); const exposureTime=nfDifficultyValue(difficultyProfile,"exposure_time",8); const distractorCount=Math.max(2,Math.min(5,nfDifficultyValue(difficultyProfile,"stimulus_similarity",L)));
   const ALL=["circle_f","triangle_f","square_f","diamond_f","circle_o","square_o","star_f","diamond_o","triangle_o","star_o"];
-  const [target]=useState(()=>shuffle(ALL).slice(0,6));
-  const [phase,setPhase]=useState("study"),[seconds,setSeconds]=useState(8),[selected,setSelected]=useState(new Set());
-  const [pool]=useState(()=>shuffle([...target,...shuffle(ALL.filter(x=>!target.includes(x))).slice(0,4)]));
+  const [target]=useState(()=>shuffle(ALL).slice(0,stimulusCount));
+  const [phase,setPhase]=useState("study"),[seconds,setSeconds]=useState(exposureTime),[selected,setSelected]=useState(new Set());
+  const [pool]=useState(()=>shuffle([...target,...shuffle(ALL.filter(x=>!target.includes(x))).slice(0,distractorCount)]));
   const t0=useRef(Date.now()),doneRef=useRef(false);
   useEffect(()=>{if(phase!=="study")return;const tm=setInterval(()=>setSeconds(v=>{if(v<=1){clearInterval(tm);setPhase("recognition");return 0}return v-1}),1000);return()=>clearInterval(tm)},[phase]);
   const toggle=x=>setSelected(prev=>{const n=new Set(prev);n.has(x)?n.delete(x):n.add(x);return n});
@@ -6251,15 +6627,15 @@ function NF63VisualMemory({onDone,modoMayor}){
 function nfPlayToneSequence(sequence,{duration=.22,gap=.12,gain=.055}={}){
   try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return false;const ctx=new C();sequence.forEach((tone,i)=>{const o=ctx.createOscillator(),g=ctx.createGain(),freq=typeof tone==="number"?tone:tone.freq,dur=typeof tone==="object"&&tone.dur?tone.dur:duration,amp=typeof tone==="object"&&tone.gain?tone.gain:gain;o.type="sine";o.frequency.value=freq;o.connect(g);g.connect(ctx.destination);g.gain.value=amp;const st=ctx.currentTime+i*(duration+gap);o.start(st);o.stop(st+dur)});setTimeout(()=>ctx.close(),sequence.length*(duration+gap)*1000+450);return true}catch(e){return false}
 }
-function NF71VisualChange({onDone,modoMayor,difficultyLevel=2}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"];const make=()=>{const a=shuffle(shapes).slice(0,L>=4?4:3),changed=Math.random()<.65,b=[...a],idx=Math.floor(Math.random()*a.length);if(changed)b[idx]=shapes.find(x=>!a.includes(x))||shapes[(shapes.indexOf(a[idx])+1)%shapes.length];return{a,b,changed}};const[items]=useState(()=>Array.from({length:count},make)),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur],row=arr=><div style={{display:"flex",gap:12,justifyContent:"center"}}>{arr.map((x,i)=><span key={i} style={{width:M?76:62,height:M?76:62,border:`1px solid ${COLORS.border}`,borderRadius:10,display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?52:43}/></span>)}</div>;const answer=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.changed,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,changeDetection:true,clinicalProcess:"discriminación visual / detección de cambios"}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},380)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Compara ambos grupos. Decide si son exactamente iguales o si cambió alguna figura." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={285}><div style={{display:"grid",gap:20}}>{row(item.a)}<div style={{height:1,background:COLORS.border}}/>{row(item.b)}</div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={locked.current} onClick={()=>answer(false)}>Son iguales</BtnSecondary><BtnPrimary disabled={locked.current} onClick={()=>answer(true)}>Hay un cambio</BtnPrimary></div></div>}
-function NF71VisualClosure({onDone,modoMayor,difficultyLevel=3}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),kinds=["house","clock","key","umbrella","apple","scissors","car","book","flower","phone"],masks=L<=2?["right","left"]:["right","left","top","bottom"],count=[0,4,5,6,7,8][L];const[items]=useState(()=>shuffle(kinds).slice(0,count).map(kind=>({kind,mask:masks[Math.floor(Math.random()*masks.length)],opts:shuffle([kind,...shuffle(kinds.filter(x=>x!==kind)).slice(0,3)])}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.kind,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,visualClosure:true,clinicalProcess:"cierre visual / reconocimiento de objetos incompletos"}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},380)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa el objeto incompleto e identifica qué objeto es." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={250}><NFPartialObject kind={item.kind} mask={item.mask} size={M?145:125}/></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:580,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:64,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.kind?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800}}>{NF_STIMULUS_OBJECTS[v]}</button>)}</div></div>}
-function NF71FigureGround({onDone,modoMayor,difficultyLevel=3}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),trials=[0,3,4,5,6,6][L],grid=L<=2?12:L<=4?16:20,shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"];const[items]=useState(()=>Array.from({length:trials},()=>{const target=shapes[Math.floor(Math.random()*shapes.length)],cells=Array.from({length:grid},()=>shapes[Math.floor(Math.random()*shapes.length)]);for(let i=0;i<(L<=2?3:4);i++)cells[i]=target;const x=shuffle(cells);return{target,cells:x,count:x.filter(v=>v===target).length}})),[cur,setCur]=useState(0),[selected,setSelected]=useState(new Set()),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const toggle=i=>{if(!locked.current)setSelected(p=>{const n=new Set(p);n.has(i)?n.delete(i):n.add(i);return n})};const confirm=()=>{if(locked.current)return;locked.current=true;const hits=[...selected].filter(i=>item.cells[i]===item.target).length,comm=[...selected].filter(i=>item.cells[i]!==item.target).length,ok=comm===0&&hits===item.count,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,figureGround:true,clinicalProcess:"figura-fondo / exploración visual"}});else{setScore(ns);setCur(c=>c+1);setSelected(new Set());locked.current=false}},400)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><div style={{display:"flex",alignItems:"center",gap:8}}><strong>Busca:</strong><NFStimulusShape id={item.target} size={38}/></div><NFAudioReadButton text="Encuentra y selecciona todas las figuras iguales al objetivo." label="Escuchar instrucción" mayor={M}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={300}><div style={{display:"grid",gridTemplateColumns:`repeat(${grid<=12?4:5},1fr)`,gap:8,maxWidth:520,width:"100%"}}>{item.cells.map((x,i)=><button key={i} aria-label="Estímulo visual" onClick={()=>toggle(i)} style={{minHeight:M?70:58,borderRadius:9,border:`2px solid ${selected.has(i)?COLORS.primary:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?43:36}/></button>)}</div></NFTrainingStimulusCard><BtnPrimary onClick={confirm}>Confirmar selección</BtnPrimary></div>}
-function NF71AuditorySameDifferent({onDone,modoMayor,difficultyLevel=2}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],freqs=[330,440,550,660];const[items]=useState(()=>Array.from({length:count},()=>{const f1=freqs[Math.floor(Math.random()*4)],same=Math.random()<.5,f2=same?f1:shuffle(freqs.filter(x=>x!==f1))[0];return{f1,f2,same}})),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const play=()=>{if(nfPlayToneSequence([item.f1,item.f2],{duration:.32,gap:.34}))setPlayed(true)};const answer=v=>{if(locked.current||!played)return;locked.current=true;const ok=v===item.same,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,clinicalProcess:"discriminación auditiva / igual-diferente"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);locked.current=false}},330)};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha los dos sonidos y decide si son iguales o diferentes." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar sonidos"}</BtnPrimary></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={!played||locked.current} onClick={()=>answer(true)}>Iguales</BtnSecondary><BtnPrimary disabled={!played||locked.current} onClick={()=>answer(false)}>Diferentes</BtnPrimary></div></div>}
-function NF71AuditoryPitch({onDone,modoMayor,difficultyLevel=2}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],pairs=L<=2?[[320,650],[350,700]]:[[380,520],[420,600],[350,500]];const[items]=useState(()=>Array.from({length:count},()=>{const p=pairs[Math.floor(Math.random()*pairs.length)],seq=Math.random()<.5?p:[p[1],p[0]];return{seq,ans:seq[0]>seq[1]?0:1}})),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const play=()=>{if(nfPlayToneSequence(item.seq,{duration:.34,gap:.35}))setPlayed(true)};const pick=v=>{if(locked.current||!played)return;locked.current=true;const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,clinicalProcess:"discriminación de frecuencia / tono"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);locked.current=false}},330)};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha dos sonidos e indica cuál es más agudo." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar sonidos"}</BtnPrimary></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={!played||locked.current} onClick={()=>pick(0)}>El primero</BtnSecondary><BtnPrimary disabled={!played||locked.current} onClick={()=>pick(1)}>El segundo</BtnPrimary></div></div>}
-function NF71AuditoryOrder({onDone,modoMayor,difficultyLevel=3}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),len=L<=2?2:L<=4?3:4,count=[0,4,5,6,7,8][L],tones=[330,480,660],labels={330:"Grave",480:"Medio",660:"Agudo"};const[items]=useState(()=>Array.from({length:count},()=>Array.from({length:len},()=>tones[Math.floor(Math.random()*3)]))),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[answer,setAnswer]=useState([]),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),seq=items[cur];const play=()=>{if(nfPlayToneSequence(seq,{duration:.28,gap:.18}))setPlayed(true)};const choose=f=>{if(locked.current||!played)return;const next=[...answer,f];setAnswer(next);if(next.length===len){locked.current=true;const ok=next.every((x,i)=>x===seq[i]),ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,sequenceLength:len,clinicalProcess:"orden temporal auditivo / secuenciación"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);setAnswer([]);locked.current=false}},350)}};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha la secuencia y reconstruye el orden de los tonos." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><div><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar secuencia"}</BtnPrimary><div style={{marginTop:16,fontWeight:800}}>Respuesta: {answer.map(x=>labels[x]).join(" → ")||"—"}</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:600,margin:"0 auto"}}>{tones.map(f=><BtnSecondary key={f} disabled={!played||locked.current} onClick={()=>choose(f)}>{labels[f]}</BtnSecondary>)}</div></div>}
-function NF71AuditoryTarget({onDone,modoMayor,difficultyLevel=3}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],tones=[340,500,680];const[items]=useState(()=>Array.from({length:count},()=>{const target=tones[Math.floor(Math.random()*3)],present=Math.random()<.7;let seq=Array.from({length:L<=2?4:6},()=>tones[Math.floor(Math.random()*3)]);if(present&&!seq.includes(target))seq[Math.floor(Math.random()*seq.length)]=target;if(!present)seq=seq.map(x=>x===target?tones.find(t=>t!==target):x);return{target,present,seq}})),[cur,setCur]=useState(0),[tp,setTp]=useState(false),[sp,setSp]=useState(false),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const answer=v=>{if(locked.current||!sp)return;locked.current=true;const ok=v===item.present,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,clinicalProcess:"figura-fondo auditiva / detección de objetivo"}});else{setScore(ns);setCur(c=>c+1);setTp(false);setSp(false);locked.current=false}},330)};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha el sonido objetivo. Después decide si aparece dentro de la secuencia." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={240}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,width:"100%"}}><BtnSecondary onClick={()=>{if(nfPlayToneSequence([item.target],{duration:.42}))setTp(true)}}>1. Sonido objetivo</BtnSecondary><BtnPrimary disabled={!tp} onClick={()=>{if(nfPlayToneSequence(item.seq,{duration:.2,gap:.13}))setSp(true)}}>2. Secuencia</BtnPrimary></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={!sp||locked.current} onClick={()=>answer(false)}>No apareció</BtnSecondary><BtnPrimary disabled={!sp||locked.current} onClick={()=>answer(true)}>Sí apareció</BtnPrimary></div></div>}
-function NF63AuditoryPatterns({onDone,modoMayor}){
-  const M=!!modoMayor;
+function NF71VisualChange({onDone,modoMayor,difficultyLevel=2,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],visualComplexity=nfDifficultyValue(difficultyProfile,"visual_complexity",L),changeSubtlety=nfDifficultyValue(difficultyProfile,"change_subtlety",L),shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"];const make=()=>{const a=shuffle(shapes).slice(0,visualComplexity>=4?4:3),changed=Math.random()<.65,b=[...a],idx=Math.floor(Math.random()*a.length);if(changed)b[idx]=shapes.find(x=>!a.includes(x))||shapes[(shapes.indexOf(a[idx])+1)%shapes.length];return{a,b,changed}};const[items]=useState(()=>Array.from({length:count},make)),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur],row=arr=><div style={{display:"flex",gap:12,justifyContent:"center"}}>{arr.map((x,i)=><span key={i} style={{width:M?76:62,height:M?76:62,border:`1px solid ${COLORS.border}`,borderRadius:10,display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?52:43}/></span>)}</div>;const answer=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.changed,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,changeDetection:true,clinicalProcess:"discriminación visual / detección de cambios"}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},380)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Compara ambos grupos. Decide si son exactamente iguales o si cambió alguna figura." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={285}><div style={{display:"grid",gap:20}}>{row(item.a)}<div style={{height:1,background:COLORS.border}}/>{row(item.b)}</div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={locked.current} onClick={()=>answer(false)}>Son iguales</BtnSecondary><BtnPrimary disabled={locked.current} onClick={()=>answer(true)}>Hay un cambio</BtnPrimary></div></div>}
+function NF71VisualClosure({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),figureComplexity=nfDifficultyValue(difficultyProfile,"figure_complexity",L),distractorSimilarity=nfDifficultyValue(difficultyProfile,"distractor_similarity",L),kinds=["house","clock","key","umbrella","apple","scissors","car","book","flower","phone"],masks=figureComplexity<=2?["right","left"]:["right","left","top","bottom"],count=[0,4,5,6,7,8][L];const[items]=useState(()=>shuffle(kinds).slice(0,count).map(kind=>({kind,mask:masks[Math.floor(Math.random()*masks.length)],opts:shuffle([kind,...shuffle(kinds.filter(x=>x!==kind)).slice(0,distractorSimilarity<=2?2:3)])}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.kind,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,visualClosure:true,clinicalProcess:"cierre visual / reconocimiento de objetos incompletos"}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},380)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa el objeto incompleto e identifica qué objeto es." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={250}><NFPartialObject kind={item.kind} mask={item.mask} size={M?145:125}/></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:580,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:64,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.kind?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800}}>{NF_STIMULUS_OBJECTS[v]}</button>)}</div></div>}
+function NF71FigureGround({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),trials=[0,3,4,5,6,6][L],visualDensity=nfDifficultyValue(difficultyProfile,"visual_density",L),targetCount=nfDifficultyValue(difficultyProfile,"target_count",L<=2?3:4),grid=visualDensity<=2?12:visualDensity<=4?16:20,shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"];const[items]=useState(()=>Array.from({length:trials},()=>{const target=shapes[Math.floor(Math.random()*shapes.length)],cells=Array.from({length:grid},()=>shapes[Math.floor(Math.random()*shapes.length)]);for(let i=0;i<Math.max(2,Math.min(5,targetCount));i++)cells[i]=target;const x=shuffle(cells);return{target,cells:x,count:x.filter(v=>v===target).length}})),[cur,setCur]=useState(0),[selected,setSelected]=useState(new Set()),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const toggle=i=>{if(!locked.current)setSelected(p=>{const n=new Set(p);n.has(i)?n.delete(i):n.add(i);return n})};const confirm=()=>{if(locked.current)return;locked.current=true;const hits=[...selected].filter(i=>item.cells[i]===item.target).length,comm=[...selected].filter(i=>item.cells[i]!==item.target).length,ok=comm===0&&hits===item.count,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,figureGround:true,clinicalProcess:"figura-fondo / exploración visual"}});else{setScore(ns);setCur(c=>c+1);setSelected(new Set());locked.current=false}},400)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><div style={{display:"flex",alignItems:"center",gap:8}}><strong>Busca:</strong><NFStimulusShape id={item.target} size={38}/></div><NFAudioReadButton text="Encuentra y selecciona todas las figuras iguales al objetivo." label="Escuchar instrucción" mayor={M}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={300}><div style={{display:"grid",gridTemplateColumns:`repeat(${grid<=12?4:5},1fr)`,gap:8,maxWidth:520,width:"100%"}}>{item.cells.map((x,i)=><button key={i} aria-label="Estímulo visual" onClick={()=>toggle(i)} style={{minHeight:M?70:58,borderRadius:9,border:`2px solid ${selected.has(i)?COLORS.primary:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?43:36}/></button>)}</div></NFTrainingStimulusCard><BtnPrimary onClick={confirm}>Confirmar selección</BtnPrimary></div>}
+function NF71AuditorySameDifferent({onDone,modoMayor,difficultyLevel=2,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=nfDifficultyValue(difficultyProfile,"trial_count",[0,4,5,6,7,8][L]),similarity=nfDifficultyValue(difficultyProfile,"acoustic_similarity",L),gap=Math.max(25,180-similarity*28),freqs=[360,440,520,600];const[items]=useState(()=>Array.from({length:count},()=>{const f1=freqs[Math.floor(Math.random()*4)],same=Math.random()<.5,f2=same?f1:Math.max(180,Math.min(900,f1+(Math.random()<.5?-gap:gap)));return{f1,f2,same}})),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const play=()=>{if(nfPlayToneSequence([item.f1,item.f2],{duration:.32,gap:.34}))setPlayed(true)};const answer=v=>{if(locked.current||!played)return;locked.current=true;const ok=v===item.same,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,clinicalProcess:"discriminación auditiva / igual-diferente"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);locked.current=false}},330)};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha los dos sonidos y decide si son iguales o diferentes." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar sonidos"}</BtnPrimary></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={!played||locked.current} onClick={()=>answer(true)}>Iguales</BtnSecondary><BtnPrimary disabled={!played||locked.current} onClick={()=>answer(false)}>Diferentes</BtnPrimary></div></div>}
+function NF71AuditoryPitch({onDone,modoMayor,difficultyLevel=2,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=nfDifficultyValue(difficultyProfile,"trial_count",[0,4,5,6,7,8][L]),proximity=nfDifficultyValue(difficultyProfile,"frequency_proximity",L),gap=Math.max(35,260-proximity*40),bases=[340,420,500],pairs=bases.map(x=>[x,x+gap]);const[items]=useState(()=>Array.from({length:count},()=>{const p=pairs[Math.floor(Math.random()*pairs.length)],seq=Math.random()<.5?p:[p[1],p[0]];return{seq,ans:seq[0]>seq[1]?0:1}})),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const play=()=>{if(nfPlayToneSequence(item.seq,{duration:.34,gap:.35}))setPlayed(true)};const pick=v=>{if(locked.current||!played)return;locked.current=true;const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,clinicalProcess:"discriminación de frecuencia / tono"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);locked.current=false}},330)};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha dos sonidos e indica cuál es más agudo." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar sonidos"}</BtnPrimary></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={!played||locked.current} onClick={()=>pick(0)}>El primero</BtnSecondary><BtnPrimary disabled={!played||locked.current} onClick={()=>pick(1)}>El segundo</BtnPrimary></div></div>}
+function NF71AuditoryOrder({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),len=nfDifficultyValue(difficultyProfile,"sequence_length",L<=2?2:L<=4?3:4),count=[0,4,5,6,7,8][L],tones=[330,480,660],labels={330:"Grave",480:"Medio",660:"Agudo"};const[items]=useState(()=>Array.from({length:count},()=>Array.from({length:len},()=>tones[Math.floor(Math.random()*3)]))),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[answer,setAnswer]=useState([]),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),seq=items[cur];const play=()=>{if(nfPlayToneSequence(seq,{duration:.28,gap:.18}))setPlayed(true)};const choose=f=>{if(locked.current||!played)return;const next=[...answer,f];setAnswer(next);if(next.length===len){locked.current=true;const ok=next.every((x,i)=>x===seq[i]),ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,sequenceLength:len,clinicalProcess:"orden temporal auditivo / secuenciación"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);setAnswer([]);locked.current=false}},350)}};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha la secuencia y reconstruye el orden de los tonos." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><div><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar secuencia"}</BtnPrimary><div style={{marginTop:16,fontWeight:800}}>Respuesta: {answer.map(x=>labels[x]).join(" → ")||"—"}</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:600,margin:"0 auto"}}>{tones.map(f=><BtnSecondary key={f} disabled={!played||locked.current} onClick={()=>choose(f)}>{labels[f]}</BtnSecondary>)}</div></div>}
+function NF71AuditoryTarget({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],distractorDensity=nfDifficultyValue(difficultyProfile,"distractor_density",L),tones=[340,500,680];const[items]=useState(()=>Array.from({length:count},()=>{const target=tones[Math.floor(Math.random()*3)],present=Math.random()<.7;let seq=Array.from({length:Math.max(4,Math.min(8,4+Math.round(distractorDensity))) },()=>tones[Math.floor(Math.random()*3)]);if(present&&!seq.includes(target))seq[Math.floor(Math.random()*seq.length)]=target;if(!present)seq=seq.map(x=>x===target?tones.find(t=>t!==target):x);return{target,present,seq}})),[cur,setCur]=useState(0),[tp,setTp]=useState(false),[sp,setSp]=useState(false),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const answer=v=>{if(locked.current||!sp)return;locked.current=true;const ok=v===item.present,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,clinicalProcess:"figura-fondo auditiva / detección de objetivo"}});else{setScore(ns);setCur(c=>c+1);setTp(false);setSp(false);locked.current=false}},330)};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha el sonido objetivo. Después decide si aparece dentro de la secuencia." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={240}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,width:"100%"}}><BtnSecondary onClick={()=>{if(nfPlayToneSequence([item.target],{duration:.42}))setTp(true)}}>1. Sonido objetivo</BtnSecondary><BtnPrimary disabled={!tp} onClick={()=>{if(nfPlayToneSequence(item.seq,{duration:.2,gap:.13}))setSp(true)}}>2. Secuencia</BtnPrimary></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={!sp||locked.current} onClick={()=>answer(false)}>No apareció</BtnSecondary><BtnPrimary disabled={!sp||locked.current} onClick={()=>answer(true)}>Sí apareció</BtnPrimary></div></div>}
+function NF63AuditoryPatterns({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const sequenceLength=nfDifficultyValue(difficultyProfile,"sequence_length",3); const similarity=nfDifficultyValue(difficultyProfile,"stimulus_similarity",L);
   const [idx,setIdx]=useState(0),[score,setScore]=useState(0),[playedA,setPlayedA]=useState(false),[playedB,setPlayedB]=useState(false);
   const items=[
     {a:[420,620,420],b:[420,620,420],same:true},
@@ -6277,15 +6653,15 @@ function NF63AuditoryPatterns({onDone,modoMayor}){
       if(which==="A")setPlayedA(true);else setPlayedB(true);
     }catch(e){}
   };
-  const item=items[idx];
+  const activeItems=items.map(x=>({...x,a:x.a.slice(0,Math.min(x.a.length,sequenceLength)),b:x.b.slice(0,Math.min(x.b.length,sequenceLength))})); const item=activeItems[idx];
   const answer=same=>{
     if(locked.current||!playedA||!playedB)return;
     locked.current=true;
     const ok=same===item.same,n=score+(ok?1:0);
     records.current.push({ok,sameTarget:item.same});
     setTimeout(()=>{
-      if(idx+1>=items.length){
-        onDone({correct:n,total:items.length,errors:items.length-n,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPatternDiscrimination:true,clinicalProcess:"discriminación auditiva de patrones"}});
+      if(idx+1>=activeItems.length){
+        onDone({correct:n,total:activeItems.length,errors:activeItems.length-n,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPatternDiscrimination:true,clinicalProcess:"discriminación auditiva de patrones"}});
       }else{
         setScore(n);setIdx(i=>i+1);setPlayedA(false);setPlayedB(false);locked.current=false;
       }
@@ -6294,7 +6670,7 @@ function NF63AuditoryPatterns({onDone,modoMayor}){
   return <div style={{padding:"4px 0",textAlign:"center"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
       <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Discriminación auditiva</div>
-      <Badge label={`${idx+1}/${items.length}`} color={COLORS.info}/>
+      <Badge label={`${idx+1}/${activeItems.length}`} color={COLORS.info}/>
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={240}>
       <div style={{width:"100%",maxWidth:560}}>
@@ -6311,38 +6687,38 @@ function NF63AuditoryPatterns({onDone,modoMayor}){
     </div>
   </div>;
 }
-function NF63PraxiaActions({onDone,modoMayor}){
-  const M=!!modoMayor;
+function NF63PraxiaActions({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const actionSteps=nfDifficultyValue(difficultyProfile,"action_step_count",2);
   const items=[
     "Muestra cómo usarías un peine sin tenerlo en la mano.",
     "Haz el gesto de despedirte.",
     "Representa cómo abrirías una puerta con una llave.",
     "Muestra en orden cómo prepararías una bebida caliente."
   ];
-  const [idx,setIdx]=useState(0);
+  const activeItems=items.slice(0,Math.max(2,Math.min(items.length,actionSteps))); const [idx,setIdx]=useState(0);
   const rec=useRef([]),locked=useRef(false),t0=useRef(Date.now());
   const rate=ok=>{
     if(locked.current)return;
     locked.current=true;rec.current.push(ok);
     setTimeout(()=>{
-      if(idx+1>=items.length){
+      if(idx+1>=activeItems.length){
         const c=rec.current.filter(Boolean).length;
-        onDone({correct:c,total:items.length,errors:items.length-c,seconds:Math.round((Date.now()-t0.current)/1000),requiresReview:true,specificMetrics:{professionalObservation:true,praxiaTask:true,clinicalProcess:"praxias ideomotoras / secuenciación funcional"}});
+        onDone({correct:c,total:activeItems.length,errors:activeItems.length-c,seconds:Math.round((Date.now()-t0.current)/1000),requiresReview:true,specificMetrics:{professionalObservation:true,praxiaTask:true,clinicalProcess:"praxias ideomotoras / secuenciación funcional"}});
       }else{setIdx(i=>i+1);locked.current=false}
     },300);
   };
   return <div style={{padding:"4px 0",textAlign:"center"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
       <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent}}>Ejecución observada</div>
-      <Badge label={`${idx+1}/${items.length}`} color={COLORS.info}/>
+      <Badge label={`${idx+1}/${activeItems.length}`} color={COLORS.info}/>
     </div>
     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
-      <NFAudioReadButton text={items[idx]} label="Escuchar acción" mayor={modoMayor}/>
+      <NFAudioReadButton text={activeItems[idx]} label="Escuchar acción" mayor={modoMayor}/>
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={240}>
       <div style={{maxWidth:700}}>
         <div style={{fontSize:".66rem",fontWeight:800,color:COLORS.primary,marginBottom:10}}>Realiza la acción</div>
-        <p style={{margin:0,fontWeight:800,fontSize:M?"1.3rem":"1.08rem",lineHeight:1.6}}>{items[idx]}</p>
+        <p style={{margin:0,fontWeight:800,fontSize:M?"1.3rem":"1.08rem",lineHeight:1.6}}>{activeItems[idx]}</p>
       </div>
     </NFTrainingStimulusCard>
     <p style={{fontSize:M?".88rem":".75rem",color:COLORS.textMuted,maxWidth:650,margin:"0 auto 12px"}}>El profesional valora la ejecución considerando comprensión, movilidad, dolor y limitaciones sensoriales.</p>
@@ -6352,31 +6728,31 @@ function NF63PraxiaActions({onDone,modoMayor}){
     </div>
   </div>;
 }
-function NF63SocialInference({onDone,modoMayor}){
-  const M=!!modoMayor;
+function NF63SocialInference({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const contextComplexity=nfDifficultyValue(difficultyProfile,"context_complexity",L); const ambiguity=nfDifficultyValue(difficultyProfile,"ambiguity",L);
   const items=[
     {p:"Una persona dice “estoy bien”, pero habla muy bajo, evita mirar y acaba de recibir una noticia difícil. ¿Qué interpretación es más prudente?",o:["Podría estar afectada aunque diga que está bien","Está feliz con seguridad","Está mintiendo necesariamente"],a:0},
     {p:"Alguien mira varias veces el reloj durante una conversación. ¿Qué conclusión es más adecuada?",o:["Puede tener prisa, pero hace falta contexto","No quiere volver a verte","Está enojado con seguridad"],a:0},
     {p:"Un compañero comete un error y responde con una sonrisa nerviosa. ¿Qué podría reflejar?",o:["Incomodidad o nerviosismo","Alegría obligatoriamente","Falta de comprensión necesariamente"],a:0},
   ];
-  const [i,setI]=useState(0),[sc,setSc]=useState(0),[sel,setSel]=useState(null);
+  const activeItems=items.slice(0,contextComplexity<=2?2:3); const [i,setI]=useState(0),[sc,setSc]=useState(0),[sel,setSel]=useState(null);
   const locked=useRef(false),t0=useRef(Date.now()),trialT0=useRef(Date.now()),records=useRef([]);
-  const it=items[i];
+  const it=activeItems[i];
   const pick=x=>{
     if(locked.current)return;
     locked.current=true;setSel(x);
     const ok=x===it.a,n=sc+(ok?1:0);
     records.current.push({ok,rt:Date.now()-trialT0.current});
     setTimeout(()=>{
-      if(i+1>=items.length){
+      if(i+1>=activeItems.length){
         const rs=records.current;
-        onDone({correct:n,total:items.length,errors:items.length-n,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{socialInference:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),clinicalProcess:"inferencia social / interpretación contextual"}});
+        onDone({correct:n,total:activeItems.length,errors:activeItems.length-n,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{socialInference:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),clinicalProcess:"inferencia social / interpretación contextual"}});
       }else{setSc(n);setI(v=>v+1);setSel(null);locked.current=false;trialT0.current=Date.now()}
     },430);
   };
   return <div style={{padding:"4px 0",textAlign:"center"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-      <Badge label={`${i+1}/${items.length}`} color={COLORS.info}/>
+      <Badge label={`${i+1}/${activeItems.length}`} color={COLORS.info}/>
       <NFAudioReadButton text={`${it.p} Opciones: ${it.o.join(", ")}.`} label="Escuchar situación" mayor={modoMayor}/>
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
@@ -6392,16 +6768,16 @@ function NF63SocialInference({onDone,modoMayor}){
     </div>
   </div>;
 }
-function NF63MetacognitiveReview({onDone,modoMayor}){
-  const M=!!modoMayor;
+function NF63MetacognitiveReview({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const reflectionDepth=nfDifficultyValue(difficultyProfile,"reflection_depth",L);
   const items=[
     {p:"¿Cuál sigue? 3, 6, 9, 12…",o:["14","15","16"],a:1},
     {p:"Todos los tulos son verdes. Este objeto es un tulo. Entonces…",o:["Es verde","No es verde","No se puede saber"],a:0},
     {p:"Si una cita empieza a las 10:00 y dura una hora, ¿a qué hora termina?",o:["10:30","11:00","12:00"],a:1}
   ];
-  const [i,setI]=useState(0),[phase,setPhase]=useState("answer"),[choice,setChoice]=useState(null),[score,setScore]=useState(0),[cal,setCal]=useState(0);
+  const activeItems=items.slice(0,reflectionDepth<=2?2:3); const [i,setI]=useState(0),[phase,setPhase]=useState("answer"),[choice,setChoice]=useState(null),[score,setScore]=useState(0),[cal,setCal]=useState(0);
   const locked=useRef(false),t0=useRef(Date.now()),records=useRef([]);
-  const it=items[i];
+  const it=activeItems[i];
   const confidence=c=>{
     if(locked.current)return;
     locked.current=true;
@@ -6410,8 +6786,8 @@ function NF63MetacognitiveReview({onDone,modoMayor}){
     const ns=score+(ok?1:0),nc=cal+(aligned?1:0);
     records.current.push({ok,confidence:c,aligned});
     setTimeout(()=>{
-      if(i+1>=items.length){
-        onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{calibrationAligned:nc,calibrationTotal:items.length,metacognitiveCalibration:true,clinicalProcess:"metacognición / calibración de confianza"}});
+      if(i+1>=activeItems.length){
+        onDone({correct:ns,total:activeItems.length,errors:activeItems.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{calibrationAligned:nc,calibrationTotal:activeItems.length,metacognitiveCalibration:true,clinicalProcess:"metacognición / calibración de confianza"}});
       }else{
         setScore(ns);setCal(nc);setI(v=>v+1);setChoice(null);setPhase("answer");locked.current=false;
       }
@@ -6420,7 +6796,7 @@ function NF63MetacognitiveReview({onDone,modoMayor}){
   return <div style={{padding:"4px 0",textAlign:"center"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
       <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Monitorea tu seguridad</div>
-      <Badge label={`${i+1}/${items.length}`} color={COLORS.info}/>
+      <Badge label={`${i+1}/${activeItems.length}`} color={COLORS.info}/>
     </div>
     {phase==="answer"?<>
       <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
@@ -11572,16 +11948,32 @@ function nfComparableExerciseSeries(sessions = [], domId, maxSessions = 5) {
     (s?.results || []).forEach(r=>{
       if(r?.domId!==domId || !r?.exId || !nfFinite(r?.pct)) return;
       if(!byExercise[r.exId]) byExercise[r.exId]=[];
+      const nm=nfMetricProfileForResult(r);
       byExercise[r.exId].push({
         sessionNumber:s.numero,
         pct:r.pct,
         level:nfFinite(r.adaptiveLevel)?r.adaptiveLevel:null,
         support:getTrackedSupportLevel(r),
+        normalizedMetrics:nm,
+        difficultySignature:nm?.challenge?.signature||null,
+        effectiveLoad:nm?.challenge?.effectiveLoad??null,
+        secondsPerTrial:nm?.efficiency?.secondsPerTrial??null,
+        meanReactionMs:nm?.efficiency?.meanReactionMs??null,
+        rawResult:r,
       });
     });
   });
   return Object.entries(byExercise)
-    .map(([exId,rows])=>({exId,rows:rows.slice(-maxSessions)}))
+    .map(([exId,rows])=>{
+      const recentRows=rows.slice(-maxSessions);
+      const first=recentRows[0]?.rawResult||null;
+      const last=recentRows[recentRows.length-1]?.rawResult||null;
+      return {
+        exId,
+        rows:recentRows.map(({rawResult,...row})=>row),
+        contextualChange:recentRows.length>=2?nfContextualExerciseChange(first,last):null,
+      };
+    })
     .filter(x=>x.rows.length>=2)
     .sort((a,b)=>b.rows.length-a.rows.length);
 }
@@ -11743,7 +12135,8 @@ function buildTherapeuticFollowUpV2(paciente) {
       const best=comparableSeries[0];
       const first=best.rows[0], last=best.rows[best.rows.length-1];
       const delta=last.pct-first.pct;
-      reasons.push(`Evidencia comparable en ${best.exId}: ${first.pct}% → ${last.pct}% (${delta>0?"+":""}${delta} pts) en ${best.rows.length} exposiciones.`);
+      const contextual=best.contextualChange;
+      reasons.push(`Evidencia comparable en ${best.exId}: ${first.pct}% → ${last.pct}% (${delta>0?"+":""}${delta} pts) en ${best.rows.length} exposiciones.${contextual?.label?` ${contextual.label}.`:""}`);
     } else {
       reasons.push("No hay todavía suficiente repetición del mismo ejercicio para estimar cambio comparable por tarea.");
     }
@@ -12062,6 +12455,11 @@ function buildClinicalProcessFollowUp(paciente) {
           errors:typeof result.errors==="number"?result.errors:null,
           omissions:typeof result.specificMetrics?.omissions==="number"?result.specificMetrics.omissions:null,
           falseAlarms:typeof result.specificMetrics?.falseAlarms==="number"?result.specificMetrics.falseAlarms:null,
+          normalizedMetrics:nfMetricProfileForResult(result),
+          difficultySignature:nfMetricProfileForResult(result)?.challenge?.signature||null,
+          effectiveLoad:nfMetricProfileForResult(result)?.challenge?.effectiveLoad??null,
+          secondsPerTrial:nfMetricProfileForResult(result)?.efficiency?.secondsPerTrial??null,
+          meanReactionMs:nfMetricProfileForResult(result)?.efficiency?.meanReactionMs??null,
           exId:result.exId || null,
           exercise:result.nombre || result.exId || "Ejercicio sin nombre",
           loadContext:load?.tracked?{status:load.status,high:load.high||0,pauseSeconds:load.pauseSeconds||0,adjustments:load.adjustments||0}:null,
@@ -12088,6 +12486,12 @@ function buildClinicalProcessFollowUp(paciente) {
       const first=numeric[0] || null;
       const last=numeric[numeric.length-1] || null;
       const delta=first&&last&&numeric.length>=2?Math.round((last.pct-first.pct)*10)/10:null;
+      const contextualChange=(first&&last&&numeric.length>=2)
+        ? nfContextualExerciseChange(
+            {pct:first.pct,adaptiveLevel:first.level,effectiveLoad:first.effectiveLoad,normalizedMetrics:first.normalizedMetrics,supportLevel:first.support},
+            {pct:last.pct,adaptiveLevel:last.level,effectiveLoad:last.effectiveLoad,normalizedMetrics:last.normalizedMetrics,supportLevel:last.support}
+          )
+        : null;
       return {
         exId,
         exercise:exRows.find(x=>x.exercise)?.exercise || exId,
@@ -12097,6 +12501,7 @@ function buildClinicalProcessFollowUp(paciente) {
         firstPct:first?.pct ?? null,
         lastPct:last?.pct ?? null,
         delta,
+        contextualChange,
         trend:nfProcessTrendFromDelta(delta),
         rows:exRows.slice(-6),
       };
@@ -12185,6 +12590,9 @@ function buildClinicalProcessFollowUp(paciente) {
       falseAlarmsTotal:hasFalseAlarms?falseAlarmsTotal:null,
       avgLevel,
       levelDelta,
+      avgSecondsPerTrial:nfRoundedMean(recent.map(x=>x.secondsPerTrial),2),
+      meanReactionMs:nfRoundedMean(recent.map(x=>x.meanReactionMs),0),
+      normalizedMetricsVersion:NEUROFLEX_NORMALIZED_METRICS_VERSION,
       variability,
       evidence,
       loadContext,
@@ -12258,9 +12666,11 @@ function NFClinicalProcessFollowUpPanel({ paciente }) {
                   ["Indicador reciente",row.latest?.pct!==null&&row.latest?.pct!==undefined?`${row.latest.pct}%`:"—"],
                   ["Cambio comparable",row.comparableDelta!==null?`${row.comparableDelta>0?"+":""}${row.comparableDelta} pts`:"—"],
                   ["Autonomía",row.autonomyRate!==null?`${row.autonomyRate}%`:"—"],
-                  ["Apoyo medio",row.avgSupport!==null?`${row.avgSupport}/3`:"—"],
+                  ["Apoyo medio",row.avgSupport!==null?`${row.avgSupport}/4`:"—"],
                   ["Dificultad media",row.avgLevel!==null?`${row.avgLevel}/5`:"—"],
                   ["Tiempo medio",row.avgSeconds!==null?`${row.avgSeconds} s`:"—"],
+                  ["Tiempo/ensayo",row.avgSecondsPerTrial!==null?`${row.avgSecondsPerTrial} s`:"—"],
+                  ["Reacción media",row.meanReactionMs!==null?`${row.meanReactionMs} ms`:"—"],
                   ["Errores medios",row.avgErrors!==null?row.avgErrors:"—"],
                   ["Omisiones",row.omissionsTotal!==null?row.omissionsTotal:"—"],
                   ["Falsas alarmas",row.falseAlarmsTotal!==null?row.falseAlarmsTotal:"—"],
@@ -12415,7 +12825,7 @@ function NFTherapeuticTrajectorySummary({data}){
   const metricCards=[
     {label:"Desempeño reciente",value:nfFinite(last.indicator)?`${last.indicator}%`:"—",delta:tr.changes?.indicator,color:COLORS.primary},
     {label:"Autonomía",value:nfFinite(last.autonomy)?`${last.autonomy}%`:"—",delta:tr.changes?.autonomy,color:COLORS.success},
-    {label:"Apoyo medio",value:nfFinite(last.support)?`${last.support}/3`:"—",delta:tr.changes?.support,color:COLORS.warning,inverse:true},
+    {label:"Apoyo medio",value:nfFinite(last.support)?`${last.support}/4`:"—",delta:tr.changes?.support,color:COLORS.warning,inverse:true},
     {label:"Nivel administrado",value:nfFinite(last.level)?`${last.level}/5`:"—",delta:tr.changes?.level,color:COLORS.info},
   ];
   const deltaText=(d,inverse=false)=>{
@@ -12547,7 +12957,7 @@ function TherapeuticFollowUpPanel({ paciente }) {
               <div><div style={{fontSize:".7rem",fontWeight:800}}>Sesión {session.numero || "—"}</div><div style={{fontSize:".6rem",color:COLORS.textMuted}}>{date}</div></div>
               <div><div style={{fontSize:".59rem",color:COLORS.textMuted}}>Indicador</div><strong style={{fontSize:".76rem"}}>{indicator!==null?`${indicator}%`:"—"}</strong></div>
               <div><div style={{fontSize:".59rem",color:COLORS.textMuted}}>Autonomía</div><strong style={{fontSize:".76rem"}}>{autonomy!==null?`${autonomy}%`:"—"}</strong></div>
-              <div><div style={{fontSize:".59rem",color:COLORS.textMuted}}>Apoyo</div><strong style={{fontSize:".76rem"}}>{support!==null?`${support}/3`:"—"}</strong></div>
+              <div><div style={{fontSize:".59rem",color:COLORS.textMuted}}>Apoyo</div><strong style={{fontSize:".76rem"}}>{support!==null?`${support}/4`:"—"}</strong></div>
               <div><div style={{fontSize:".59rem",color:COLORS.textMuted}}>Nivel</div><strong style={{fontSize:".76rem"}}>{level!==null?`${level}/5`:"—"}</strong></div>
               <div><div style={{fontSize:".59rem",color:COLORS.textMuted}}>Carga alta</div><strong style={{fontSize:".76rem",color:load.high?COLORS.warning:COLORS.textSecond}}>{load.tracked?load.high:"—"}</strong></div>
             </div>;
@@ -17792,6 +18202,97 @@ function ReportDisclaimer() {
 }
 
 
+
+function nfContextualPatternPriority(pattern){
+  const order={
+    maintained_at_higher_challenge:5,
+    less_support:5,
+    accuracy_improved_same_context:5,
+    more_efficient:4,
+    stable:3,
+    lower_with_higher_challenge:2,
+    lower_same_context:1,
+    improved_lower_challenge:2,
+    insufficient:0,
+  };
+  return order[pattern] ?? 0;
+}
+
+function nfContextualProfessionalText(change){
+  if(!change) return null;
+  const map={
+    maintained_at_higher_challenge:"El desempeño se mantuvo o mejoró mientras aumentó la demanda administrada.",
+    less_support:"El desempeño se mantuvo o mejoró con menor necesidad de apoyo.",
+    accuracy_improved_same_context:"Se observa mayor precisión en condiciones de dificultad comparables.",
+    more_efficient:"La ejecución fue más eficiente manteniendo un desempeño comparable.",
+    stable:"El desempeño se mantiene relativamente estable en las observaciones comparables.",
+    lower_with_higher_challenge:"La reducción del desempeño coincide con un aumento de la demanda; conviene revisar tolerancia y ajuste de dificultad.",
+    lower_same_context:"Se observa una reducción del desempeño en condiciones comparables y requiere revisión profesional.",
+    improved_lower_challenge:"La mayor precisión coincide con una reducción de la demanda, por lo que no debe interpretarse como progresión por sí sola.",
+    insufficient:"Aún no existe evidencia contextual suficiente para interpretar el cambio.",
+  };
+  return map[change.pattern] || null;
+}
+
+function nfContextualFamilyText(change){
+  if(!change) return null;
+  const map={
+    maintained_at_higher_challenge:"Ha logrado mantener un desempeño parecido incluso cuando las actividades han sido más exigentes.",
+    less_support:"Ha podido resolver actividades similares necesitando menos ayuda.",
+    accuracy_improved_same_context:"Ha mostrado mayor precisión en actividades comparables.",
+    more_efficient:"Ha resuelto actividades comparables de una forma más ágil o eficiente.",
+    stable:"Su desempeño se ha mantenido relativamente estable en actividades comparables.",
+    lower_with_higher_challenge:"Cuando las actividades aumentaron de dificultad, el desempeño bajó; el profesional revisará el nivel de reto.",
+    lower_same_context:"En algunas actividades comparables se observó una variación que conviene seguir revisando.",
+    improved_lower_challenge:"El desempeño mejoró cuando la actividad fue menos exigente, por lo que todavía conviene consolidar antes de aumentar el reto.",
+    insufficient:"Todavía hacen falta más actividades comparables para describir un cambio con claridad.",
+  };
+  return map[change.pattern] || null;
+}
+
+function nfDomainContextualReportRows(paciente){
+  const follow=buildTherapeuticFollowUpV2(paciente);
+  return (follow?.domainFollowUp || []).map(row=>{
+    const contextual=row?.comparableExercise?.contextualChange || null;
+    return {
+      domainId:row.domainId,
+      label:row.label,
+      action:row.action,
+      contextual,
+      professionalText:nfContextualProfessionalText(contextual),
+      familyText:nfContextualFamilyText(contextual),
+      priority:nfContextualPatternPriority(contextual?.pattern),
+    };
+  }).sort((a,b)=>b.priority-a.priority);
+}
+
+function nfFamilyProgressHighlights(paciente,limit=4){
+  return nfDomainContextualReportRows(paciente)
+    .filter(x=>x.contextual && x.contextual.pattern!=="insufficient" && x.familyText)
+    .slice(0,limit);
+}
+
+function nfProfessionalProgressHighlights(paciente,limit=6){
+  return nfDomainContextualReportRows(paciente)
+    .filter(x=>x.contextual && x.contextual.pattern!=="insufficient" && x.professionalText)
+    .slice(0,limit);
+}
+
+function nfSessionRecentContext(paciente,domId){
+  const sesiones=[...(paciente?.sesiones||[])].filter(Boolean).sort((a,b)=>(a.numero||0)-(b.numero||0));
+  for(let i=sesiones.length-1;i>=0;i--){
+    const d=sesiones[i]?.byDom?.[domId];
+    if(d) return {
+      sessionNumber:sesiones[i].numero||null,
+      averageSecondsPerTrial:typeof d.averageSecondsPerTrial==="number"?d.averageSecondsPerTrial:null,
+      meanReactionMs:typeof d.meanReactionMs==="number"?d.meanReactionMs:null,
+      omissions:typeof d.totalOmissions==="number"?d.totalOmissions:null,
+      falseAlarms:typeof d.totalFalseAlarms==="number"?d.totalFalseAlarms:null,
+    };
+  }
+  return null;
+}
+
 function buildProfessionalLongitudinalReportRows(paciente) {
   const follow=buildTherapeuticFollowUpV2(paciente);
   return (follow?.domainFollowUp || []).map(d=>({
@@ -17837,7 +18338,7 @@ function ProfessionalProcessReportSection({ paciente }) {
           {row.observations} observación(es) · {row.sessionsCount} sesión(es) · {row.exerciseCount} ejercicio(s)
           {row.lastPct!==null?` · indicador reciente ${row.lastPct}%`:""}
           {row.autonomyRate!==null?` · autonomía ${row.autonomyRate}%`:""}
-          {row.avgSupport!==null?` · apoyo medio ${row.avgSupport}/3`:""}
+          {row.avgSupport!==null?` · apoyo medio ${row.avgSupport}/4`:""}
         </div>
         <div style={{fontSize:".64rem",color:"#667085",lineHeight:1.5,marginTop:4}}>
           <strong>{row.evidence.label}.</strong>{row.comparableExercise
@@ -17879,8 +18380,13 @@ function buildProfessionalConclusions(paciente) {
     const autonomous=processRows.filter(x=>x.autonomyRate!==null&&x.autonomyRate>=70);
     const support=processRows.filter(x=>x.avgSupport!==null&&x.avgSupport>1);
     if(autonomous.length) conclusions.push(`En ${autonomous.length} proceso(s) con registro suficiente se observa una proporción reciente de ejecución autónoma igual o superior al 70%; este dato describe el desempeño dentro de las tareas administradas.`);
-    if(support.length) conclusions.push(`En ${support.length} proceso(s) la necesidad media de apoyo reciente supera el nivel 1/3 y debe considerarse al interpretar el desempeño.`);
+    if(support.length) conclusions.push(`En ${support.length} proceso(s) la necesidad media de apoyo reciente supera el nivel 1/4 y debe considerarse al interpretar el desempeño.`);
   }
+
+  const contextualHighlights=nfProfessionalProgressHighlights(paciente,4);
+  contextualHighlights.forEach(h=>{
+    conclusions.push(`${h.label}: ${h.professionalText}`);
+  });
 
   review.forEach(item=>{
     if(item?.detail) recommendations.push(`${DOMINIOS_ADULTO[item.id]?.label || item.id}: ${item.detail}`);
@@ -17923,6 +18429,7 @@ function buildFamilyReportSummary(paciente) {
   return {
     summary,
     active,
+    highlights:nfFamilyProgressHighlights(paciente,4),
     areas:(follow?.domainFollowUp || []).map(d=>({
       id:d.domainId,
       label:d.label,
@@ -17930,6 +18437,8 @@ function buildFamilyReportSummary(paciente) {
       actionText:familyActionText(d.action),
       objective:d.objective || null,
       latest:d.latest || null,
+      contextual:d?.comparableExercise?.contextualChange || null,
+      contextualText:nfContextualFamilyText(d?.comparableExercise?.contextualChange || null),
     }))
   };
 }
@@ -17990,6 +18499,21 @@ function ReportePacienteFamiliaImprimible({paciente}) {
       </p>
     </section>
 
+    {data.highlights.length>0&&<section style={{marginBottom:22}}>
+      <h3 style={{fontSize:"1rem",marginBottom:10}}>Cambios que se han observado</h3>
+      <div style={{display:"grid",gap:8}}>
+        {data.highlights.map(h=><div key={h.domainId} style={{padding:"11px 12px",border:"1px solid #e7ebf1",borderRadius:10,background:"#fbfcfe"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,fontWeight:800,fontSize:".77rem",marginBottom:4}}>
+            <NFLineIcon name={DOMINIOS_ADULTO[h.domainId]?.icon || "followup"} size={17}/>{h.label}
+          </div>
+          <p style={{fontSize:".71rem",lineHeight:1.55,color:"#5f6b7f",margin:0}}>{h.familyText}</p>
+        </div>)}
+      </div>
+      <p style={{fontSize:".68rem",color:"#7a8598",lineHeight:1.5,marginTop:8}}>
+        Estos cambios se describen únicamente cuando existen actividades suficientemente comparables entre sesiones.
+      </p>
+    </section>}
+
     {data.active.length>0&&<section style={{marginBottom:22}}>
       <h3 style={{fontSize:"1rem",marginBottom:10}}>Áreas que estamos trabajando</h3>
       <div style={{display:"grid",gap:8}}>
@@ -18013,11 +18537,11 @@ function ReportePacienteFamiliaImprimible({paciente}) {
             <div style={{fontSize:".68rem",fontWeight:800,color:"#475467"}}>{a.actionText}</div>
           </div>
           <p style={{fontSize:".69rem",lineHeight:1.5,color:"#667085",margin:"5px 0 0"}}>
-            {a.action==="progress"?"Las sesiones recientes permiten considerar tareas un poco más exigentes, de forma gradual."
+            {a.contextualText || (a.action==="progress"?"Las sesiones recientes permiten considerar tareas un poco más exigentes, de forma gradual."
               :a.action==="maintain"?"El trabajo reciente sugiere seguir practicando y consolidando el nivel actual."
               :a.action==="adjust_strategy"?"Puede ser útil cambiar apoyos, estrategia o cantidad de dificultad antes de aumentar el reto."
               :a.action==="review_reassessment"?"El profesional debería revisar esta área y decidir si necesita una nueva exploración."
-              :"Todavía hacen falta más sesiones comparables para describir una tendencia con mayor claridad."}
+              :"Todavía hacen falta más sesiones comparables para describir una tendencia con mayor claridad.")}
           </p>
         </div>)}
       </div>
@@ -18050,6 +18574,10 @@ function buildFamilyPdfLines(paciente) {
   data.active.forEach(a=>{
     lines.push(`${DOMINIOS_ADULTO[a.id]?.label || a.id}: ${a.objetivo || "Objetivo en seguimiento."}`);
   });
+  if(data.highlights.length){
+    lines.push("","CAMBIOS OBSERVADOS");
+    data.highlights.forEach(h=>lines.push(`${h.label}: ${h.familyText}`));
+  }
   lines.push("","COMO VA CADA AREA");
   data.areas.forEach(a=>{
     lines.push(`${a.label}: ${a.actionText}.`);
@@ -18273,6 +18801,7 @@ function ReporteIntervencionEvolucionImprimible({ paciente }) {
                 {!!follow.summary.reviewReassessment&&<p>{plural(follow.summary.reviewReassessment,"área amerita","áreas ameritan")} revisión clínica y eventual reevaluación si el patrón persiste.</p>}
                 {!!follow.summary.insufficient&&<p>En {plural(follow.summary.insufficient,"área aún no hay","áreas aún no hay")} suficientes sesiones comparables para describir una tendencia.</p>}
               </>}
+          {nfProfessionalProgressHighlights(paciente,3).map(h=><p key={h.domainId}><strong>{h.label}:</strong> {h.professionalText}</p>)}
           <p>La evolución se interpreta dentro de las tareas de intervención y no se compara directamente con los índices de la evaluación cognitiva.</p>
         </div>
       </section>
@@ -18306,6 +18835,8 @@ function ReporteIntervencionEvolucionImprimible({ paciente }) {
           {followRows.map(row=>{
             const dom=DOMINIOS_ADULTO[row.domainId];
             const recent=row.latest;
+            const contextual=row?.comparableExercise?.contextualChange || null;
+            const recentContext=nfSessionRecentContext(paciente,row.domainId);
             return <div key={row.domainId} className="nf-intervention-follow-card">
               <div className="nf-intervention-follow-card__head">
                 <span><NFLineIcon name={dom?.icon || "followup"} size={18}/></span>
@@ -18316,8 +18847,16 @@ function ReporteIntervencionEvolucionImprimible({ paciente }) {
                 <div><b>{recent?.pct!=null?`${Math.round(recent.pct)}%`:"—"}</b><span>desempeño reciente</span></div>
                 <div><b>{recent?.level!=null?`${recent.level}/5`:"—"}</b><span>nivel reciente</span></div>
                 <div><b>{recent?.autonomy!=null?`${Math.round(recent.autonomy)}%`:"—"}</b><span>autonomía</span></div>
-                <div><b>{recent?.support!=null?`${recent.support}/3`:"—"}</b><span>apoyo medio</span></div>
+                <div><b>{recent?.support!=null?`${recent.support}/4`:"—"}</b><span>apoyo medio</span></div>
               </div>
+              {contextual&&<p><strong>Lectura contextual:</strong> {nfContextualProfessionalText(contextual)}</p>}
+              {(recentContext?.averageSecondsPerTrial!==null || recentContext?.meanReactionMs!==null) &&
+                <p>
+                  <strong>Eficiencia reciente:</strong>
+                  {recentContext?.averageSecondsPerTrial!==null?` ${recentContext.averageSecondsPerTrial} s por ensayo`:""}
+                  {recentContext?.averageSecondsPerTrial!==null&&recentContext?.meanReactionMs!==null?" · ":""}
+                  {recentContext?.meanReactionMs!==null?`${recentContext.meanReactionMs} ms de reacción media`:""}.
+                </p>}
               {row.reasons?.slice(0,2).map((x,i)=><p key={i}>{x.replace(/Evidencia comparable en [^:]+:/,"En una tarea comparable:")}</p>)}
             </div>;
           })}
@@ -18336,7 +18875,9 @@ function ReporteIntervencionEvolucionImprimible({ paciente }) {
               {plural(row.observations,"observación","observaciones")} · {plural(row.sessionsCount,"sesión","sesiones")} · {plural(row.exerciseCount,"ejercicio","ejercicios")}
               {row.lastPct!==null?` · indicador reciente ${row.lastPct}%`:""}
               {row.autonomyRate!==null?` · autonomía ${row.autonomyRate}%`:""}
-              {row.avgSupport!==null?` · apoyo medio ${row.avgSupport}/3`:""}
+              {row.avgSupport!==null?` · apoyo medio ${row.avgSupport}/4`:""}
+              {row.avgSecondsPerTrial!==null?` · ${row.avgSecondsPerTrial} s/ensayo`:""}
+              {row.meanReactionMs!==null?` · reacción ${row.meanReactionMs} ms`:""}
               {row.comparableDelta!==null?` · cambio comparable ${row.comparableDelta>0?"+":""}${row.comparableDelta} pts`:" · sin cambio comparable suficiente"}
             </p>
           </div>)}
@@ -18347,7 +18888,7 @@ function ReporteIntervencionEvolucionImprimible({ paciente }) {
         <h3 style={{fontSize:"1rem",marginBottom:7}}>5. Registro de sesiones</h3>
         <div className="nf-intervention-session-table">
           <div className="nf-intervention-session-row is-head">
-            <span>Sesión</span><span>Fecha</span><span>Desempeño</span><span>Autonomía</span><span>Nivel</span><span>Duración</span>
+            <span>Sesión</span><span>Fecha</span><span>Desempeño</span><span>Autonomía</span><span>Nivel</span><span>Apoyo</span><span>Duración</span>
           </div>
           {sesiones.map(ss=><div key={ss.numero} className="nf-intervention-session-row">
             <span><b>{ss.numero}</b></span>
@@ -18355,6 +18896,7 @@ function ReporteIntervencionEvolucionImprimible({ paciente }) {
             <span>{getSessionMetric(ss,"taskIndicator")!==null?`${getSessionMetric(ss,"taskIndicator")}%`:"—"}</span>
             <span>{getSessionMetric(ss,"autonomyRate")!==null?`${getSessionMetric(ss,"autonomyRate")}%`:"—"}</span>
             <span>{getSessionMetric(ss,"averageAdaptiveLevel")!==null?`${getSessionMetric(ss,"averageAdaptiveLevel")}/5`:"—"}</span>
+            <span>{getSessionMetric(ss,"averageSupportLevel")!==null?`${getSessionMetric(ss,"averageSupportLevel")}/4`:"—"}</span>
             <span>{fmt(ss.secs || 0)}</span>
             {ss.nota&&<small>Nota clínica: {ss.nota}</small>}
           </div>)}
@@ -18395,6 +18937,8 @@ function ReporteSesionImprimible({ paciente, sesion }) {
           ["Indicador", indicator !== null ? `${indicator}%` : "—"],
           ["Autonomía", getSessionMetric(sesion, "autonomyRate") !== null ? `${getSessionMetric(sesion, "autonomyRate")}%` : "—"],
           ["Nivel medio", getSessionMetric(sesion, "averageAdaptiveLevel") !== null ? `${getSessionMetric(sesion, "averageAdaptiveLevel")}/5` : "—"],
+          ["Apoyo medio", getSessionMetric(sesion, "averageSupportLevel") !== null ? `${getSessionMetric(sesion, "averageSupportLevel")}/4` : "—"],
+          ["Tiempo/ensayo", getSessionMetric(sesion, "averageSecondsPerTrial") !== null ? `${getSessionMetric(sesion, "averageSecondsPerTrial")} s` : "—"],
           ["Duración", fmt(sesion.secs || 0)],
         ].map(([label, value]) => (
           <div key={label} style={{ padding: 10, border: "1px solid #eceef3", borderRadius: 8, textAlign: "center" }}>
@@ -18413,6 +18957,8 @@ function ReporteSesionImprimible({ paciente, sesion }) {
           </div>
           <div style={{ color: "#667085", fontSize: ".7rem", marginTop: 2 }}>
             Nivel {r.adaptiveLevel ?? "—"}/5 · Apoyo: {supportLabelForResult(r)}
+            {nfMetricProfileForResult(r)?.efficiency?.secondsPerTrial!=null?` · ${nfMetricProfileForResult(r).efficiency.secondsPerTrial} s/ensayo`:""}
+            {nfMetricProfileForResult(r)?.efficiency?.meanReactionMs!=null?` · reacción ${nfMetricProfileForResult(r).efficiency.meanReactionMs} ms`:""}
             {typeof r.seconds === "number" ? ` · ${fmt(r.seconds)}` : ""}
             {r.professionalOverride ? " · Ajuste profesional" : ""}
           </div>
@@ -19855,6 +20401,200 @@ function formatSpecificMetric(key, value) {
   return String(value);
 }
 
+// ─── FASE E · MÉTRICAS NORMALIZADAS ─────────────────────────────────────────
+// Estas métricas organizan variables comparables sin producir un puntaje clínico
+// compuesto ni equivalencias normativas.
+
+function nfMetricNumber(...values){
+  for(const v of values){
+    if(typeof v==="number" && Number.isFinite(v)) return v;
+  }
+  return null;
+}
+
+function nfDifficultySignature(result){
+  const md=result?.multidimensionalDifficulty;
+  if(!md?.values) return typeof result?.adaptiveLevel==="number" ? `nivel:${result.adaptiveLevel}` : null;
+  const keys=Object.keys(md.values).sort();
+  return keys.map(k=>`${k}:${md.values[k]}`).join("|");
+}
+
+function nfDifficultySummaryForMetric(result){
+  const md=result?.multidimensionalDifficulty;
+  if(!md?.descriptors?.length){
+    return {
+      level:nfMetricNumber(result?.adaptiveLevel),
+      effectiveLoad:nfMetricNumber(result?.effectiveLoad),
+      signature:nfDifficultySignature(result),
+      dimensions:[],
+    };
+  }
+  return {
+    level:nfMetricNumber(result?.adaptiveLevel,md.level),
+    effectiveLoad:nfMetricNumber(result?.effectiveLoad),
+    signature:nfDifficultySignature(result),
+    dimensions:md.descriptors.map(d=>({
+      id:d.id,
+      value:d.value,
+      unit:d.unit||null,
+    })),
+  };
+}
+
+function nfBuildNormalizedMetrics(result){
+  if(!result) return null;
+  const sm=result.specificMetrics||{};
+  const total=nfMetricNumber(result.total);
+  const correct=nfMetricNumber(result.correct);
+  const errors=nfMetricNumber(result.errors);
+  const pct=nfMetricNumber(result.pct);
+  const omissions=nfMetricNumber(sm.omissions,sm.errorProfile?.omissions,sm.errorProfile?.prospectiveOmission);
+  const falseAlarms=nfMetricNumber(sm.falseAlarms,sm.commissions,sm.errorProfile?.falseAlarms,sm.errorProfile?.commissions);
+  const meanReactionMs=nfMetricNumber(
+    sm.meanReactionMs,
+    sm.averageReactionMs,
+    sm.meanGoReactionMs,
+    sm.avgReactionMs,
+    result.avgMs
+  );
+  const reactionVariabilityMs=nfMetricNumber(sm.reactionVariabilityMs,result.variabilityMs);
+  const totalSeconds=nfMetricNumber(result.seconds,sm.totalSeconds,sm.completionSeconds);
+  const secondsPerTrial=(totalSeconds!==null && total!==null && total>0)
+    ? Math.round((totalSeconds/total)*100)/100
+    : null;
+  const supportLevel=getTrackedSupportLevel(result);
+  const supportEvents=nfMetricNumber(result.supportSummary?.totalEvents,result.support?.events?.length);
+  const challenge=nfDifficultySummaryForMetric(result);
+
+  return {
+    version:NEUROFLEX_NORMALIZED_METRICS_VERSION,
+    validity:{
+      quantifiable:pct!==null && !result.requiresReview,
+      professionalReviewRequired:!!result.requiresReview,
+      supportMayAffectInterpretation:!!result.supportInterpretationAffected,
+      preparationScored:!!result.preparationRecord?.scored,
+    },
+    accuracy:{
+      pct,
+      correct,
+      total,
+      errors,
+      errorRate:total!==null&&total>0&&errors!==null?Math.round((errors/total)*1000)/10:null,
+      omissions,
+      falseAlarms,
+    },
+    efficiency:{
+      totalSeconds,
+      secondsPerTrial,
+      meanReactionMs,
+      reactionVariabilityMs,
+    },
+    challenge,
+    independence:{
+      supportLevel:typeof supportLevel==="number"?supportLevel:null,
+      supportEvents,
+      autonomous:typeof supportLevel==="number"?supportLevel===0:null,
+      instructionRepeats:nfMetricNumber(result.support?.instructionRepeats),
+      generalHints:nfMetricNumber(result.support?.generalHints),
+      specificHints:nfMetricNumber(result.support?.specificHints),
+      modelingUses:nfMetricNumber(result.support?.modelingUses),
+    },
+    taskSpecific:{...(result.specificMetrics||{})},
+  };
+}
+
+function nfMetricProfileForResult(result){
+  return result?.normalizedMetrics?.version===NEUROFLEX_NORMALIZED_METRICS_VERSION
+    ? result.normalizedMetrics
+    : nfBuildNormalizedMetrics(result);
+}
+
+function nfMetricMean(results,path){
+  const vals=(results||[]).map(r=>{
+    const profile=nfMetricProfileForResult(r);
+    return path.reduce((v,k)=>v?.[k],profile);
+  }).filter(v=>typeof v==="number"&&Number.isFinite(v));
+  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+}
+
+function nfContextualExerciseChange(firstResult,lastResult){
+  if(!firstResult||!lastResult) return null;
+  const first=nfMetricProfileForResult(firstResult);
+  const last=nfMetricProfileForResult(lastResult);
+  if(!first||!last) return null;
+
+  const pct1=first.accuracy?.pct,pct2=last.accuracy?.pct;
+  const support1=first.independence?.supportLevel,support2=last.independence?.supportLevel;
+  const level1=first.challenge?.level,level2=last.challenge?.level;
+  const load1=first.challenge?.effectiveLoad,load2=last.challenge?.effectiveLoad;
+  const rt1=first.efficiency?.meanReactionMs,rt2=last.efficiency?.meanReactionMs;
+  const spt1=first.efficiency?.secondsPerTrial,spt2=last.efficiency?.secondsPerTrial;
+
+  const accuracyDelta=(typeof pct1==="number"&&typeof pct2==="number")?Math.round((pct2-pct1)*10)/10:null;
+  const supportDelta=(typeof support1==="number"&&typeof support2==="number")?Math.round((support2-support1)*10)/10:null;
+  const levelDelta=(typeof level1==="number"&&typeof level2==="number")?Math.round((level2-level1)*10)/10:null;
+  const loadDelta=(typeof load1==="number"&&typeof load2==="number")?Math.round((load2-load1)*10)/10:null;
+  const reactionDelta=(typeof rt1==="number"&&typeof rt2==="number")?Math.round(rt2-rt1):null;
+  const secondsPerTrialDelta=(typeof spt1==="number"&&typeof spt2==="number")?Math.round((spt2-spt1)*100)/100:null;
+
+  const sameDifficulty=first.challenge?.signature && last.challenge?.signature
+    ? first.challenge.signature===last.challenge.signature
+    : (levelDelta===0);
+  const challengeIncreased=(levelDelta!==null&&levelDelta>0)||(loadDelta!==null&&loadDelta>0);
+  const challengeDecreased=(levelDelta!==null&&levelDelta<0)||(loadDelta!==null&&loadDelta<0);
+  const supportReduced=supportDelta!==null&&supportDelta<0;
+  const supportIncreased=supportDelta!==null&&supportDelta>0;
+  const accuracyStable=accuracyDelta!==null&&Math.abs(accuracyDelta)<5;
+  const accuracyImproved=accuracyDelta!==null&&accuracyDelta>=5;
+  const accuracyLower=accuracyDelta!==null&&accuracyDelta<=-5;
+  const speedImproved=(reactionDelta!==null&&reactionDelta<0)||(secondsPerTrialDelta!==null&&secondsPerTrialDelta<0);
+
+  let pattern="insufficient";
+  let label="Evidencia insuficiente";
+  if(accuracyImproved && sameDifficulty && !supportIncreased){
+    pattern="accuracy_improved_same_context";
+    label="Mayor precisión en contexto comparable";
+  }else if((accuracyStable||accuracyImproved) && challengeIncreased && !supportIncreased){
+    pattern="maintained_at_higher_challenge";
+    label="Desempeño sostenido con mayor demanda";
+  }else if((accuracyStable||accuracyImproved) && supportReduced){
+    pattern="less_support";
+    label="Desempeño sostenido con menor apoyo";
+  }else if((accuracyStable||accuracyImproved) && speedImproved && sameDifficulty){
+    pattern="more_efficient";
+    label="Mayor eficiencia en contexto comparable";
+  }else if(accuracyLower && challengeIncreased){
+    pattern="lower_with_higher_challenge";
+    label="Menor precisión junto con aumento de demanda";
+  }else if(accuracyLower && sameDifficulty){
+    pattern="lower_same_context";
+    label="Variación a revisar en contexto comparable";
+  }else if(challengeDecreased && accuracyImproved){
+    pattern="improved_lower_challenge";
+    label="Mayor precisión con menor demanda";
+  }else if(accuracyStable){
+    pattern="stable";
+    label="Desempeño relativamente estable";
+  }
+
+  return {
+    version:NEUROFLEX_CONTEXTUAL_PROGRESS_VERSION,
+    pattern,label,
+    sameDifficulty:!!sameDifficulty,
+    accuracyDelta,
+    supportDelta,
+    levelDelta,
+    loadDelta,
+    reactionDelta,
+    secondsPerTrialDelta,
+    challengeIncreased,
+    challengeDecreased,
+    supportReduced,
+    supportIncreased,
+    interpretation:"Descriptivo dentro de NeuroFlex; no equivale a cambio neuropsicológico normativo.",
+  };
+}
+
 function buildSessionMetrics(results = [], secs = 0) {
   const cuantificables = results.filter(r => typeof r.pct === "number" && !Number.isNaN(r.pct));
   const pct = safeAverage(cuantificables.map(r => r.pct));
@@ -19886,8 +20626,22 @@ function buildSessionMetrics(results = [], secs = 0) {
     sessionSeconds: secs || 0,
     totalOmissions: results.reduce((a,r) => a + (r.specificMetrics?.omissions || 0), 0),
     totalFalseAlarms: results.reduce((a,r) => a + (r.specificMetrics?.falseAlarms || 0), 0),
-    reactionTimeTasks: results.filter(r => typeof r.specificMetrics?.averageReactionMs === "number").length,
+    reactionTimeTasks: results.filter(r => {
+      const m=nfMetricProfileForResult(r);
+      return typeof m?.efficiency?.meanReactionMs==="number";
+    }).length,
     metacognitionTrackedExercises: results.filter(r => !!r.metacognition).length,
+    normalizedMetricsVersion:NEUROFLEX_NORMALIZED_METRICS_VERSION,
+    averageSecondsPerTrial:(()=>{
+      const v=nfMetricMean(results,["efficiency","secondsPerTrial"]);
+      return v===null?null:Math.round(v*100)/100;
+    })(),
+    meanReactionMs:(()=>{
+      const v=nfMetricMean(results,["efficiency","meanReactionMs"]);
+      return v===null?null:Math.round(v);
+    })(),
+    difficultyProfileTrackedExercises:results.filter(r=>!!nfMetricProfileForResult(r)?.challenge?.signature).length,
+    supportAffectedInterpretationExercises:results.filter(r=>!!nfMetricProfileForResult(r)?.validity?.supportMayAffectInterpretation).length,
   };
 }
 
@@ -19898,6 +20652,7 @@ function buildDomainMetrics(results = []) {
       byDom[r.domId] = {
         correct: 0, total: 0, errors: 0, count: 0,
         pcts: [], secondsList: [], supportLevels: [], difficultyLevels: [],
+        secondsPerTrialList:[], reactionMsList:[], omissionsList:[], falseAlarmsList:[],
         clinicalReviewCount: 0,
       };
     }
@@ -19912,6 +20667,11 @@ function buildDomainMetrics(results = []) {
     const trackedSupport = getTrackedSupportLevel(r);
     if (typeof trackedSupport === "number") d.supportLevels.push(trackedSupport);
     if (typeof r.adaptiveLevel === "number") d.difficultyLevels.push(r.adaptiveLevel);
+    const normalized=nfMetricProfileForResult(r);
+    if(typeof normalized?.efficiency?.secondsPerTrial==="number") d.secondsPerTrialList.push(normalized.efficiency.secondsPerTrial);
+    if(typeof normalized?.efficiency?.meanReactionMs==="number") d.reactionMsList.push(normalized.efficiency.meanReactionMs);
+    if(typeof normalized?.accuracy?.omissions==="number") d.omissionsList.push(normalized.accuracy.omissions);
+    if(typeof normalized?.accuracy?.falseAlarms==="number") d.falseAlarmsList.push(normalized.accuracy.falseAlarms);
   });
 
   Object.values(byDom).forEach(d => {
@@ -19927,12 +20687,23 @@ function buildDomainMetrics(results = []) {
       ? Math.round((d.supportLevels.filter(x => x === 0).length / d.supportLevels.length) * 100)
       : null;
     d.supportTrackedCount = d.supportLevels.length;
+    const secTrialAvg=safeAverage(d.secondsPerTrialList);
+    const reactionAvg=safeAverage(d.reactionMsList);
+    d.averageSecondsPerTrial=secTrialAvg===null?null:Math.round(secTrialAvg*100)/100;
+    d.meanReactionMs=reactionAvg===null?null:Math.round(reactionAvg);
+    d.totalOmissions=d.omissionsList.length?d.omissionsList.reduce((a,b)=>a+b,0):null;
+    d.totalFalseAlarms=d.falseAlarmsList.length?d.falseAlarmsList.reduce((a,b)=>a+b,0):null;
+    d.normalizedMetricsVersion=NEUROFLEX_NORMALIZED_METRICS_VERSION;
 
     // Las listas son temporales para calcular promedios. No se guardan en Firestore.
     delete d.pcts;
     delete d.secondsList;
     delete d.supportLevels;
     delete d.difficultyLevels;
+    delete d.secondsPerTrialList;
+    delete d.reactionMsList;
+    delete d.omissionsList;
+    delete d.falseAlarmsList;
   });
 
   return byDom;
@@ -20438,18 +21209,133 @@ function getLastExerciseResult(paciente, exId) {
   return null;
 }
 
+function nfPreparationResponseText(exId){
+  const response=getNFExerciseAdaptiveProfile(exId)?.response || "seleccion";
+  const map={
+    seleccion:"Selecciona una opción y confirma cuando corresponda.",
+    multiseleccion:"Selecciona únicamente las opciones que cumplen la regla.",
+    reconstruccion:"Reconstruye la información en el orden solicitado.",
+    seleccion_secuencia:"Selecciona o reconstruye la secuencia respetando el orden.",
+    deteccion:"Responde únicamente cuando se cumpla la condición indicada.",
+    oral_registro:"La respuesta se realiza verbalmente y el profesional registra la ejecución.",
+    oral_apoyo:"La respuesta principal es verbal; el profesional puede registrar el desempeño.",
+    toque_ordenado:"Toca los elementos en el orden indicado.",
+    toque:"Responde tocando el estímulo cuando corresponda.",
+    ejecucion_observada:"Realiza la acción indicada; el profesional registra la ejecución.",
+  };
+  return map[response] || "Sigue exactamente la forma de respuesta indicada en la actividad.";
+}
+
+function resolvePreparationDecision(paciente, exId, configuredMode = "auto") {
+  const protocol=getTaskLearningProtocol(exId);
+  const profile=getNFExerciseAdaptiveProfile(exId);
+  const recommendation=profile?.preparationMode || "direct";
+  const attempts=getExerciseAttemptCount(paciente, exId);
+  const last=getLastExerciseResult(paciente, exId);
+  const lastSupport=getTrackedSupportLevel(last);
+
+  if(configuredMode==="comprobacion"){
+    return {mode:"direct",source:"professional_config",recommendation,hasSpecificProtocol:!!protocol,attempts};
+  }
+  if(configuredMode==="aprendizaje"){
+    return {mode:protocol?"learning":"orientation",source:"professional_config",recommendation,hasSpecificProtocol:!!protocol,attempts};
+  }
+  if(configuredMode==="practica"){
+    return {mode:protocol?"practice":"review",source:"professional_config",recommendation,hasSpecificProtocol:!!protocol,attempts};
+  }
+
+  if(attempts===0){
+    if(protocol) return {mode:"learning",source:"first_exposure",recommendation,hasSpecificProtocol:true,attempts};
+    if(recommendation==="teaching") return {mode:"orientation",source:"profile_recommendation",recommendation,hasSpecificProtocol:false,attempts};
+    if(recommendation==="practice") return {mode:"review",source:"profile_recommendation",recommendation,hasSpecificProtocol:false,attempts};
+    return {mode:"direct",source:"profile_recommendation",recommendation,hasSpecificProtocol:false,attempts};
+  }
+
+  const needsReview=
+    !!last?.requiresReview ||
+    (typeof last?.pct==="number" && last.pct<60) ||
+    (typeof lastSupport==="number" && lastSupport>=2);
+
+  if(needsReview){
+    if(protocol) return {mode:"practice",source:"previous_performance",recommendation,hasSpecificProtocol:true,attempts};
+    if(recommendation!=="direct") return {mode:"review",source:"previous_performance",recommendation,hasSpecificProtocol:false,attempts};
+  }
+
+  return {mode:"direct",source:"previous_familiarity",recommendation,hasSpecificProtocol:!!protocol,attempts};
+}
+
 function resolvePreparationMode(paciente, exId, configuredMode = "auto") {
-  const protocol = getTaskLearningProtocol(exId);
-  if (!protocol) return "comprobacion";
-  if (configuredMode === "aprendizaje" || configuredMode === "practica" || configuredMode === "comprobacion") return configuredMode;
-
-  const attempts = getExerciseAttemptCount(paciente, exId);
-  const last = getLastExerciseResult(paciente, exId);
-
-  if (attempts === 0) return "aprendizaje";
-  if (last && typeof last.pct === "number" && last.pct < 60) return "practica";
-  if (last?.requiresReview) return "practica";
+  const d=resolvePreparationDecision(paciente,exId,configuredMode);
+  if(d.mode==="learning"||d.mode==="orientation") return "aprendizaje";
+  if(d.mode==="practice"||d.mode==="review") return "practica";
   return "comprobacion";
+}
+
+function emptyTaskPreparationRecord(){
+  return {
+    version:NEUROFLEX_TASK_PREPARATION_VERSION,
+    mode:"direct",
+    source:"none",
+    recommendation:"direct",
+    specificProtocol:false,
+    viewed:false,
+    instructionListens:0,
+    comprehensionConfirmed:false,
+    completedAt:null,
+    scored:false,
+  };
+}
+
+function GenericTaskPreparationScreen({item,mayor,mode="review",onListen,onContinue,onDirect}){
+  const [confirmed,setConfirmed]=useState(false);
+  const exId=item?.ex?.id;
+  const title=mode==="orientation"?"Preparación de la actividad":"Revisión de la consigna";
+  const subtitle=mode==="orientation"
+    ?"Antes de puntuar, revisa cómo funciona la actividad."
+    :"Esta revisión no forma parte del resultado de la sesión.";
+
+  return <div style={{maxWidth:620,margin:"0 auto"}}>
+    <Card style={{padding:mayor?32:25}}>
+      <div style={{textAlign:"center",marginBottom:20}}>
+        <div className="nf-task-ready-mark"><NFLineIcon name="reading" size={26}/></div>
+        <div style={{fontSize:".68rem",fontWeight:850,color:COLORS.primary,letterSpacing:".05em",textTransform:"uppercase",marginBottom:4}}>Preparación · No puntuable</div>
+        <h3 style={{margin:"0 0 6px",fontSize:mayor?"1.4rem":"1.15rem"}}>{title}</h3>
+        <p style={{margin:0,color:COLORS.textMuted,fontSize:mayor?".96rem":".8rem",lineHeight:1.55}}>{subtitle}</p>
+      </div>
+
+      <div className="nf-eval-instruction" style={{marginBottom:14}}>
+        <span className="nf-eval-instruction__label">Qué debes hacer</span>
+        <p className="nf-eval-instruction__text">{item?.ex?.instruccion}</p>
+      </div>
+
+      <div style={{padding:mayor?16:13,borderRadius:11,border:`1px solid ${COLORS.border}`,background:COLORS.bg,marginBottom:14}}>
+        <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.textSecond,marginBottom:5}}>FORMA DE RESPONDER</div>
+        <p style={{margin:0,color:COLORS.textSecond,lineHeight:1.55,fontSize:mayor?".96rem":".79rem"}}>
+          {nfPreparationResponseText(exId)}
+        </p>
+      </div>
+
+      <div style={{padding:12,borderRadius:10,background:"#FAFCFB",border:`1px solid ${COLORS.border}`,fontSize:mayor?".86rem":".72rem",color:COLORS.textMuted,lineHeight:1.5,marginBottom:16}}>
+        Esta fase sirve para comprobar la comprensión de la consigna y el manejo de la respuesta. <strong>No suma ni resta puntos</strong> y no debe utilizarse para enseñar la solución cognitiva de la tarea.
+      </div>
+
+      <button onClick={onListen} style={{width:"100%",minHeight:46,background:"#fff",border:`1px solid ${COLORS.border}`,borderRadius:10,padding:"9px 12px",cursor:"pointer",fontFamily:"inherit",color:COLORS.primaryDark,fontWeight:750,display:"flex",alignItems:"center",justifyContent:"center",gap:7,marginBottom:14}}>
+        <NFIcon name="volume" size={18}/> Escuchar instrucción
+      </button>
+
+      <label style={{display:"flex",alignItems:"center",gap:10,padding:"12px 13px",borderRadius:10,border:`1px solid ${confirmed?COLORS.primary:COLORS.border}`,background:confirmed?COLORS.primary+"08":"#fff",fontWeight:750,fontSize:mayor?".95rem":".8rem",cursor:"pointer"}}>
+        <input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
+        Comprendió qué debe hacer y cómo responder
+      </label>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1.4fr",gap:10,marginTop:16}}>
+        <BtnSecondary onClick={onDirect}>Ir directo a la tarea</BtnSecondary>
+        <BtnPrimary disabled={!confirmed} onClick={()=>onContinue?.({comprehensionConfirmed:true})} style={{opacity:confirmed?1:.5}}>
+          Comenzar actividad
+        </BtnPrimary>
+      </div>
+    </Card>
+  </div>;
 }
 
 function TaskLearningScreen({ exId, mayor, onContinue, onSkip }) {
@@ -20744,10 +21630,10 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8 }}>
           {[
-            { id:"auto", label:"Según necesidad", desc:"Primera vez: enseña; dificultad previa: practica" },
+            { id:"auto", label:"Según necesidad", desc:"Usa historial + perfil del ejercicio; la preparación no puntúa" },
             { id:"aprendizaje", label:"Aprendizaje", desc:"Explicación + ejemplo + práctica" },
             { id:"practica", label:"Práctica", desc:"Ensayo guiado antes de ejecutar" },
-            { id:"comprobacion", label:"Comprobación", desc:"Va directo a la tarea puntuable" },
+            { id:"comprobacion", label:"Directo", desc:"Omite preparación y comienza la tarea puntuable" },
           ].map(opt => (
             <button key={opt.id} onClick={() => setPreparacionTarea(opt.id)} style={{
               padding:"10px 8px",borderRadius:11,border:`2px solid ${preparacionTarea===opt.id?COLORS.primary:COLORS.border}`,
@@ -20826,13 +21712,14 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
 
 
 function getEntryPhaseForExercise(paciente, item, config, showDemo, demoSeen = new Set()) {
-  const exId = item?.ex?.id;
-  if (!exId) return "exercise";
-  const mode = resolvePreparationMode(paciente, exId, config?.preparacionTarea || "auto");
-  if (mode === "aprendizaje" && getTaskLearningProtocol(exId)) return "learning";
-  if (mode === "practica" && getTaskLearningProtocol(exId)) return "practice";
-  if (mode === "comprobacion" && getTaskLearningProtocol(exId)) return "exercise";
-  if (showDemo && !demoSeen.has(exId)) return "demo";
+  const exId=item?.ex?.id;
+  if(!exId)return "exercise";
+  const decision=resolvePreparationDecision(paciente,exId,config?.preparacionTarea || "auto");
+  if(decision.mode==="learning")return "learning";
+  if(decision.mode==="practice")return "practice";
+  if(decision.mode==="orientation")return "preparation_orientation";
+  if(decision.mode==="review")return "preparation_review";
+  if(showDemo && !demoSeen.has(exId))return "demo";
   return "exercise";
 }
 
@@ -21011,6 +21898,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
   const [lastResult, setLastResult] = useState(null);
   const [pendingResult, setPendingResult] = useState(null);
   const [supportByItem, setSupportByItem] = useState({});
+  const [preparationByItem,setPreparationByItem]=useState({});
   const [supportOverlay, setSupportOverlay] = useState(null); // "general" | "specific" | "modeling" | null
   const [loadChecks, setLoadChecks] = useState([]);
   const [currentLoadRating, setCurrentLoadRating] = useState(null);
@@ -21066,6 +21954,35 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
   };
 
   const currentSupport = supportByItem[queue[cur]?.key] || emptySupportRecord();
+
+  const registerPreparation=(patch={})=>{
+    const item=queue[cur];
+    if(!item?.key)return;
+    const decision=resolvePreparationDecision(paciente,item.ex?.id,config.preparacionTarea || "auto");
+    setPreparationByItem(prev=>{
+      const current=prev[item.key] || emptyTaskPreparationRecord();
+      return {...prev,[item.key]:{
+        ...current,
+        version:NEUROFLEX_TASK_PREPARATION_VERSION,
+        mode:decision.mode,
+        source:decision.source,
+        recommendation:decision.recommendation,
+        specificProtocol:decision.hasSpecificProtocol,
+        viewed:true,
+        ...patch,
+      }};
+    });
+  };
+
+  const listenPreparationInstruction=()=>{
+    registerPreparation({instructionListens:(preparationByItem[queue[cur]?.key]?.instructionListens||0)+1});
+    speakInstruction(queue[cur]?.ex?.instruccion,{immediate:true});
+  };
+
+  const completePreparation=(patch={})=>{
+    registerPreparation({...patch,completedAt:new Date().toISOString(),scored:false});
+    setPhase("exercise");
+  };
 
   const shouldMonitorLoad = () => {
     const item=queue[cur];
@@ -21145,6 +22062,15 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
       supportContaminationRisk:!!support.contaminationRisk,
       autonomous: (support.maxSupportLevel || 0) === 0,
       preparationMode: resolvePreparationMode(paciente, item.ex.id, config.preparacionTarea || "auto"),
+      preparationDecision:resolvePreparationDecision(paciente,item.ex.id,config.preparacionTarea || "auto"),
+      preparationRecord:preparationByItem[item?.key] || {
+        ...emptyTaskPreparationRecord(),
+        mode:"direct",
+        source:"not_shown",
+        recommendation:getNFExerciseAdaptiveProfile(item.ex.id)?.preparationMode || "direct",
+      },
+      difficultyEngineVersion:NEUROFLEX_MULTIDIMENSIONAL_DIFFICULTY_VERSION,
+      multidimensionalDifficulty:nfBuildExerciseDifficultyProfile(item.ex.id,item.adaptiveLevel),
       effectiveLoad:nfF64EffectiveLoad({exId:item.ex.id,adaptiveLevel:item.adaptiveLevel}),
       curveTarget:nfF64CurveTarget(cur,queue.length),
       inSessionLoadAdjustment:!!item.inSessionLoadAdjustment,
@@ -21154,6 +22080,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
       ...(res.specificMetrics || {}),
       ...getExerciseSpecificMetrics(entry),
     };
+    entry.normalizedMetrics=nfBuildNormalizedMetrics(entry);
     const shouldAskMetacognition =
       queue.length <= 4 ||
       cur === queue.length - 1 ||
@@ -21244,7 +22171,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
     };
     const sessionBase = {
       numero: sesionNum,
-      dataVersion: 7,
+      dataVersion: 12,
       date: new Date().toISOString(),
       gp: globalPct,
       byDom,
@@ -21302,8 +22229,11 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
     <TaskLearningScreen
       exId={curItem?.ex?.id}
       mayor={mayor}
-      onContinue={() => setPhase("practice")}
-      onSkip={() => setPhase("exercise")}
+      onContinue={() => {
+        registerPreparation({mode:"learning",viewed:true});
+        setPhase("practice");
+      }}
+      onSkip={() => completePreparation({mode:"learning",comprehensionConfirmed:false,skippedToTask:true})}
     />
   );
 
@@ -21311,7 +22241,25 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
     <GuidedPracticeScreen
       exId={curItem?.ex?.id}
       mayor={mayor}
-      onComplete={() => setPhase("exercise")}
+      onComplete={() => completePreparation({mode:"practice",comprehensionConfirmed:true})}
+    />
+  );
+
+  if(phase==="preparation_orientation" || phase==="preparation_review") return (
+    <GenericTaskPreparationScreen
+      item={curItem}
+      mayor={mayor}
+      mode={phase==="preparation_orientation"?"orientation":"review"}
+      onListen={listenPreparationInstruction}
+      onContinue={(data)=>completePreparation({
+        mode:phase==="preparation_orientation"?"orientation":"review",
+        comprehensionConfirmed:!!data?.comprehensionConfirmed,
+      })}
+      onDirect={()=>completePreparation({
+        mode:phase==="preparation_orientation"?"orientation":"review",
+        comprehensionConfirmed:false,
+        skippedToTask:true,
+      })}
     />
   );
 
@@ -21322,6 +22270,14 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
       mayor={mayor}
       onContinuar={() => {
         if (curItem?.ex?.id) setDemoSeen(prev => new Set([...prev, curItem.ex.id]));
+        registerPreparation({
+          mode:"demo",
+          source:"demo_enabled",
+          recommendation:getNFExerciseAdaptiveProfile(curItem?.ex?.id)?.preparationMode || "direct",
+          comprehensionConfirmed:true,
+          completedAt:new Date().toISOString(),
+          scored:false,
+        });
         setPhase("exercise");
       }}
     />
@@ -21492,6 +22448,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
             modoMayor={mayor}
             adaptiveLevel={curItem?.adaptiveLevel}
             difficultyLevel={curItem?.adaptiveLevel}
+            difficultyProfile={nfBuildExerciseDifficultyProfile(curItem?.ex?.id,curItem?.adaptiveLevel)}
           />}
         </div>
 
