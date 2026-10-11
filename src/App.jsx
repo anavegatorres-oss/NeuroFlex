@@ -559,6 +559,55 @@ body{background:
 @media(max-width:900px){.nf-v2-report-type-grid{grid-template-columns:1fr!important}.nf-v2-report-brand-head__top{align-items:flex-start;flex-direction:column}.nf-v2-report-brand-head__meta{min-width:0;width:100%}}
 @media print{.nf-v2-print-report{box-shadow:none!important;border:0!important;border-radius:0!important;padding:0!important}.nf-v2-report-brand-head__rule{-webkit-print-color-adjust:exact;print-color-adjust:exact}.nf-v2-report-brand-head__top{flex-direction:row!important}.nf-v2-report-brand-head__meta{min-width:190px!important;width:auto!important}.nf-v2-print-report section{break-inside:avoid-page}}
 
+
+/* ─── F77.0 · SISTEMA VISUAL DE TARJETAS NEUROFLEX ───────────────────────── */
+.nf-visual-card{
+  --nf-card-size:120px;
+  position:relative;
+  width:100%;
+  min-width:0;
+  aspect-ratio:1/1;
+  border-radius:16px;
+  border:2px solid #DDE4EE;
+  background:#FFFFFF;
+  box-shadow:0 7px 20px rgba(25,45,78,.055);
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease,transform .18s ease,opacity .18s ease;
+}
+.nf-visual-card--s{max-width:88px;border-radius:13px}
+.nf-visual-card--m{max-width:126px}
+.nf-visual-card--l{max-width:184px;border-radius:19px}
+.nf-visual-card.is-interactive{cursor:pointer}
+.nf-visual-card.is-interactive:hover{border-color:#BFCDE1;box-shadow:0 9px 24px rgba(25,45,78,.085);transform:translateY(-1px)}
+.nf-visual-card.is-selected{border-color:#4F8CFF;box-shadow:0 0 0 4px rgba(79,140,255,.11),0 9px 24px rgba(25,45,78,.07)}
+.nf-visual-card.is-correct{border-color:#27A98D;background:#F1FBF8;box-shadow:0 0 0 4px rgba(39,169,141,.09)}
+.nf-visual-card.is-incorrect{border-color:#DE6A72;background:#FFF6F6;box-shadow:0 0 0 4px rgba(222,106,114,.08)}
+.nf-visual-card.is-blocked{opacity:.48;border-style:dashed;box-shadow:none;cursor:default}
+.nf-visual-card__content{width:100%;height:100%;display:grid;place-items:center;padding:12%;box-sizing:border-box}
+.nf-visual-card__back{position:absolute;inset:0;background:#EEF4FA}
+.nf-visual-card__back img{width:100%;height:100%;display:block;object-fit:cover}
+.nf-visual-card__status{
+  position:absolute;right:8px;top:8px;width:24px;height:24px;border-radius:50%;
+  display:grid;place-items:center;background:#fff;box-shadow:0 2px 8px rgba(23,35,62,.12);font-size:.72rem;font-weight:900
+}
+.nf-visual-card.is-correct .nf-visual-card__status{color:#17836E}
+.nf-visual-card.is-incorrect .nf-visual-card__status{color:#C54954}
+.nf-visual-card-grid{display:grid;gap:14px;justify-content:center;align-items:stretch}
+.nf-visual-card-grid--memory{grid-template-columns:repeat(3,minmax(84px,126px))}
+.nf-visual-card-grid--choices{grid-template-columns:repeat(3,minmax(88px,126px))}
+.nf-visual-model-wrap{display:grid;place-items:center;padding:7px}
+.nf-visual-model-label{font-size:.65rem;font-weight:850;color:#758198;letter-spacing:.06em;margin-bottom:10px}
+.nf-naming-stimulus-wrap{display:grid;place-items:center;min-height:280px}
+.nf-naming-stimulus-wrap .nf-visual-card{width:min(190px,70vw)}
+.nf-visual-card--senior.nf-visual-card--s{max-width:104px}
+.nf-visual-card--senior.nf-visual-card--m{max-width:146px}
+.nf-visual-card--senior.nf-visual-card--l{max-width:208px}
+@media(max-width:640px){
+  .nf-visual-card-grid--memory,.nf-visual-card-grid--choices{grid-template-columns:repeat(2,minmax(92px,132px))}
+}
+
 /* ─── F69.6 · PULIDO GLOBAL: MARCA, ICONOS, CALM Y TIPOGRAFÍA ─────────────── */
 :root{--nf-calm-purple:#7667C9;--nf-calm-blue:#5680B8;--nf-calm-teal:#4B9A91;--nf-calm-ink:#17233E}
 html,body,#root,.nf-v2-shell{font-family:'Manrope',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;font-feature-settings:"cv02","cv03","cv04","cv11";-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
@@ -1244,6 +1293,67 @@ const NeuroFlexBrandLogo = ({ width = 310, className = "", compact=false }) => {
     </div>
   );
 };
+
+
+const NF_VISUAL_CARD_BACK = "/neuroflex-assets/cards/neuroflex-card-back.png";
+
+function NeuroFlexCard({
+  children,
+  size="m",
+  state="normal",
+  hidden=false,
+  interactive=false,
+  disabled=false,
+  senior=false,
+  onClick,
+  ariaLabel="Estímulo visual",
+  style,
+}){
+  const effectiveState=disabled?"blocked":state;
+  const cls=[
+    "nf-visual-card",
+    `nf-visual-card--${size}`,
+    senior?"nf-visual-card--senior":"",
+    interactive&&!disabled?"is-interactive":"",
+    effectiveState!=="normal"?`is-${effectiveState}`:"",
+  ].filter(Boolean).join(" ");
+  const status=effectiveState==="correct"?"✓":effectiveState==="incorrect"?"×":null;
+  const common={className:cls,style, "aria-label":ariaLabel};
+  const content=<>
+    {hidden
+      ? <div className="nf-visual-card__back"><img src={NF_VISUAL_CARD_BACK} alt="" aria-hidden="true"/></div>
+      : <div className="nf-visual-card__content">{children}</div>}
+    {status&&<span className="nf-visual-card__status" aria-hidden="true">{status}</span>}
+  </>;
+  if(interactive){
+    return <button type="button" {...common} disabled={disabled} onClick={onClick} style={{...style,padding:0,fontFamily:"inherit"}}>{content}</button>;
+  }
+  return <div {...common}>{content}</div>;
+}
+
+function NeuroFlexMemoryCard({children,faceUp=true,size="m",state="normal",senior=false,onClick,interactive=false,ariaLabel}){
+  return <NeuroFlexCard
+    size={size}
+    state={state}
+    hidden={!faceUp}
+    senior={senior}
+    interactive={interactive}
+    onClick={onClick}
+    ariaLabel={ariaLabel || (faceUp?"Tarjeta visible":"Tarjeta NeuroFlex oculta")}
+  >{children}</NeuroFlexCard>;
+}
+
+function NeuroFlexStimulusTile({children,size="m",state="normal",senior=false,onClick,disabled=false,ariaLabel}){
+  return <NeuroFlexCard
+    size={size}
+    state={state}
+    senior={senior}
+    interactive
+    disabled={disabled}
+    onClick={onClick}
+    ariaLabel={ariaLabel}
+  >{children}</NeuroFlexCard>;
+}
 
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
 const SIDEBAR_ITEMS = {
@@ -4083,8 +4193,12 @@ const EX_ADULTO = {
             <div style={{textAlign:"left"}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>DENOMINACIÓN ORAL</div><div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>Di el nombre antes de pedir ayuda.</div></div>
             <Badge label={`${cur+1}/${ITEMS.length}`} color={COLORS.info}/>
           </div>
-          <NFTrainingStimulusCard modoMayor={M} minHeight={280}>
-            <NFStimulusObject kind={item.kind} size={M?150:128} label="Elemento para denominar"/>
+          <NFTrainingStimulusCard modoMayor={M} minHeight={300}>
+            <div className="nf-naming-stimulus-wrap">
+              <NeuroFlexCard size="l" senior={M} ariaLabel="Elemento para denominar">
+                <NFStimulusObject kind={item.kind} size={M?148:128} label="Elemento para denominar"/>
+              </NeuroFlexCard>
+            </div>
           </NFTrainingStimulusCard>
 
           {mode==="spontaneous"&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:560,margin:"0 auto"}}>
@@ -4248,19 +4362,30 @@ const EX_ADULTO = {
             <Badge label={`${cur+1}/${ROUNDS}`} color={COLORS.info}/>
           </div>
 
-          <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
-            <div>
-              <div style={{fontSize:".65rem",fontWeight:800,color:COLORS.textMuted,marginBottom:10}}>MODELO</div>
-              <NFStimulusShape id={item.target} size={M?104:86}/>
+          <NFTrainingStimulusCard modoMayor={M} minHeight={235}>
+            <div className="nf-visual-model-wrap">
+              <div className="nf-visual-model-label">MODELO</div>
+              <NeuroFlexCard size="l" senior={M} ariaLabel="Figura modelo">
+                <NFStimulusShape id={item.target} size={M?100:84}/>
+              </NeuroFlexCard>
             </div>
           </NFTrainingStimulusCard>
 
-          <div style={{display:"grid",gridTemplateColumns:`repeat(${Math.min(optionCount,3)},1fr)`,gap:M?16:12,maxWidth:620,margin:"0 auto"}}>
-            {item.opts.map(opt=><button key={opt} disabled={locked.current} onClick={()=>pick(opt)} style={{
-              minHeight:M?96:82,borderRadius:15,border:`3px solid ${!sel?COLORS.border:opt===item.target?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,
-              background:!sel?"#fff":opt===item.target?COLORS.success+"0D":sel===opt?COLORS.error+"0D":"#fff",
-              cursor:locked.current?"default":"pointer"
-            }}>{opt}</button>)}
+          <div className="nf-visual-card-grid nf-visual-card-grid--choices" style={{maxWidth:620,margin:"0 auto"}}>
+            {item.opts.map(opt=>{
+              const state=!sel?"normal":opt===item.target?"correct":sel===opt?"incorrect":"normal";
+              return <NeuroFlexStimulusTile
+                key={opt}
+                size="m"
+                senior={M}
+                state={state}
+                disabled={locked.current}
+                onClick={()=>pick(opt)}
+                ariaLabel="Opción visual"
+              >
+                <NFStimulusShape id={opt} size={M?62:52}/>
+              </NeuroFlexStimulusTile>;
+            })}
           </div>
         </div>;
       }
@@ -5759,6 +5884,7 @@ const NEUROFLEX_MULTIDIMENSIONAL_CLOSURE_VERSION = "NF-DIFF-CLOSE-1.0";
 const NEUROFLEX_NORMALIZED_METRICS_VERSION = "NF-METRICS-1.0";
 const NEUROFLEX_CONTEXTUAL_PROGRESS_VERSION = "NF-PROGRESS-CONTEXT-1.0";
 const NEUROFLEX_REPORT_METRICS_VERSION = "NF-REPORT-METRICS-1.0";
+const NEUROFLEX_VISUAL_CARD_SYSTEM_VERSION = "NF-VISUAL-CARDS-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -6605,18 +6731,29 @@ function NF63VisualMemory({onDone,modoMayor,difficultyLevel=3,difficultyProfile}
   if(phase==="study")return <div style={{textAlign:"center",padding:"4px 0"}}>
     <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Memoria visual</div>
     <p style={{fontSize:M?".95rem":".8rem",color:COLORS.textMuted}}>Observa las figuras · {seconds}s</p>
-    <NFTrainingStimulusCard modoMayor={M} minHeight={250}>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:M?18:14,maxWidth:460,width:"100%"}}>
-        {target.map((x,i)=><div key={i} style={{minHeight:M?92:78,display:"grid",placeItems:"center",border:`2px solid ${COLORS.border}`,borderRadius:14,background:"#fff"}}>{x}</div>)}
+    <NFTrainingStimulusCard modoMayor={M} minHeight={285}>
+      <div className="nf-visual-card-grid nf-visual-card-grid--memory" style={{maxWidth:470,width:"100%"}}>
+        {target.map((x,i)=><NeuroFlexMemoryCard key={i} faceUp size="m" senior={M} ariaLabel="Figura para memorizar">
+          <NFStimulusShape id={x} size={M?60:52}/>
+        </NeuroFlexMemoryCard>)}
       </div>
     </NFTrainingStimulusCard>
   </div>;
   return <div style={{textAlign:"center",padding:"4px 0"}}>
     <h3 style={{margin:"0 0 5px"}}>Selecciona las figuras que viste</h3>
     <p style={{fontSize:M?".92rem":".78rem",color:COLORS.textMuted,marginTop:0}}>Puedes seleccionar varias. Algunas son distractores.</p>
-    <NFTrainingStimulusCard modoMayor={M} minHeight={280}>
-      <div style={{display:"grid",gridTemplateColumns:M?"repeat(3,1fr)":"repeat(5,1fr)",gap:M?15:11,width:"100%",maxWidth:650}}>
-        {pool.map(x=><button key={x} onClick={()=>toggle(x)} style={{minHeight:M?88:74,border:`2px solid ${selected.has(x)?COLORS.primary:COLORS.border}`,borderRadius:13,background:selected.has(x)?COLORS.primary+"0D":"#fff",cursor:"pointer"}}><NFStimulusShape id={x} size={M?54:46}/></button>)}
+    <NFTrainingStimulusCard modoMayor={M} minHeight={300}>
+      <div className="nf-visual-card-grid nf-visual-card-grid--choices" style={{width:"100%",maxWidth:650}}>
+        {pool.map(x=><NeuroFlexStimulusTile
+          key={x}
+          size="m"
+          senior={M}
+          state={selected.has(x)?"selected":"normal"}
+          onClick={()=>toggle(x)}
+          ariaLabel="Opción de memoria visual"
+        >
+          <NFStimulusShape id={x} size={M?58:48}/>
+        </NeuroFlexStimulusTile>)}
       </div>
     </NFTrainingStimulusCard>
     <div style={{maxWidth:520,margin:"0 auto"}}><BtnPrimary onClick={finish} style={{width:"100%"}}>Confirmar selección</BtnPrimary></div>
