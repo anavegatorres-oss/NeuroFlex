@@ -333,6 +333,21 @@ const baseStyles = `
 .nf-eval-domain-head__icon,.nf-exercise-domain-icon{border-radius:12px;background:linear-gradient(145deg,#EAF6F4,#F2F0F8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .nf-eval-domain-head__icon{width:43px;height:43px}
 .nf-eval-instruction,.nf-exercise-instruction{background:#F7FAF9;border:1px solid #DCE5E3;border-radius:12px;padding:13px 15px;margin-bottom:18px}
+.nf-eval-instruction{position:relative;overflow:hidden;padding:16px 18px 16px 21px!important;background:#F7FAFE!important;border:1px solid #D7E2F2!important}
+.nf-eval-instruction:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#55758D}
+.nf-eval-instruction__label{display:block;margin-bottom:6px;color:#315CB6;font-size:.72rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase}
+.nf-eval-instruction__text{margin:0;color:#27364F;font-size:.94rem;line-height:1.62;font-weight:560}
+.nf-evaluation-focus.is-senior .nf-eval-instruction__label{font-size:.86rem}
+.nf-evaluation-focus.is-senior .nf-eval-instruction__text{font-size:1.08rem;line-height:1.68}
+.nf-screening-instruction{position:relative;overflow:hidden;margin-bottom:12px;padding:18px 18px 18px 22px;border-radius:13px;border:1px solid #C9D8EC;background:#F6F9FE;box-shadow:0 4px 14px rgba(49,92,182,.045)}
+.nf-screening-instruction:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#55758D}
+.nf-screening-instruction__label{display:block;margin-bottom:8px;color:#315CB6;font-size:.76rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase}
+.nf-screening-instruction__text{margin:0;color:#26354E;font-size:.95rem;line-height:1.62;font-weight:560}
+.nf-screening-helper{margin-bottom:22px;padding:9px 12px;border-radius:10px;background:#F3F6F9;color:#7A879B;font-size:.72rem;line-height:1.5;border:1px solid #E7ECF2}
+.nf-evaluation-focus.is-senior .nf-screening-instruction__label{font-size:.9rem}
+.nf-evaluation-focus.is-senior .nf-screening-instruction__text{font-size:1.1rem;line-height:1.7}
+.nf-evaluation-focus.is-senior .nf-screening-helper{font-size:.84rem}
+
 .nf-exercise-instruction__label{display:flex;align-items:center;gap:6px;color:#287F83;font-size:.67rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
 .nf-demo-card{border:1px solid #DCE5E3!important;box-shadow:0 10px 30px rgba(36,59,83,.06)!important}
 .nf-demo-head{text-align:center;margin-bottom:22px}
@@ -5723,6 +5738,87 @@ const NF_SESSION_VARIETY_PROFILE = {
 // para preparar ayudas graduadas, práctica guiada y adaptación multidimensional.
 const NEUROFLEX_EXERCISE_PROFILE_VERSION = "NF-EX-PROFILE-1.0";
 
+const NEUROFLEX_SUPPORT_SYSTEM_VERSION = "NF-SUPPORT-2.0";
+const NEUROFLEX_INSTRUCTION_HIERARCHY_VERSION = "NF-INSTRUCTION-1.0";
+
+const NF_SUPPORT_LEVELS = {
+  0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
+  1:{id:"instruction_repeat",label:"Repetición de consigna",short:"Consigna repetida"},
+  2:{id:"general_cue",label:"Pista general",short:"Pista general"},
+  3:{id:"specific_cue",label:"Pista específica",short:"Pista específica"},
+  4:{id:"modeling",label:"Modelado / demostración",short:"Modelado"},
+};
+
+const NF_SUPPORT_GENERAL_CUES = {
+  memoria_trabajo:"Mantén activa la información importante y resuelve un paso a la vez.",
+  memoria_episodica:"Organiza la información antes de intentar recuperarla.",
+  atencion:"Haz una búsqueda ordenada y comprueba antes de responder.",
+  funciones_exec:"Identifica primero la regla activa y comprueba si cambia antes de responder.",
+  velocidad_proc:"Prioriza una respuesta correcta y estable antes de aumentar la velocidad.",
+  lenguaje:"Ubica primero el significado general y luego concreta la respuesta.",
+  percepcion_visual:"Compara una característica visual a la vez.",
+  percepcion_auditiva:"Escucha la secuencia completa antes de decidir.",
+  orientacion:"Usa referencias del contexto actual sin adivinar.",
+  razonamiento:"Busca una regla que se mantenga en todos los elementos.",
+  calculo:"Divide el problema en pasos y verifica cada resultado parcial.",
+  flexibilidad:"Comprueba la regla antes de cada respuesta y detecta cuándo cambia.",
+  comprension:"Identifica la idea central antes de revisar los detalles.",
+};
+
+function nfExerciseSpecificSupportCue(exId,domId){
+  const profile=getNFExerciseAdaptiveProfile(exId);
+  const mechanic=profile?.mechanic || "";
+  const byMechanic={
+    secuencia:"Repite mentalmente los elementos en el mismo orden antes de responder.",
+    ordenamiento:"Separa primero los elementos y luego reorganízalos según la regla.",
+    doble_tarea:"Resuelve una demanda sin perder de vista la otra.",
+    actualizacion:"Compara cada estímulo con el que corresponde según la regla de actualización.",
+    vigilancia:"Mantén el criterio objetivo estable durante toda la búsqueda.",
+    busqueda:"Recorre el espacio de forma sistemática para evitar omisiones.",
+    produccion:"Usa una estrategia de agrupación para organizar la respuesta.",
+    secuenciacion:"Localiza el siguiente elemento válido antes de tocarlo.",
+    velocidad:"Espera el estímulo objetivo y responde solo cuando aparezca.",
+    discriminacion:"Compara solo la característica relevante de la consigna.",
+    denominacion:"Describe mentalmente el objeto y busca su nombre más específico.",
+    relacion_conceptual:"Identifica qué relación une el primer par y aplícala al segundo.",
+    comprension:"Vuelve a la información explícita que responde exactamente la pregunta.",
+    emparejamiento:"Compara forma, orientación y posición antes de elegir.",
+    rotacion:"Imagina la figura girando sin cambiar su estructura.",
+    conteo:"Marca mentalmente lo ya contado para no repetir ni omitir.",
+    patron:"Busca qué característica cambia y cuál permanece estable.",
+    orientacion:"Apóyate en referencias actuales de tiempo, lugar, persona o situación.",
+    regla:"Verifica la regla activa antes de cada respuesta.",
+    problema_funcional:"Identifica qué dato necesitas y qué operación permite obtenerlo.",
+    calculo_funcional:"Calcula el total primero y luego determina la diferencia.",
+    deduccion:"Usa únicamente las premisas dadas; evita agregar información externa.",
+    ordenamiento_logico:"Ubica primero las relaciones obligatorias y después completa el orden.",
+    matriz:"Compara filas y columnas para identificar la regla compartida.",
+    idea_principal:"Pregunta qué idea resume mejor todo el texto, no solo un detalle.",
+    ordenamiento_narrativo:"Busca relaciones de antes-después y causa-consecuencia.",
+    filtrado_informacion:"Separa los datos necesarios de los que no cambian la respuesta.",
+    lectura_funcional:"Localiza primero la sección del documento donde debería estar la información.",
+    comparacion:"Compara los estímulos por partes, no como un todo.",
+    cierre_visual:"Usa los contornos visibles para anticipar la forma completa.",
+    figura_fondo:"Define el objetivo y rastrea sistemáticamente entre los distractores.",
+    discriminacion_auditiva:"Compara duración, tono y secuencia antes de decidir.",
+    tono:"Escucha cuál sonido se percibe más alto o más bajo.",
+    secuencia_auditiva:"Conserva el orden temporal antes de reconstruir la secuencia.",
+    figura_fondo_auditiva:"Mantén el sonido objetivo como referencia y descarta los distractores.",
+    inhibicion:"Espera la señal que indica responder y frena la respuesta cuando corresponda.",
+  };
+  return byMechanic[mechanic] || NF_SUPPORT_GENERAL_CUES[domId] || "Identifica la regla principal y resuelve un paso a la vez.";
+}
+
+function nfSupportImpact(exId,level){
+  const risk=!!getNFExerciseAdaptiveProfile(exId)?.supportCapabilities?.contaminationRisk;
+  if(!level) return {risk,impact:"none",interpretationAffected:false};
+  if(level>=4) return {risk,impact:"material",interpretationAffected:true};
+  if(level>=3 && risk) return {risk,impact:"material",interpretationAffected:true};
+  if(level>=2) return {risk,impact:risk?"possible":"low",interpretationAffected:risk};
+  return {risk,impact:"low",interpretationAffected:false};
+}
+
+
 const NF_EXERCISE_DIFFICULTY_DIMENSIONS = {
   digits_forward:["sequence_length","presentation_interval","trial_count"],
   digits_backward:["sequence_length","presentation_interval","trial_count"],
@@ -9303,27 +9399,11 @@ function NFScreeningChoiceBlock({ blockId, title, instruction, items, paciente, 
         </div>
       </div>
 
-      <div style={{
-        padding:mayor?"16px 18px":"13px 16px",
-        borderRadius:12,
-        border:`1px solid ${COLORS.border}`,
-        background:COLORS.primary+"05",
-        color:COLORS.textSecond,
-        fontSize:mayor?".96rem":".8rem",
-        lineHeight:1.6,
-        marginBottom:12
-      }}>
-        <strong style={{color:COLORS.primary}}>Qué debes hacer:</strong> {item.rule || instruction}
+      <div className="nf-screening-instruction">
+        <span className="nf-screening-instruction__label">Qué debes hacer</span>
+        <p className="nf-screening-instruction__text">{item.rule || instruction}</p>
       </div>
-      <div style={{
-        marginBottom:22,
-        padding:"9px 12px",
-        borderRadius:10,
-        background:COLORS.bg,
-        color:COLORS.textMuted,
-        fontSize:mayor?".82rem":".72rem",
-        lineHeight:1.5
-      }}>
+      <div className="nf-screening-helper">
         Elige siempre una de las opciones que aparecen abajo. Si una opción dice “NO RESPONDER” o “ESPERAR”, debes seleccionarla; no es necesario dejar la pantalla sin tocar.
       </div>
 
@@ -14267,7 +14347,8 @@ function EvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }) {
 
         {/* Instrucción */}
         <div className="nf-eval-instruction">
-          <p style={{ margin: 0, fontSize: ".88rem", color: COLORS.primary, fontWeight: 500, display:"flex", alignItems:"flex-start", gap:8 }}><NFLineIcon name="plan" size={17}/><span>{curEx?.instruccion}</span></p>
+          <span className="nf-eval-instruction__label">Qué debes hacer</span>
+          <p className="nf-eval-instruction__text">{curEx?.instruccion}</p>
         </div>
 
         {/* Exercise */}
@@ -15182,7 +15263,7 @@ function buildSessionPdfLines(paciente, sesion) {
     "DETALLE DE EJERCICIOS",
   ];
   (sesion?.results || []).forEach(r => {
-    lines.push(`${DOMINIOS_ADULTO[r.domId]?.label || r.domId} - ${r.nombre}: ${typeof r.pct === "number" ? `${r.pct}%` : "valoracion profesional"} | nivel ${r.adaptiveLevel ?? "—"} | apoyo ${supportLabel(getTrackedSupportLevel(r))}`);
+    lines.push(`${DOMINIOS_ADULTO[r.domId]?.label || r.domId} - ${r.nombre}: ${typeof r.pct === "number" ? `${r.pct}%` : "valoracion profesional"} | nivel ${r.adaptiveLevel ?? "—"} | apoyo ${supportLabelForResult(r)}`);
     if (r.specificMetrics && Object.keys(r.specificMetrics).length) {
       const specific = Object.entries(r.specificMetrics)
         .filter(([k]) => !["adaptiveLevel","supportLevel","totalSeconds"].includes(k))
@@ -18331,7 +18412,7 @@ function ReporteSesionImprimible({ paciente, sesion }) {
             <span style={{ fontSize: ".75rem" }}>{typeof r.pct === "number" ? `${r.pct}%` : "Valoración profesional"}</span>
           </div>
           <div style={{ color: "#667085", fontSize: ".7rem", marginTop: 2 }}>
-            Nivel {r.adaptiveLevel ?? "—"}/5 · Apoyo: {supportLabel(getTrackedSupportLevel(r))}
+            Nivel {r.adaptiveLevel ?? "—"}/5 · Apoyo: {supportLabelForResult(r)}
             {typeof r.seconds === "number" ? ` · ${fmt(r.seconds)}` : ""}
             {r.professionalOverride ? " · Ajuste profesional" : ""}
           </div>
@@ -19611,30 +19692,26 @@ function PerfilPacienteWrapper({ paciente: pacienteInit, onVolver, profesionalUi
 }
 
 
-// ─── APOYOS GRADUADOS ─────────────────────────────────────────────────────────
-// Los apoyos se registran sin convertirlos en "errores".
-// Nivel 0 = ejecución autónoma; 1 = repetición; 2 = ejemplo; 3 = pista estratégica.
-const SUPPORT_STRATEGIES = {
-  memoria_trabajo: "Concéntrate en pocos elementos a la vez y repásalos mentalmente antes de responder.",
-  memoria_episodica: "Busca una forma de relacionar la información con una imagen, historia o categoría.",
-  atencion: "Revisa de forma ordenada, de izquierda a derecha, y vuelve a comprobar antes de responder.",
-  funciones_exec: "Identifica primero la regla de la tarea y mantén esa regla activa antes de actuar.",
-  velocidad_proc: "Prioriza precisión; cuando la respuesta sea clara, intenta responder sin demoras innecesarias.",
-  lenguaje: "Piensa primero en la categoría o significado general y luego busca la palabra concreta.",
-  percepcion_visual: "Compara una característica a la vez: forma, orientación, tamaño o posición.",
-  orientacion: "Usa referencias del contexto actual: fecha, lugar, personas y situación presente.",
-  razonamiento: "Busca qué regla se repite y comprueba si funciona en todos los elementos.",
-  calculo: "Divide la operación en pasos simples y verifica el resultado antes de confirmar.",
-  flexibilidad: "Antes de responder, verifica si la regla sigue siendo la misma o ha cambiado.",
-  comprension: "Identifica la idea principal y luego revisa los detalles que apoyan la respuesta.",
-};
+// ─── APOYOS GRADUADOS · F76.1 ────────────────────────────────────────────────
+// Registro estandarizado y retrocompatible.
+// NF-SUPPORT-2.0: 0 independiente, 1 repetición, 2 pista general,
+// 3 pista específica, 4 modelado/demostración.
+const SUPPORT_STRATEGIES = NF_SUPPORT_GENERAL_CUES;
 
 function emptySupportRecord() {
   return {
-    instructionRepeats: 0,
-    exampleRequests: 0,
-    strategyHints: 0,
-    maxSupportLevel: 0,
+    schemaVersion:NEUROFLEX_SUPPORT_SYSTEM_VERSION,
+    instructionRepeats:0,
+    generalHints:0,
+    specificHints:0,
+    modelingUses:0,
+    // Campos heredados conservados para reportes/datos previos.
+    exampleRequests:0,
+    strategyHints:0,
+    maxSupportLevel:0,
+    events:[],
+    interpretationAffected:false,
+    contaminationRisk:false,
   };
 }
 
@@ -19651,12 +19728,36 @@ function getTrackedSupportLevel(result) {
   return typeof result.support?.maxSupportLevel === "number" ? result.support.maxSupportLevel : 0;
 }
 
-function supportLabel(level) {
+function supportLabel(level,schemaVersion=null) {
   if (level === null || level === undefined) return "No registrado";
-  if (level === 0) return "Autónomo";
-  if (level === 1) return "Repetición de instrucción";
-  if (level === 2) return "Ejemplo adicional";
-  return "Pista estratégica";
+  // Retrocompatibilidad: antes de F76.1, nivel 2=ejemplo y nivel 3=pista estratégica.
+  if(schemaVersion!==NEUROFLEX_SUPPORT_SYSTEM_VERSION){
+    if(level===0)return "Autónomo";
+    if(level===1)return "Repetición de instrucción";
+    if(level===2)return "Ejemplo adicional";
+    return "Pista estratégica";
+  }
+  return NF_SUPPORT_LEVELS[level]?.label || `Apoyo nivel ${level}`;
+}
+
+function supportLabelForResult(result){
+  const level=getTrackedSupportLevel(result);
+  const version=result?.support?.schemaVersion || result?.supportSchemaVersion || null;
+  return supportLabel(level,version);
+}
+
+function summarizeSupportRecord(record={}){
+  const total=(record.instructionRepeats||0)+(record.generalHints||0)+(record.specificHints||0)+(record.modelingUses||0);
+  return {
+    totalEvents:total,
+    instructionRepeats:record.instructionRepeats||0,
+    generalHints:record.generalHints||0,
+    specificHints:record.specificHints||0,
+    modelingUses:record.modelingUses||0,
+    maxSupportLevel:record.maxSupportLevel||0,
+    interpretationAffected:!!record.interpretationAffected,
+    contaminationRisk:!!record.contaminationRisk,
+  };
 }
 
 
@@ -19778,6 +19879,10 @@ function buildSessionMetrics(results = [], secs = 0) {
     autonomyRate: trackedSupport.length ? Math.round((autonomous / trackedSupport.length) * 100) : null,
     supportTrackedExercises: trackedSupport.length,
     exercisesWithSupport: trackedSupport.length ? trackedSupport.filter(v => v > 0).length : null,
+    supportInterpretationAffectedExercises:results.filter(r=>r.supportInterpretationAffected).length,
+    generalHints:results.reduce((a,r)=>a+(r.support?.generalHints||0),0),
+    specificHints:results.reduce((a,r)=>a+(r.support?.specificHints||0),0),
+    modelingUses:results.reduce((a,r)=>a+(r.support?.modelingUses||0),0),
     sessionSeconds: secs || 0,
     totalOmissions: results.reduce((a,r) => a + (r.specificMetrics?.omissions || 0), 0),
     totalFalseAlarms: results.reduce((a,r) => a + (r.specificMetrics?.falseAlarms || 0), 0),
@@ -20906,7 +21011,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
   const [lastResult, setLastResult] = useState(null);
   const [pendingResult, setPendingResult] = useState(null);
   const [supportByItem, setSupportByItem] = useState({});
-  const [supportOverlay, setSupportOverlay] = useState(null); // "example" | "strategy" | null
+  const [supportOverlay, setSupportOverlay] = useState(null); // "general" | "specific" | "modeling" | null
   const [loadChecks, setLoadChecks] = useState([]);
   const [currentLoadRating, setCurrentLoadRating] = useState(null);
   const [pauseStartedAt, setPauseStartedAt] = useState(null);
@@ -20923,23 +21028,39 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
   }, [cur, phase]);
 
   const registerSupport = (type) => {
-    const key = queue[cur]?.key;
+    const item=queue[cur];
+    const key=item?.key;
     if (!key) return;
+    const levelByType={repeat:1,general:2,specific:3,modeling:4};
+    const level=levelByType[type] || 0;
     setSupportByItem(prev => {
       const current = prev[key] || emptySupportRecord();
-      const next = { ...current };
-      if (type === "repeat") {
-        next.instructionRepeats += 1;
-        next.maxSupportLevel = Math.max(next.maxSupportLevel, 1);
+      const next = {
+        ...current,
+        schemaVersion:NEUROFLEX_SUPPORT_SYSTEM_VERSION,
+        events:[...(current.events||[])],
+      };
+      if(type==="repeat")next.instructionRepeats=(next.instructionRepeats||0)+1;
+      if(type==="general")next.generalHints=(next.generalHints||0)+1;
+      if(type==="specific"){
+        next.specificHints=(next.specificHints||0)+1;
+        next.strategyHints=(next.strategyHints||0)+1;
       }
-      if (type === "example") {
-        next.exampleRequests += 1;
-        next.maxSupportLevel = Math.max(next.maxSupportLevel, 2);
+      if(type==="modeling"){
+        next.modelingUses=(next.modelingUses||0)+1;
+        next.exampleRequests=(next.exampleRequests||0)+1;
       }
-      if (type === "strategy") {
-        next.strategyHints += 1;
-        next.maxSupportLevel = Math.max(next.maxSupportLevel, 3);
-      }
+      next.maxSupportLevel=Math.max(next.maxSupportLevel||0,level);
+      const impact=nfSupportImpact(item?.ex?.id,level);
+      next.contaminationRisk=!!impact.risk;
+      next.interpretationAffected=!!next.interpretationAffected || !!impact.interpretationAffected;
+      next.events.push({
+        type,
+        level,
+        at:new Date().toISOString(),
+        impact:impact.impact,
+        interpretationAffected:!!impact.interpretationAffected,
+      });
       return { ...prev, [key]: next };
     });
   };
@@ -21018,6 +21139,10 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
       requiresReview,
       support,
       supportLevel: support.maxSupportLevel || 0,
+      supportSchemaVersion:support.schemaVersion || NEUROFLEX_SUPPORT_SYSTEM_VERSION,
+      supportSummary:summarizeSupportRecord(support),
+      supportInterpretationAffected:!!support.interpretationAffected,
+      supportContaminationRisk:!!support.contaminationRisk,
       autonomous: (support.maxSupportLevel || 0) === 0,
       preparationMode: resolvePreparationMode(paciente, item.ex.id, config.preparacionTarea || "auto"),
       effectiveLoad:nfF64EffectiveLoad({exId:item.ex.id,adaptiveLevel:item.adaptiveLevel}),
@@ -21076,6 +21201,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
     setCur(nextIdx);
     setPhase(getEntryPhaseForExercise(paciente, nextItem, config, showDemo, demoSeen));
     setLastResult(null);
+    setSupportOverlay(null);
     setCurrentLoadRating(null);
     if(pauseStartedAt){
       const secs=Math.max(1,Math.round((Date.now()-pauseStartedAt)/1000));
@@ -21089,6 +21215,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
     const metrics = buildSessionMetrics(results, Math.round((Date.now() - t0.current) / 1000));
     const globalPct = metrics.taskIndicator;
     const supportSummary = {
+      schemaVersion:NEUROFLEX_SUPPORT_SYSTEM_VERSION,
       exercisesWithSupport: results.filter(r => {
         const level = getTrackedSupportLevel(r);
         return typeof level === "number" && level > 0;
@@ -21096,8 +21223,14 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
       autonomousExercises: results.filter(r => getTrackedSupportLevel(r) === 0).length,
       supportTrackedExercises: results.filter(r => hasTrackedSupport(r)).length,
       instructionRepeats: results.reduce((a, r) => a + (r.support?.instructionRepeats || 0), 0),
+      generalHints:results.reduce((a,r)=>a+(r.support?.generalHints||0),0),
+      specificHints:results.reduce((a,r)=>a+(r.support?.specificHints||0),0),
+      modelingUses:results.reduce((a,r)=>a+(r.support?.modelingUses||0),0),
+      // Compatibilidad histórica.
       exampleRequests: results.reduce((a, r) => a + (r.support?.exampleRequests || 0), 0),
       strategyHints: results.reduce((a, r) => a + (r.support?.strategyHints || 0), 0),
+      interpretationAffectedExercises:results.filter(r=>r.supportInterpretationAffected).length,
+      contaminationRiskExercises:results.filter(r=>r.supportContaminationRisk).length,
     };
     const metacognitionSummary = getMetacognitiveSummary(results);
     const finalPauseSeconds=pauseSeconds+(pauseStartedAt?Math.max(1,Math.round((Date.now()-pauseStartedAt)/1000)):0);
@@ -21111,7 +21244,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
     };
     const sessionBase = {
       numero: sesionNum,
-      dataVersion: 6,
+      dataVersion: 7,
       date: new Date().toISOString(),
       gp: globalPct,
       byDom,
@@ -21214,7 +21347,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
                 {typeof r.pct === "number"
                   ? <span style={{ fontWeight: 700, color: gradeColor(r.pct) }}>{r.pct}%</span>
                   : <span style={{ fontSize: ".72rem", color: COLORS.accent, fontWeight: 600 }}>Valoración profesional</span>}
-                <div style={{ color: COLORS.textMuted, fontSize: ".66rem", marginTop: 2 }}>{supportLabel(getTrackedSupportLevel(r))}</div>
+                <div style={{ color: COLORS.textMuted, fontSize: ".66rem", marginTop: 2 }}>{supportLabelForResult(r)}</div>
               </div>
             </div>
           ))}
@@ -21236,7 +21369,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
           ? <p style={{ fontSize: mayor ? "2rem" : "1.5rem", fontWeight: 900, color: gradeColor(lastResult.pct), marginBottom: 24 }}>{lastResult.pct}%</p>
           : <p style={{ fontSize: mayor ? "1.1rem" : ".9rem", fontWeight: 700, color: COLORS.accent, marginBottom: 24 }}>Pendiente de valoración profesional</p>}
         <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".92rem" : ".78rem", margin: "-12px 0 20px" }}>
-          Nivel de apoyo: <strong>{supportLabel(getTrackedSupportLevel(lastResult))}</strong>
+          Nivel de apoyo: <strong>{supportLabelForResult(lastResult)}</strong>
         </p>
 
         {shouldMonitorLoad() && <div style={{margin:"0 0 20px",padding:mayor?18:14,borderRadius:14,border:`1px solid ${COLORS.border}`,background:COLORS.bg,textAlign:"left"}}>
@@ -21325,21 +21458,31 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
         {/* Apoyos funcionales: discretos y separados del estímulo */}
         <div style={{ marginBottom: 18, display:"flex", justifyContent:"space-between", gap:10, alignItems:"center", flexWrap:"wrap" }}>
           <span style={{ fontSize: mayor ? ".88rem" : ".73rem", color: COLORS.textMuted }}>
-            Apoyo: <strong style={{ color: currentSupport.maxSupportLevel ? COLORS.accent : COLORS.textSecond }}>{supportLabel(currentSupport.maxSupportLevel)}</strong>
+            Apoyo: <strong style={{ color: currentSupport.maxSupportLevel ? COLORS.accent : COLORS.textSecond }}>{supportLabel(currentSupport.maxSupportLevel,NEUROFLEX_SUPPORT_SYSTEM_VERSION)}</strong>
           </span>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button onClick={() => { registerSupport("general"); setSupportOverlay("general"); }}
+              style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
+              <NFIcon name="hint" size={17}/> Pista general
+            </button>
+            <button onClick={() => { registerSupport("specific"); setSupportOverlay("specific"); }}
+              style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
+              <NFIcon name="hint" size={17}/> Pista específica
+            </button>
             {DEMOS[curItem?.ex?.id] && (
-              <button onClick={() => { registerSupport("example"); setSupportOverlay("example"); }}
+              <button onClick={() => { registerSupport("modeling"); setSupportOverlay("modeling"); }}
                 style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
-                <NFIcon name="example" size={17}/> Ver ejemplo
+                <NFIcon name="example" size={17}/> Modelado
               </button>
             )}
-            <button onClick={() => { registerSupport("strategy"); setSupportOverlay("strategy"); }}
-              style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
-              <NFIcon name="hint" size={17}/> Pista estratégica
-            </button>
           </div>
         </div>
+
+        {currentSupport.interpretationAffected && (
+          <div style={{margin:"-6px 0 16px",padding:"9px 11px",borderRadius:10,background:"#FFF8EE",border:"1px solid #F0DEC0",color:"#8A651F",fontSize:mayor?".82rem":".7rem",lineHeight:1.45}}>
+            El apoyo utilizado puede modificar la independencia o la demanda cognitiva observada. Quedará señalado en el registro profesional.
+          </div>
+        )}
 
         {/* Zona cognitiva protegida: sin marca, ilustraciones o movimiento ambiental */}
         <div className="nf-protected-stimulus-zone" style={{background:COLORS.white,minHeight:220,padding:mayor?"16px 4px":"10px 0"}}>
@@ -21355,9 +21498,9 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
         {supportOverlay && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(36,59,83,.42)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
             <div style={{ width: "100%", maxWidth: 520, background: COLORS.white, borderRadius: 18, padding: mayor ? 28 : 24, boxShadow: "0 22px 64px rgba(36,59,83,.2)", border:`1px solid ${COLORS.border}` }}>
-              {supportOverlay === "example" && DEMOS[curItem?.ex?.id] ? (
+              {supportOverlay === "modeling" && DEMOS[curItem?.ex?.id] ? (
                 <>
-                  <h3 style={{ margin: "0 0 14px", fontSize: mayor ? "1.25rem" : "1.05rem",display:"flex",alignItems:"center",gap:8 }}><NFIcon name="example" size={21}/> Ejemplo adicional</h3>
+                  <h3 style={{ margin: "0 0 14px", fontSize: mayor ? "1.25rem" : "1.05rem",display:"flex",alignItems:"center",gap:8 }}><NFIcon name="example" size={21}/> Modelado / demostración</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
                     {DEMOS[curItem.ex.id].pasos?.map((p, i) => (
                       <div key={i} style={{ padding: "10px 12px", background: COLORS.bg, border:`1px solid ${COLORS.border}`, borderRadius: 9, fontSize: mayor ? ".95rem" : ".82rem" }}>
@@ -21371,14 +21514,24 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
                     </div>
                   )}
                 </>
+              ) : supportOverlay==="specific" ? (
+                <>
+                  <h3 style={{ margin: "0 0 12px", fontSize: mayor ? "1.25rem" : "1.05rem",display:"flex",alignItems:"center",gap:8 }}><NFIcon name="hint" size={21}/> Pista específica</h3>
+                  <p style={{ lineHeight: 1.65, color: COLORS.textSecond, fontSize: mayor ? "1rem" : ".88rem" }}>
+                    {nfExerciseSpecificSupportCue(curItem?.ex?.id,curItem?.domId)}
+                  </p>
+                  <p style={{ color: COLORS.textMuted, fontSize: ".74rem", marginTop: 10 }}>
+                    Esta ayuda orienta la mecánica concreta de la actividad y queda registrada para interpretar el desempeño.
+                  </p>
+                </>
               ) : (
                 <>
-                  <h3 style={{ margin: "0 0 12px", fontSize: mayor ? "1.25rem" : "1.05rem",display:"flex",alignItems:"center",gap:8 }}><NFIcon name="hint" size={21}/> Pista estratégica</h3>
+                  <h3 style={{ margin: "0 0 12px", fontSize: mayor ? "1.25rem" : "1.05rem",display:"flex",alignItems:"center",gap:8 }}><NFIcon name="hint" size={21}/> Pista general</h3>
                   <p style={{ lineHeight: 1.65, color: COLORS.textSecond, fontSize: mayor ? "1rem" : ".88rem" }}>
                     {SUPPORT_STRATEGIES[curItem?.domId] || "Detente un momento, identifica la regla principal y resuelve un paso a la vez."}
                   </p>
                   <p style={{ color: COLORS.textMuted, fontSize: ".74rem", marginTop: 10 }}>
-                    La pista orienta la estrategia sin revelar la respuesta.
+                    La pista orienta una estrategia general sin revelar la respuesta.
                   </p>
                 </>
               )}
@@ -21488,7 +21641,7 @@ function ReporteSesion({ sesion, paciente, onVolver }) {
                   {r.preparationMode && r.preparationMode !== "comprobacion" ? ` · Preparación: ${r.preparationMode}` : ""}
                 </p>
                 <p style={{ margin: "2px 0 0", fontSize: ".68rem", color: getTrackedSupportLevel(r) === null ? COLORS.textMuted : getTrackedSupportLevel(r) > 0 ? COLORS.accent : COLORS.success }}>
-                  Apoyo: {supportLabel(getTrackedSupportLevel(r))}
+                  Apoyo: {supportLabelForResult(r)}
                 </p>
                 {r.professionalOverride ? (
                   <p style={{ margin: "2px 0 0", fontSize: ".66rem", color: COLORS.accent }}>
