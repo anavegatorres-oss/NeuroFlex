@@ -334,18 +334,18 @@ const baseStyles = `
 .nf-eval-domain-head__icon{width:43px;height:43px}
 .nf-eval-instruction,.nf-exercise-instruction{background:#F7FAF9;border:1px solid #DCE5E3;border-radius:12px;padding:13px 15px;margin-bottom:18px}
 .nf-eval-instruction{position:relative;overflow:hidden;padding:16px 18px 16px 21px!important;background:#F7FAFE!important;border:1px solid #D7E2F2!important}
-.nf-eval-instruction:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#55758D}
-.nf-eval-instruction__label{display:block;margin-bottom:6px;color:#315CB6;font-size:.72rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase}
-.nf-eval-instruction__text{margin:0;color:#27364F;font-size:.94rem;line-height:1.62;font-weight:560}
+.nf-eval-instruction:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#55758D;opacity:.72}
+.nf-eval-instruction__label{display:block;margin-bottom:8px;color:#315CB6;font-size:.72rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase;text-align:center}
+.nf-eval-instruction__text{margin:0 auto;color:#1F2D47;font-size:1.28rem;line-height:1.45;font-weight:800;text-align:center;max-width:780px}
 .nf-evaluation-focus.is-senior .nf-eval-instruction__label{font-size:.86rem}
-.nf-evaluation-focus.is-senior .nf-eval-instruction__text{font-size:1.08rem;line-height:1.68}
+.nf-evaluation-focus.is-senior .nf-eval-instruction__text{font-size:1.48rem;line-height:1.48}
 .nf-screening-instruction{position:relative;overflow:hidden;margin-bottom:12px;padding:18px 18px 18px 22px;border-radius:13px;border:1px solid #C9D8EC;background:#F6F9FE;box-shadow:0 4px 14px rgba(49,92,182,.045)}
-.nf-screening-instruction:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#55758D}
-.nf-screening-instruction__label{display:block;margin-bottom:8px;color:#315CB6;font-size:.76rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase}
-.nf-screening-instruction__text{margin:0;color:#26354E;font-size:.95rem;line-height:1.62;font-weight:560}
+.nf-screening-instruction:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#55758D;opacity:.72}
+.nf-screening-instruction__label{display:block;margin-bottom:8px;color:#315CB6;font-size:.76rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase;text-align:center}
+.nf-screening-instruction__text{margin:0 auto;color:#1F2D47;font-size:1.28rem;line-height:1.45;font-weight:800;text-align:center;max-width:780px}
 .nf-screening-helper{margin-bottom:22px;padding:9px 12px;border-radius:10px;background:#F3F6F9;color:#7A879B;font-size:.72rem;line-height:1.5;border:1px solid #E7ECF2}
 .nf-evaluation-focus.is-senior .nf-screening-instruction__label{font-size:.9rem}
-.nf-evaluation-focus.is-senior .nf-screening-instruction__text{font-size:1.1rem;line-height:1.7}
+.nf-evaluation-focus.is-senior .nf-screening-instruction__text{font-size:1.5rem;line-height:1.5}
 .nf-evaluation-focus.is-senior .nf-screening-helper{font-size:.84rem}
 
 .nf-exercise-instruction__label{display:flex;align-items:center;gap:6px;color:#287F83;font-size:.67rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
@@ -559,6 +559,58 @@ body{background:
 @media(max-width:900px){.nf-v2-report-type-grid{grid-template-columns:1fr!important}.nf-v2-report-brand-head__top{align-items:flex-start;flex-direction:column}.nf-v2-report-brand-head__meta{min-width:0;width:100%}}
 @media print{.nf-v2-print-report{box-shadow:none!important;border:0!important;border-radius:0!important;padding:0!important}.nf-v2-report-brand-head__rule{-webkit-print-color-adjust:exact;print-color-adjust:exact}.nf-v2-report-brand-head__top{flex-direction:row!important}.nf-v2-report-brand-head__meta{min-width:190px!important;width:auto!important}.nf-v2-print-report section{break-inside:avoid-page}}
 
+
+
+/* ─── F77.2 · PANEL UNIVERSAL DE EJERCICIO NEUROFLEX ─────────────────────── */
+.nf-unified-exercise-panel{
+  position:relative;
+  width:100%;
+  height:430px;
+  min-height:430px;
+  max-height:430px;
+  box-sizing:border-box;
+  overflow:auto;
+  border:2px solid #DCE4EF;
+  border-radius:18px;
+  background:
+    linear-gradient(rgba(255,255,255,.972),rgba(255,255,255,.972)),
+    url("/neuroflex-assets/neuroflex-mark.png") center 52% / 205px auto no-repeat;
+  box-shadow:0 10px 28px rgba(27,47,82,.055);
+  padding:28px 30px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  isolation:isolate;
+}
+.nf-unified-exercise-panel__content{
+  width:100%;
+  max-width:760px;
+  margin:auto;
+  position:relative;
+  z-index:1;
+}
+.nf-unified-exercise-panel.is-compact .nf-unified-exercise-panel__content{max-width:680px}
+.nf-unified-exercise-panel.is-wide .nf-unified-exercise-panel__content{max-width:820px}
+.nf-evaluation-focus.is-senior .nf-unified-exercise-panel,
+.nf-exercise-focus.is-senior .nf-unified-exercise-panel,
+.nf-unified-exercise-panel.is-senior{
+  height:480px;
+  min-height:480px;
+  max-height:480px;
+  padding:32px 34px;
+}
+@media(max-width:720px){
+  .nf-unified-exercise-panel,
+  .nf-evaluation-focus.is-senior .nf-unified-exercise-panel,
+  .nf-exercise-focus.is-senior .nf-unified-exercise-panel,
+  .nf-unified-exercise-panel.is-senior{
+    height:auto;
+    min-height:390px;
+    max-height:none;
+    padding:22px 18px;
+    background-size:150px auto;
+  }
+}
 
 /* ─── F77.0 · SISTEMA VISUAL DE TARJETAS NEUROFLEX ───────────────────────── */
 .nf-visual-card{
@@ -1353,6 +1405,27 @@ function NeuroFlexStimulusTile({children,size="m",state="normal",senior=false,on
     onClick={onClick}
     ariaLabel={ariaLabel}
   >{children}</NeuroFlexCard>;
+}
+
+
+function NeuroFlexExercisePanel({
+  children,
+  senior=false,
+  variant="default",
+  className="",
+  style,
+  ariaLabel="Área del ejercicio",
+}){
+  const cls=[
+    "nf-unified-exercise-panel",
+    variant==="compact"?"is-compact":"",
+    variant==="wide"?"is-wide":"",
+    senior?"is-senior":"",
+    className,
+  ].filter(Boolean).join(" ");
+  return <section className={cls} style={style} aria-label={ariaLabel}>
+    <div className="nf-unified-exercise-panel__content">{children}</div>
+  </section>;
 }
 
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
@@ -3075,15 +3148,14 @@ function chooseAdaptiveExercise(paciente, domId, exs, usedIds = []) {
 
 
 function NFTrainingStimulusCard({children,modoMayor=false,minHeight=170}){
-  return <div style={{
-    minHeight:modoMayor?Math.max(minHeight,200):minHeight,
-    display:"flex",alignItems:"center",justifyContent:"center",
-    padding:modoMayor?"28px 24px":"24px 20px",
-    margin:"18px 0 22px",
-    border:`2px solid ${COLORS.border}`,borderRadius:16,
-    background:"#fff",boxShadow:"0 8px 24px rgba(20,45,55,.05)",
-    textAlign:"center"
-  }}>{children}</div>;
+  return <NeuroFlexExercisePanel
+    senior={!!modoMayor}
+    variant="compact"
+    ariaLabel="Área central del ejercicio"
+    style={{margin:"18px 0 22px",textAlign:"center"}}
+  >
+    {children}
+  </NeuroFlexExercisePanel>;
 }
 
 function NFSequenceResponsePad({value=[],onChange,symbols=[],maxLength,modoMayor=false,confirmLabel="Confirmar",onConfirm}){
@@ -5885,6 +5957,8 @@ const NEUROFLEX_NORMALIZED_METRICS_VERSION = "NF-METRICS-1.0";
 const NEUROFLEX_CONTEXTUAL_PROGRESS_VERSION = "NF-PROGRESS-CONTEXT-1.0";
 const NEUROFLEX_REPORT_METRICS_VERSION = "NF-REPORT-METRICS-1.0";
 const NEUROFLEX_VISUAL_CARD_SYSTEM_VERSION = "NF-VISUAL-CARDS-1.0";
+const NEUROFLEX_UNIFIED_INSTRUCTION_VERSION = "NF-INSTRUCTION-UNIFIED-1.0";
+const NEUROFLEX_UNIFIED_EXERCISE_PANEL_VERSION = "NF-PANEL-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -7389,11 +7463,13 @@ function AssessmentTaskShell({ taskId, paciente, children, note }) {
         </div>
         <div className="nf-eval-domain-pill nf-v2-domain-pill" style={{color:domainVisual.color,borderColor:domainVisual.color+"30",background:domainVisual.color+"0B"}}>{ASSESSMENT_DOMAINS_V2[task?.primaryDomain]?.label}</div>
       </div>
-      <Card className="nf-eval-task-card" style={{padding:mayor?34:28}}>
+      <Card className="nf-eval-task-card" style={{padding:mayor?24:20}}>
         {/* Las notas técnicas/clinimétricas pertenecen al registro profesional y no se muestran al paciente durante la administración. */}
-        <div className="nf-protected-stimulus-zone" style={{background:COLORS.white,color:COLORS.textPrimary}}>
-          {children}
-        </div>
+        <NeuroFlexExercisePanel senior={mayor} variant="wide" ariaLabel="Panel de evaluación">
+          <div className="nf-protected-stimulus-zone" style={{background:"transparent",color:COLORS.textPrimary}}>
+            {children}
+          </div>
+        </NeuroFlexExercisePanel>
       </Card>
     </div>
   );
@@ -9920,53 +9996,43 @@ function NFScreeningChoiceBlock({ blockId, title, instruction, items, paciente, 
         Elige siempre una de las opciones que aparecen abajo. Si una opción dice “NO RESPONDER” o “ESPERAR”, debes seleccionarla; no es necesario dejar la pantalla sin tocar.
       </div>
 
-      <div style={{
-        minHeight:mayor?190:165,
-        display:"flex",
-        flexDirection:"column",
-        alignItems:"center",
-        justifyContent:"center",
-        padding:mayor?"30px 24px":"26px 22px",
-        borderRadius:16,
-        background:"#fff",
-        border:`2px solid ${COLORS.border}`,
-        boxShadow:"0 8px 24px rgba(20,45,55,.05)",
-        marginBottom:22,
-        textAlign:"center"
-      }}>
-        {item.stimulus && <div style={{
-          fontSize:mayor?"2.25rem":"1.9rem",
-          fontWeight:900,
-          letterSpacing:item.stimulus.length<12?4:1,
-          lineHeight:1.35,
-          color:COLORS.textPrimary,
-          marginBottom:item.prompt?18:0
-        }}>{item.stimulus}</div>}
-        <div style={{
-          fontSize:mayor?"1.18rem":"1rem",
-          fontWeight:800,
-          lineHeight:1.55,
-          maxWidth:650
-        }}>{item.prompt}</div>
-      </div>
-
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:14}}>
-        {(Array.isArray(item.options)?item.options:[]).map((opt,i)=><button key={`${blockId || title}_${item.id}_${i}`} disabled={locked} aria-label={`Respuesta ${opt}`} onClick={()=>pick(i)}
-          style={{
-            minHeight:mayor?72:62,
-            padding:mayor?"18px 16px":"15px 14px",
-            borderRadius:13,
-            border:`2px solid ${COLORS.border}`,
-            background:"#fff",
-            fontFamily:"inherit",
-            fontSize:mayor?"1rem":".88rem",
-            fontWeight:800,
-            cursor:locked?"default":"pointer",
-            opacity:locked?.75:1
-          }}>
-          {opt}
-        </button>)}
-      </div>
+      <NeuroFlexExercisePanel senior={mayor} variant="wide" ariaLabel="Ejercicio de tamizaje" style={{marginBottom:18}}>
+        <div style={{display:"flex",flexDirection:"column",justifyContent:"center",minHeight:"100%",textAlign:"center"}}>
+          <div style={{minHeight:mayor?185:155,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"8px 10px 24px"}}>
+            {item.stimulus && <div style={{
+              fontSize:mayor?"2.25rem":"1.9rem",
+              fontWeight:900,
+              letterSpacing:item.stimulus.length<12?4:1,
+              lineHeight:1.35,
+              color:COLORS.textPrimary,
+              marginBottom:item.prompt?18:0
+            }}>{item.stimulus}</div>}
+            <div style={{
+              fontSize:mayor?"1.22rem":"1.08rem",
+              fontWeight:800,
+              lineHeight:1.55,
+              maxWidth:650
+            }}>{item.prompt}</div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:14}}>
+            {(Array.isArray(item.options)?item.options:[]).map((opt,i)=><button key={`${blockId || title}_${item.id}_${i}`} disabled={locked} aria-label={`Respuesta ${opt}`} onClick={()=>pick(i)}
+              style={{
+                minHeight:mayor?72:62,
+                padding:mayor?"18px 16px":"15px 14px",
+                borderRadius:13,
+                border:`2px solid ${COLORS.border}`,
+                background:"rgba(255,255,255,.94)",
+                fontFamily:"inherit",
+                fontSize:mayor?"1rem":".88rem",
+                fontWeight:800,
+                cursor:locked?"default":"pointer",
+                opacity:locked?.75:1
+              }}>
+              {opt}
+            </button>)}
+          </div>
+        </div>
+      </NeuroFlexExercisePanel>
 
       <div style={{display:"flex",justifyContent:"flex-end",marginTop:12}}>
         <button
@@ -14383,22 +14449,25 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
   return (
     <div style={{ maxWidth: 680, margin: "0 auto" }}>
       <Card style={{ padding: mayor ? 32 : 26 }}>
-        <div style={{ display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",marginBottom:18 }}>
+        <div style={{ display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",marginBottom:14 }}>
           <div>
             <div style={{ fontSize:".72rem",fontWeight:800,color:COLORS.primary,letterSpacing:".04em",textTransform:"uppercase" }}>
               Familiarización · No puntuable
             </div>
-            <h2 style={{ margin:"5px 0 6px",fontSize:mayor?"1.45rem":"1.25rem" }}>{current.title}</h2>
-            <p style={{ margin:0,color:COLORS.textMuted,lineHeight:1.6,fontSize:mayor?"1rem":".86rem" }}>
-              {current.instruction}
-            </p>
+            <h2 style={{ margin:"5px 0 0",fontSize:mayor?"1.35rem":"1.15rem",color:COLORS.textSecond,fontWeight:700 }}>{current.title}</h2>
           </div>
           <div style={{ fontSize:".76rem",color:COLORS.textMuted,whiteSpace:"nowrap" }}>{step+1}/{steps.length}</div>
         </div>
 
         <ProgressBar value={Math.round(((step + 1) / steps.length) * 100)} color={COLORS.primary} />
 
-        <div style={{ marginTop:24,minHeight:210,display:"flex",alignItems:"center",justifyContent:"center" }}>
+        <div className="nf-eval-instruction" style={{marginTop:20,marginBottom:4}}>
+          <span className="nf-eval-instruction__label">Qué debes hacer</span>
+          <p className="nf-eval-instruction__text">{current.instruction}</p>
+        </div>
+
+        <NeuroFlexExercisePanel senior={mayor} variant="wide" ariaLabel="Área de familiarización" style={{marginTop:18,marginBottom:18}}>
+          <div style={{minHeight:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}>
           {current.id === "touch" && (
             <button
               onClick={() => { addAttempt("touch"); next(); }}
@@ -14550,9 +14619,10 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
               )}
             </div>
           )}
-        </div>
+          </div>
+        </NeuroFlexExercisePanel>
 
-        <div style={{marginTop:22,padding:12,borderRadius:10,background:COLORS.bg,fontSize:".72rem",color:COLORS.textMuted,lineHeight:1.5}}>
+        <div style={{marginTop:18,padding:12,borderRadius:10,background:COLORS.bg,fontSize:".72rem",color:COLORS.textMuted,lineHeight:1.5}}>
           Esta fase comprueba el manejo básico de la interfaz. <strong>No genera puntuación cognitiva</strong> y los intentos adicionales se registran únicamente como contexto de administración.
         </div>
 
