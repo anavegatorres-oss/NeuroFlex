@@ -1528,6 +1528,16 @@ const NF_VISUAL_OBJECT_BANK = [
   {id:"violin",label:"violín",category:"instrumentos",complexity:3},
   {id:"magnet",label:"imán",category:"objetos",complexity:2},
   {id:"accordion",label:"acordeón",category:"instrumentos",complexity:3},
+  {id:"butterfly",label:"mariposa",category:"animales",complexity:1},
+  {id:"turtle",label:"tortuga",category:"animales",complexity:2},
+  {id:"cow",label:"vaca",category:"animales",complexity:1},
+  {id:"elephant",label:"elefante",category:"animales",complexity:2},
+  {id:"frog",label:"rana",category:"animales",complexity:2},
+  {id:"penguin",label:"pingüino",category:"animales",complexity:2},
+  {id:"bee",label:"abeja",category:"animales",complexity:2},
+  {id:"otter",label:"nutria",category:"animales",complexity:3},
+  {id:"sun",label:"sol",category:"naturaleza",complexity:1},
+  {id:"moon",label:"luna",category:"naturaleza",complexity:1},
 ];
 
 const NF_VISUAL_OBJECT_BY_ID = Object.fromEntries(NF_VISUAL_OBJECT_BANK.map(x=>[x.id,x]));
@@ -1567,6 +1577,24 @@ function NeuroFlexObjectStimulus({id,size=96,senior=false,label}){
   </div>;
 }
 
+
+
+function NeuroFlexObjectChoice({id,senior=false,size="m",state="normal",disabled=false,onClick,showLabel=false}){
+  const item=NF_VISUAL_OBJECT_BY_ID[id];
+  return <NeuroFlexStimulusTile
+    size={size}
+    senior={senior}
+    state={state}
+    disabled={disabled}
+    onClick={onClick}
+    ariaLabel={item?.label || "Opción visual"}
+  >
+    <div style={{display:"grid",placeItems:"center"}}>
+      <NeuroFlexObjectStimulus id={id} size={senior?68:58} senior={senior}/>
+      {showLabel&&<div className="nf-object-bank-label">{item?.label || id}</div>}
+    </div>
+  </NeuroFlexStimulusTile>;
+}
 
 const NF_SHAPE_IDS=["circle_f","circle_o","square_f","square_o","triangle_f","triangle_o","diamond_f","diamond_o","star_f","star_o"];
 function NFStimulusShape({id,size=48,stroke="#12265A",fillColor="#2A9D8F"}) {
@@ -4936,19 +4964,34 @@ const EX_ADULTO = {
       instruccion: "Observa la secuencia visual, descubre la regla y toca la figura que debería aparecer en el espacio vacío.",
       Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const ruleComplexity=nfDifficultyValue(difficultyProfile,"rule_complexity",L); const patternLength=nfDifficultyValue(difficultyProfile,"pattern_length",5);
+        const useObjects=L<=3;
+        const objectSets=[
+          ["apple","book","apple","book","apple"],
+          ["car","car","house","car","car"],
+          ["sun","moon","sun","moon","sun"],
+          ["key","flower","phone","key","flower"],
+          ["cow","bee","cow","cow","bee"],
+        ];
+        const objectAnswers=["book","house","moon","phone","cow"];
+        const objectTypes=["AB","AAB","AB","ABC","ABB"];
+        const objectPatterns=objectSets.map((seq,i)=>{
+          const ans=objectAnswers[i];
+          const distractors=nfVisualBankDistractors(ans,3,{sameCategory:false}).map(x=>x.id);
+          return {seq,ans,opts:shuffle([ans,...distractors]),type:objectTypes[i],stimulusType:"object"};
+        });
         const EASY=[
-          {seq:["circle_f","circle_o","circle_f","circle_o","circle_f"],ans:"circle_o",opts:["circle_o","circle_f","triangle_o","square_o"],type:"AB"},
-          {seq:["triangle_f","triangle_f","square_f","triangle_f","triangle_f"],ans:"square_f",opts:["square_f","triangle_f","circle_f","diamond_f"],type:"AAB"},
-          {seq:["diamond_f","diamond_o","diamond_f","diamond_o","diamond_f"],ans:"diamond_o",opts:["diamond_o","diamond_f","square_o","circle_o"],type:"AB"}
+          {seq:["circle_f","circle_o","circle_f","circle_o","circle_f"],ans:"circle_o",opts:["circle_o","circle_f","triangle_o","square_o"],type:"AB",stimulusType:"shape"},
+          {seq:["triangle_f","triangle_f","square_f","triangle_f","triangle_f"],ans:"square_f",opts:["square_f","triangle_f","circle_f","diamond_f"],type:"AAB",stimulusType:"shape"},
+          {seq:["diamond_f","diamond_o","diamond_f","diamond_o","diamond_f"],ans:"diamond_o",opts:["diamond_o","diamond_f","square_o","circle_o"],type:"AB",stimulusType:"shape"}
         ];
         const HARD=[
-          {seq:["triangle_f","square_f","circle_f","triangle_f","square_f"],ans:"circle_f",opts:["circle_f","triangle_f","square_f","diamond_f"],type:"ABC"},
-          {seq:["circle_f","circle_f","circle_o","circle_f","circle_f"],ans:"circle_o",opts:["circle_o","circle_f","square_o","diamond_o"],type:"AAB"},
-          {seq:["triangle_f","square_f","square_f","triangle_f","square_f"],ans:"square_f",opts:["square_f","triangle_f","circle_f","diamond_o"],type:"ABB"},
-          {seq:["diamond_f","circle_f","square_o","diamond_f","circle_f"],ans:"square_o",opts:["square_o","diamond_f","circle_f","diamond_o"],type:"ABC"}
+          {seq:["triangle_f","square_f","circle_f","triangle_f","square_f"],ans:"circle_f",opts:["circle_f","triangle_f","square_f","diamond_f"],type:"ABC",stimulusType:"shape"},
+          {seq:["circle_f","circle_f","circle_o","circle_f","circle_f"],ans:"circle_o",opts:["circle_o","circle_f","square_o","diamond_o"],type:"AAB",stimulusType:"shape"},
+          {seq:["triangle_f","square_f","square_f","triangle_f","square_f"],ans:"square_f",opts:["square_f","triangle_f","circle_f","diamond_o"],type:"ABB",stimulusType:"shape"},
+          {seq:["diamond_f","circle_f","square_o","diamond_f","circle_f"],ans:"square_o",opts:["square_o","diamond_f","circle_f","diamond_o"],type:"ABC",stimulusType:"shape"}
         ];
         const count=[0,4,5,6,7,8][L];
-        const pool=ruleComplexity<=2?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD];
+        const pool=useObjects?objectPatterns:(ruleComplexity<=2?[...EASY,...HARD.slice(0,1)]:[...EASY,...HARD]);
         const [PATRONES]=useState(()=>Array.from({length:count},()=>{const p=shuffle(pool)[0];return {...p,seq:p.seq.slice(0,Math.min(p.seq.length,patternLength))}}));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now()),locked=useRef(false);
@@ -4964,7 +5007,7 @@ const EX_ADULTO = {
               const rs=records.current;
               onDone({
                 correct:ns,total:PATRONES.length,errors:PATRONES.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),
-                specificMetrics:{patternCompletion:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),clinicalProcess:"razonamiento visuoespacial / patrones"}
+                specificMetrics:{patternCompletion:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),stimulusType:p.stimulusType==="object"?"objetos NeuroFlex":"formas geométricas",clinicalProcess:"razonamiento visuoespacial / patrones"}
               });
             }else{
               setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false;trialT0.current=Date.now();
@@ -4979,16 +5022,24 @@ const EX_ADULTO = {
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={230}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:M?15:11,flexWrap:"wrap"}}>
-              {p.seq.map((x,i)=><div key={i} style={{width:M?75:64,height:M?75:64,display:"grid",placeItems:"center",borderRadius:12,border:`2px solid ${COLORS.border}`,background:"#fff",}}><NFStimulusShape id={x} size={M?54:46}/></div>)}
+              {p.seq.map((x,i)=><div key={i} style={{width:M?86:72,height:M?86:72,display:"grid",placeItems:"center",borderRadius:12,border:`2px solid ${COLORS.border}`,background:"#fff"}}>
+                {p.stimulusType==="object"
+                  ? <NeuroFlexObjectStimulus id={x} size={M?58:48} senior={M}/>
+                  : <NFStimulusShape id={x} size={M?54:46}/>}
+              </div>)}
               <div style={{width:M?75:64,height:M?75:64,display:"grid",placeItems:"center",borderRadius:12,border:`2px dashed ${COLORS.primary}`,background:COLORS.primary+"08",fontSize:M?"2rem":"1.7rem",fontWeight:900,color:COLORS.primary}}>?</div>
             </div>
           </NFTrainingStimulusCard>
           <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,maxWidth:560,margin:"0 auto"}}>
             {p.opts.map(opt=><button key={opt} disabled={locked.current} onClick={()=>pick(opt)} style={{
-              minHeight:M?82:72,borderRadius:13,
+              minHeight:M?92:78,borderRadius:13,
               border:`2px solid ${!sel?COLORS.border:opt===p.ans?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,
               background:!sel?"#fff":opt===p.ans?COLORS.success+"0D":sel===opt?COLORS.error+"0D":"#fff",cursor:"pointer"
-            }}>{opt}</button>)}
+            }}>
+              {p.stimulusType==="object"
+                ? <NeuroFlexObjectStimulus id={opt} size={M?58:48} senior={M}/>
+                : <NFStimulusShape id={opt} size={M?54:46}/>}
+            </button>)}
           </div>
         </div>;
       }
@@ -6286,6 +6337,7 @@ const NEUROFLEX_UNIFIED_EXERCISE_PANEL_VERSION = "NF-PANEL-1.0";
 const NEUROFLEX_SCREENING_PANEL_COMPLETION_VERSION = "NF-PANEL-SCREEN-1.0";
 const NEUROFLEX_EVALUATION_VISUAL_VERSION = "NF-EVAL-VISUAL-1.0";
 const NEUROFLEX_VISUAL_STIMULUS_BANK_VERSION = "NF-VISUAL-BANK-1.0";
+const NEUROFLEX_VISUAL_STIMULUS_EXPANSION_VERSION = "NF-VISUAL-BANK-2.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -7191,9 +7243,205 @@ function NF63VisualMemory({onDone,modoMayor,difficultyLevel=3,difficultyProfile}
 function nfPlayToneSequence(sequence,{duration=.22,gap=.12,gain=.055}={}){
   try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return false;const ctx=new C();sequence.forEach((tone,i)=>{const o=ctx.createOscillator(),g=ctx.createGain(),freq=typeof tone==="number"?tone:tone.freq,dur=typeof tone==="object"&&tone.dur?tone.dur:duration,amp=typeof tone==="object"&&tone.gain?tone.gain:gain;o.type="sine";o.frequency.value=freq;o.connect(g);g.connect(ctx.destination);g.gain.value=amp;const st=ctx.currentTime+i*(duration+gap);o.start(st);o.stop(st+dur)});setTimeout(()=>ctx.close(),sequence.length*(duration+gap)*1000+450);return true}catch(e){return false}
 }
-function NF71VisualChange({onDone,modoMayor,difficultyLevel=2,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],visualComplexity=nfDifficultyValue(difficultyProfile,"visual_complexity",L),changeSubtlety=nfDifficultyValue(difficultyProfile,"change_subtlety",L),shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"];const make=()=>{const a=shuffle(shapes).slice(0,visualComplexity>=4?4:3),changed=Math.random()<.65,b=[...a],idx=Math.floor(Math.random()*a.length);if(changed)b[idx]=shapes.find(x=>!a.includes(x))||shapes[(shapes.indexOf(a[idx])+1)%shapes.length];return{a,b,changed}};const[items]=useState(()=>Array.from({length:count},make)),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur],row=arr=><div style={{display:"flex",gap:12,justifyContent:"center"}}>{arr.map((x,i)=><span key={i} style={{width:M?76:62,height:M?76:62,border:`1px solid ${COLORS.border}`,borderRadius:10,display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?52:43}/></span>)}</div>;const answer=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.changed,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,changeDetection:true,clinicalProcess:"discriminación visual / detección de cambios"}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},380)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Compara ambos grupos. Decide si son exactamente iguales o si cambió alguna figura." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={285}><div style={{display:"grid",gap:20}}>{row(item.a)}<div style={{height:1,background:COLORS.border}}/>{row(item.b)}</div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={locked.current} onClick={()=>answer(false)}>Son iguales</BtnSecondary><BtnPrimary disabled={locked.current} onClick={()=>answer(true)}>Hay un cambio</BtnPrimary></div></div>}
-function NF71VisualClosure({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),figureComplexity=nfDifficultyValue(difficultyProfile,"figure_complexity",L),distractorSimilarity=nfDifficultyValue(difficultyProfile,"distractor_similarity",L),kinds=["house","clock","key","umbrella","apple","scissors","car","book","flower","phone"],masks=figureComplexity<=2?["right","left"]:["right","left","top","bottom"],count=[0,4,5,6,7,8][L];const[items]=useState(()=>shuffle(kinds).slice(0,count).map(kind=>({kind,mask:masks[Math.floor(Math.random()*masks.length)],opts:shuffle([kind,...shuffle(kinds.filter(x=>x!==kind)).slice(0,distractorSimilarity<=2?2:3)])}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.kind,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,visualClosure:true,clinicalProcess:"cierre visual / reconocimiento de objetos incompletos"}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},380)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa el objeto incompleto e identifica qué objeto es." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={250}><NFPartialObject kind={item.kind} mask={item.mask} size={M?145:125}/></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:580,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:64,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.kind?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800}}>{NF_STIMULUS_OBJECTS[v]}</button>)}</div></div>}
-function NF71FigureGround({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),trials=[0,3,4,5,6,6][L],visualDensity=nfDifficultyValue(difficultyProfile,"visual_density",L),targetCount=nfDifficultyValue(difficultyProfile,"target_count",L<=2?3:4),grid=visualDensity<=2?12:visualDensity<=4?16:20,shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"];const[items]=useState(()=>Array.from({length:trials},()=>{const target=shapes[Math.floor(Math.random()*shapes.length)],cells=Array.from({length:grid},()=>shapes[Math.floor(Math.random()*shapes.length)]);for(let i=0;i<Math.max(2,Math.min(5,targetCount));i++)cells[i]=target;const x=shuffle(cells);return{target,cells:x,count:x.filter(v=>v===target).length}})),[cur,setCur]=useState(0),[selected,setSelected]=useState(new Set()),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const toggle=i=>{if(!locked.current)setSelected(p=>{const n=new Set(p);n.has(i)?n.delete(i):n.add(i);return n})};const confirm=()=>{if(locked.current)return;locked.current=true;const hits=[...selected].filter(i=>item.cells[i]===item.target).length,comm=[...selected].filter(i=>item.cells[i]!==item.target).length,ok=comm===0&&hits===item.count,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{visualPerception:true,figureGround:true,clinicalProcess:"figura-fondo / exploración visual"}});else{setScore(ns);setCur(c=>c+1);setSelected(new Set());locked.current=false}},400)};return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><div style={{display:"flex",alignItems:"center",gap:8}}><strong>Busca:</strong><NFStimulusShape id={item.target} size={38}/></div><NFAudioReadButton text="Encuentra y selecciona todas las figuras iguales al objetivo." label="Escuchar instrucción" mayor={M}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={300}><div style={{display:"grid",gridTemplateColumns:`repeat(${grid<=12?4:5},1fr)`,gap:8,maxWidth:520,width:"100%"}}>{item.cells.map((x,i)=><button key={i} aria-label="Estímulo visual" onClick={()=>toggle(i)} style={{minHeight:M?70:58,borderRadius:9,border:`2px solid ${selected.has(i)?COLORS.primary:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?43:36}/></button>)}</div></NFTrainingStimulusCard><BtnPrimary onClick={confirm}>Confirmar selección</BtnPrimary></div>}
+function NF71VisualChange({onDone,modoMayor,difficultyLevel=2,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+  const count=[0,4,5,6,7,8][L];
+  const visualComplexity=nfDifficultyValue(difficultyProfile,"visual_complexity",L);
+  const changeSubtlety=nfDifficultyValue(difficultyProfile,"change_subtlety",L);
+  const useObjects=L<=3;
+  const objectPool=nfVisualBankPool(L<=2?1:2).map(x=>x.id);
+  const shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"];
+  const source=useObjects?objectPool:shapes;
+  const make=()=>{
+    const size=visualComplexity>=4?4:3;
+    const a=shuffle(source).slice(0,size);
+    const changed=Math.random()<.65;
+    const b=[...a];
+    const idx=Math.floor(Math.random()*a.length);
+    if(changed){
+      if(useObjects && changeSubtlety>=3){
+        const candidate=nfVisualBankDistractors(a[idx],1,{sameCategory:true})[0];
+        b[idx]=candidate?.id || source.find(x=>!a.includes(x)) || source[0];
+      }else{
+        b[idx]=source.find(x=>!a.includes(x)) || source[(source.indexOf(a[idx])+1)%source.length];
+      }
+    }
+    return {a,b,changed,stimulusType:useObjects?"object":"shape"};
+  };
+  const[items]=useState(()=>Array.from({length:count},make));
+  const[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
+  const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];
+
+  const renderStimulus=(x)=>item.stimulusType==="object"
+    ? <NeuroFlexObjectStimulus id={x} size={M?62:52} senior={M}/>
+    : <NFStimulusShape id={x} size={M?52:43}/>;
+
+  const row=arr=><div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+    {arr.map((x,i)=><span key={`${x}-${i}`} style={{
+      width:M?92:78,height:M?92:78,border:`1px solid ${COLORS.border}`,borderRadius:12,
+      display:"grid",placeItems:"center",background:"rgba(255,255,255,.94)"
+    }}>{renderStimulus(x)}</span>)}
+  </div>;
+
+  const answer=v=>{
+    if(locked.current)return;
+    locked.current=true;setSel(v);
+    const ok=v===item.changed,ns=score+(ok?1:0);
+    setTimeout(()=>{
+      if(cur+1>=items.length)onDone({
+        correct:ns,total:items.length,errors:items.length-ns,
+        seconds:Math.round((Date.now()-t0.current)/1000),
+        specificMetrics:{
+          visualPerception:true,changeDetection:true,
+          stimulusType:item.stimulusType==="object"?"objetos NeuroFlex":"formas geométricas",
+          clinicalProcess:"discriminación visual / detección de cambios"
+        }
+      });
+      else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}
+    },380)
+  };
+
+  return <div style={{textAlign:"center"}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,gap:10}}>
+      <NFAudioReadButton text="Compara ambos grupos. Decide si son exactamente iguales o si cambió algún elemento." label="Escuchar instrucción" mayor={M}/>
+      <Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/>
+    </div>
+    <NFTrainingStimulusCard modoMayor={M} minHeight={285}>
+      <div style={{display:"grid",gap:22,width:"100%"}}>
+        {row(item.a)}
+        <div style={{height:1,background:COLORS.border}}/>
+        {row(item.b)}
+      </div>
+    </NFTrainingStimulusCard>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}>
+      <BtnSecondary disabled={locked.current} onClick={()=>answer(false)}>Son iguales</BtnSecondary>
+      <BtnPrimary disabled={locked.current} onClick={()=>answer(true)}>Hay un cambio</BtnPrimary>
+    </div>
+  </div>;
+}
+function NF71VisualClosure({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+  const figureComplexity=nfDifficultyValue(difficultyProfile,"figure_complexity",L);
+  const distractorSimilarity=nfDifficultyValue(difficultyProfile,"distractor_similarity",L);
+  const kinds=nfVisualBankPool(L<=2?1:L<=4?2:3).map(x=>x.id).filter(x=>!["balloon","sun","moon"].includes(x));
+  const masks=figureComplexity<=2?["right","left"]:["right","left","top","bottom"];
+  const count=[0,4,5,6,7,8][L];
+  const[items]=useState(()=>shuffle(kinds).slice(0,count).map(kind=>{
+    const distractors=nfVisualBankDistractors(kind,distractorSimilarity<=2?2:3,{sameCategory:distractorSimilarity>=3}).map(x=>x.id);
+    return {kind,mask:masks[Math.floor(Math.random()*masks.length)],opts:shuffle([kind,...distractors])};
+  }));
+  const[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
+  const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];
+
+  const pick=v=>{
+    if(locked.current)return;
+    locked.current=true;setSel(v);
+    const ok=v===item.kind,ns=score+(ok?1:0);
+    setTimeout(()=>{
+      if(cur+1>=items.length)onDone({
+        correct:ns,total:items.length,errors:items.length-ns,
+        seconds:Math.round((Date.now()-t0.current)/1000),
+        specificMetrics:{
+          visualPerception:true,visualClosure:true,stimulusType:"objetos NeuroFlex",
+          clinicalProcess:"cierre visual / reconocimiento de objetos incompletos"
+        }
+      });
+      else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}
+    },380)
+  };
+
+  return <div style={{textAlign:"center"}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,gap:10}}>
+      <NFAudioReadButton text="Observa el objeto incompleto e identifica qué objeto es." label="Escuchar instrucción" mayor={M}/>
+      <Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/>
+    </div>
+    <NFTrainingStimulusCard modoMayor={M} minHeight={250}>
+      <NeuroFlexCard size="l" senior={M} ariaLabel="Objeto incompleto">
+        <NFPartialObject kind={item.kind} mask={item.mask} size={M?155:135}/>
+      </NeuroFlexCard>
+    </NFTrainingStimulusCard>
+    <div className="nf-visual-card-grid nf-visual-card-grid--choices" style={{maxWidth:650,margin:"0 auto"}}>
+      {item.opts.map(v=>{
+        const state=sel===null?"normal":v===item.kind?"correct":sel===v?"incorrect":"normal";
+        return <NeuroFlexObjectChoice
+          key={v}
+          id={v}
+          senior={M}
+          state={state}
+          disabled={locked.current}
+          onClick={()=>pick(v)}
+          showLabel
+        />;
+      })}
+    </div>
+  </div>;
+}
+function NF71FigureGround({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+  const trials=[0,3,4,5,6,6][L];
+  const visualDensity=nfDifficultyValue(difficultyProfile,"visual_density",L);
+  const targetCount=nfDifficultyValue(difficultyProfile,"target_count",L<=2?3:4);
+  const grid=visualDensity<=2?12:visualDensity<=4?16:20;
+  const useObjects=L<=3;
+  const objectPool=nfVisualBankPool(L<=2?1:2).map(x=>x.id);
+  const shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"];
+  const source=useObjects?objectPool:shapes;
+  const[items]=useState(()=>Array.from({length:trials},()=>{
+    const target=source[Math.floor(Math.random()*source.length)];
+    const cells=Array.from({length:grid},()=>source[Math.floor(Math.random()*source.length)]);
+    for(let i=0;i<Math.max(2,Math.min(5,targetCount));i++)cells[i]=target;
+    const x=shuffle(cells);
+    return{target,cells:x,count:x.filter(v=>v===target).length,stimulusType:useObjects?"object":"shape"};
+  }));
+  const[cur,setCur]=useState(0),[selected,setSelected]=useState(new Set()),[score,setScore]=useState(0);
+  const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];
+
+  const renderStimulus=(x,size)=>item.stimulusType==="object"
+    ? <NeuroFlexObjectStimulus id={x} size={size} senior={M}/>
+    : <NFStimulusShape id={x} size={size}/>;
+
+  const toggle=i=>{if(!locked.current)setSelected(p=>{const n=new Set(p);n.has(i)?n.delete(i):n.add(i);return n})};
+  const confirm=()=>{
+    if(locked.current)return;
+    locked.current=true;
+    const hits=[...selected].filter(i=>item.cells[i]===item.target).length;
+    const comm=[...selected].filter(i=>item.cells[i]!==item.target).length;
+    const ok=comm===0&&hits===item.count,ns=score+(ok?1:0);
+    setTimeout(()=>{
+      if(cur+1>=items.length)onDone({
+        correct:ns,total:items.length,errors:items.length-ns,
+        seconds:Math.round((Date.now()-t0.current)/1000),
+        specificMetrics:{
+          visualPerception:true,figureGround:true,
+          stimulusType:item.stimulusType==="object"?"objetos NeuroFlex":"formas geométricas",
+          clinicalProcess:"figura-fondo / exploración visual"
+        }
+      });
+      else{setScore(ns);setCur(c=>c+1);setSelected(new Set());locked.current=false}
+    },400)
+  };
+
+  return <div style={{textAlign:"center"}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,gap:12}}>
+      <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <strong>Busca:</strong>
+        <span style={{width:M?62:52,height:M?62:52,display:"grid",placeItems:"center",border:`1px solid ${COLORS.border}`,borderRadius:10,background:"#fff"}}>
+          {renderStimulus(item.target,M?48:40)}
+        </span>
+      </div>
+      <NFAudioReadButton text="Encuentra y selecciona todos los elementos iguales al objetivo." label="Escuchar instrucción" mayor={M}/>
+    </div>
+    <NFTrainingStimulusCard modoMayor={M} minHeight={300}>
+      <div style={{display:"grid",gridTemplateColumns:`repeat(${grid<=12?4:5},1fr)`,gap:8,maxWidth:580,width:"100%"}}>
+        {item.cells.map((x,i)=><button key={i} aria-label="Estímulo visual" onClick={()=>toggle(i)} style={{
+          minHeight:M?78:64,borderRadius:10,border:`2px solid ${selected.has(i)?COLORS.primary:COLORS.border}`,
+          background:"rgba(255,255,255,.94)",display:"grid",placeItems:"center"
+        }}>{renderStimulus(x,M?50:42)}</button>)}
+      </div>
+    </NFTrainingStimulusCard>
+    <BtnPrimary onClick={confirm}>Confirmar selección</BtnPrimary>
+  </div>;
+}
 function NF71AuditorySameDifferent({onDone,modoMayor,difficultyLevel=2,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=nfDifficultyValue(difficultyProfile,"trial_count",[0,4,5,6,7,8][L]),similarity=nfDifficultyValue(difficultyProfile,"acoustic_similarity",L),gap=Math.max(25,180-similarity*28),freqs=[360,440,520,600];const[items]=useState(()=>Array.from({length:count},()=>{const f1=freqs[Math.floor(Math.random()*4)],same=Math.random()<.5,f2=same?f1:Math.max(180,Math.min(900,f1+(Math.random()<.5?-gap:gap)));return{f1,f2,same}})),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const play=()=>{if(nfPlayToneSequence([item.f1,item.f2],{duration:.32,gap:.34}))setPlayed(true)};const answer=v=>{if(locked.current||!played)return;locked.current=true;const ok=v===item.same,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,clinicalProcess:"discriminación auditiva / igual-diferente"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);locked.current=false}},330)};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha los dos sonidos y decide si son iguales o diferentes." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar sonidos"}</BtnPrimary></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={!played||locked.current} onClick={()=>answer(true)}>Iguales</BtnSecondary><BtnPrimary disabled={!played||locked.current} onClick={()=>answer(false)}>Diferentes</BtnPrimary></div></div>}
 function NF71AuditoryPitch({onDone,modoMayor,difficultyLevel=2,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=nfDifficultyValue(difficultyProfile,"trial_count",[0,4,5,6,7,8][L]),proximity=nfDifficultyValue(difficultyProfile,"frequency_proximity",L),gap=Math.max(35,260-proximity*40),bases=[340,420,500],pairs=bases.map(x=>[x,x+gap]);const[items]=useState(()=>Array.from({length:count},()=>{const p=pairs[Math.floor(Math.random()*pairs.length)],seq=Math.random()<.5?p:[p[1],p[0]];return{seq,ans:seq[0]>seq[1]?0:1}})),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),item=items[cur];const play=()=>{if(nfPlayToneSequence(item.seq,{duration:.34,gap:.35}))setPlayed(true)};const pick=v=>{if(locked.current||!played)return;locked.current=true;const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,clinicalProcess:"discriminación de frecuencia / tono"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);locked.current=false}},330)};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha dos sonidos e indica cuál es más agudo." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar sonidos"}</BtnPrimary></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:520,margin:"0 auto"}}><BtnSecondary disabled={!played||locked.current} onClick={()=>pick(0)}>El primero</BtnSecondary><BtnPrimary disabled={!played||locked.current} onClick={()=>pick(1)}>El segundo</BtnPrimary></div></div>}
 function NF71AuditoryOrder({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),len=nfDifficultyValue(difficultyProfile,"sequence_length",L<=2?2:L<=4?3:4),count=[0,4,5,6,7,8][L],tones=[330,480,660],labels={330:"Grave",480:"Medio",660:"Agudo"};const[items]=useState(()=>Array.from({length:count},()=>Array.from({length:len},()=>tones[Math.floor(Math.random()*3)]))),[cur,setCur]=useState(0),[played,setPlayed]=useState(false),[answer,setAnswer]=useState([]),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false),seq=items[cur];const play=()=>{if(nfPlayToneSequence(seq,{duration:.28,gap:.18}))setPlayed(true)};const choose=f=>{if(locked.current||!played)return;const next=[...answer,f];setAnswer(next);if(next.length===len){locked.current=true;const ok=next.every((x,i)=>x===seq[i]),ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{auditoryPerception:true,sequenceLength:len,clinicalProcess:"orden temporal auditivo / secuenciación"}});else{setScore(ns);setCur(c=>c+1);setPlayed(false);setAnswer([]);locked.current=false}},350)}};return <div style={{textAlign:"center"}}><NFAudioReadButton text="Escucha la secuencia y reconstruye el orden de los tonos." label="Escuchar instrucción" mayor={M}/><NFTrainingStimulusCard modoMayor={M} minHeight={230}><div><BtnPrimary onClick={play}>{played?"Escuchar otra vez":"Escuchar secuencia"}</BtnPrimary><div style={{marginTop:16,fontWeight:800}}>Respuesta: {answer.map(x=>labels[x]).join(" → ")||"—"}</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:600,margin:"0 auto"}}>{tones.map(f=><BtnSecondary key={f} disabled={!played||locked.current} onClick={()=>choose(f)}>{labels[f]}</BtnSecondary>)}</div></div>}
