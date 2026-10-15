@@ -5959,6 +5959,7 @@ const NEUROFLEX_REPORT_METRICS_VERSION = "NF-REPORT-METRICS-1.0";
 const NEUROFLEX_VISUAL_CARD_SYSTEM_VERSION = "NF-VISUAL-CARDS-1.0";
 const NEUROFLEX_UNIFIED_INSTRUCTION_VERSION = "NF-INSTRUCTION-UNIFIED-1.0";
 const NEUROFLEX_UNIFIED_EXERCISE_PANEL_VERSION = "NF-PANEL-1.0";
+const NEUROFLEX_SCREENING_PANEL_COMPLETION_VERSION = "NF-PANEL-SCREEN-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -10055,6 +10056,43 @@ function NFScreeningChoiceBlock({ blockId, title, instruction, items, paciente, 
   </div>;
 }
 
+
+function NFScreeningSpecialShell({
+  paciente,
+  eyebrow="TAMIZAJE NEUROFLEX",
+  title,
+  progress,
+  instruction,
+  children,
+  footer=null,
+}){
+  const mayor=esModoMayor(paciente);
+  return <div style={{maxWidth:860,margin:"0 auto"}}>
+    <Card style={{padding:mayor?38:32}}>
+      <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",marginBottom:18}}>
+        <div>
+          <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary,letterSpacing:".04em"}}>{eyebrow}</div>
+          <h2 style={{margin:"5px 0 0",fontSize:mayor?"1.55rem":"1.35rem"}}>{title}</h2>
+        </div>
+        {progress&&<div style={{padding:"6px 10px",borderRadius:999,background:COLORS.bg,color:COLORS.textMuted,fontSize:".68rem",fontWeight:700}}>
+          {progress}
+        </div>}
+      </div>
+
+      {instruction&&<div className="nf-screening-instruction">
+        <span className="nf-screening-instruction__label">Qué debes hacer</span>
+        <p className="nf-screening-instruction__text">{instruction}</p>
+      </div>}
+
+      <NeuroFlexExercisePanel senior={mayor} variant="wide" ariaLabel={title} style={{marginBottom:18}}>
+        {children}
+      </NeuroFlexExercisePanel>
+
+      {footer}
+    </Card>
+  </div>;
+}
+
 function NFScreeningWorkingMemoryTrial({ paciente, onDone }) {
   const mayor=esModoMayor(paciente);
   const trials=[
@@ -10142,42 +10180,64 @@ function NFScreeningWorkingMemoryTrial({ paciente, onDone }) {
     }
   };
 
-  return <div style={{maxWidth:760,margin:"0 auto"}}>
-    <Card style={{padding:mayor?30:24,textAlign:"center"}}>
-      <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIA DE TRABAJO</div>
-      <h2 style={{margin:"6px 0 8px"}}>Mantén y transforma la información</h2>
-      <div style={{fontSize:".67rem",color:COLORS.textMuted,marginBottom:14}}>{idx+1} de {trials.length}</div>
+  const shellInstruction=phase==="ready"
+    ? `${trial.instruction} La secuencia se mostrará solo unos segundos y desaparecerá antes de que aparezcan las respuestas.`
+    : phase==="present"
+      ? "Memoriza la secuencia. No respondas todavía."
+      : trial.instruction;
 
+  return <NFScreeningSpecialShell
+    paciente={paciente}
+    eyebrow="TAMIZAJE NEUROFLEX"
+    title="Memoria de trabajo"
+    progress={`${idx+1} de ${trials.length}`}
+    instruction={shellInstruction}
+  >
+    <div style={{minHeight:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center"}}>
       {phase==="ready" && <>
-        <p style={{fontSize:mayor?".95rem":".8rem",lineHeight:1.6,color:COLORS.textSecond,maxWidth:560,margin:"0 auto 16px"}}>
-          {trial.instruction} La secuencia se mostrará solo unos segundos y desaparecerá antes de que aparezcan las respuestas.
-        </p>
+        <div style={{fontSize:mayor?"1.08rem":".92rem",lineHeight:1.65,color:COLORS.textSecond,maxWidth:560,margin:"0 auto 22px"}}>
+          La secuencia desaparecerá antes de que aparezcan las opciones.
+        </div>
         <BtnPrimary onClick={present}>Mostrar secuencia</BtnPrimary>
       </>}
 
       {phase==="present" && <>
         <Badge label={`MEMORIZA · ${seconds}s`} color={COLORS.primary}/>
-        <div aria-label="secuencia a memorizar" style={{fontSize:mayor?"2.2rem":"1.9rem",fontWeight:900,letterSpacing:10,padding:"30px 10px"}}>
+        <div aria-label="secuencia a memorizar" style={{
+          fontSize:mayor?"3rem":"2.55rem",
+          fontWeight:900,
+          letterSpacing:12,
+          padding:"42px 10px 28px",
+          color:COLORS.textPrimary
+        }}>
           {trial.sequence.join("   ")}
         </div>
-        <p style={{fontSize:".7rem",color:COLORS.textMuted}}>No respondas todavía. Las opciones aparecerán cuando la secuencia desaparezca.</p>
+        <p style={{fontSize:mayor?".9rem":".76rem",color:COLORS.textMuted,margin:0}}>
+          Las opciones aparecerán cuando termine el tiempo.
+        </p>
       </>}
 
-      {phase==="answer" && <>
-        <div style={{padding:16,borderRadius:11,background:COLORS.bg,marginBottom:14,fontSize:mayor?".95rem":".78rem",fontWeight:700,lineHeight:1.55}}>
-          {trial.instruction}
-        </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:9}}>
+      {phase==="answer" && <div style={{width:"100%"}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:12,width:"100%"}}>
           {trial.options.map((opt,i)=><button key={opt} onClick={()=>choose(i)}
-            style={{padding:mayor?16:12,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:700,cursor:"pointer"}}>
+            style={{
+              minHeight:mayor?74:64,
+              padding:mayor?16:13,
+              borderRadius:12,
+              border:`2px solid ${COLORS.border}`,
+              background:"rgba(255,255,255,.94)",
+              fontFamily:"inherit",
+              fontWeight:800,
+              fontSize:mayor?"1rem":".88rem",
+              cursor:"pointer"
+            }}>
             {opt}
           </button>)}
         </div>
-      </>}
-    </Card>
-  </div>;
+      </div>}
+    </div>
+  </NFScreeningSpecialShell>;
 }
-
 function NFScreeningMemoryBlock({ paciente, onDone }) {
   const mayor=esModoMayor(paciente);
   const words=["CASA","LIMÓN","TREN","NUBE","LLAVE","JARDÍN"];
@@ -10193,14 +10253,27 @@ function NFScreeningMemoryBlock({ paciente, onDone }) {
     return()=>clearInterval(tm);
   },[phase]);
 
-  if(phase==="study")return <div style={{maxWidth:860,margin:"0 auto"}}><Card style={{textAlign:"center",padding:mayor?38:32}}>
-    <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIA</div>
-    <h2>Recuerda estas palabras</h2>
-    <Badge label={`${seconds}s`} color={COLORS.primary}/>
-    <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginTop:22}}>
-      {words.map(w=><span key={w} style={{padding:"10px 13px",borderRadius:9,border:`1px solid ${COLORS.border}`,fontWeight:800}}>{w}</span>)}
+  if(phase==="study")return <NFScreeningSpecialShell
+    paciente={paciente}
+    eyebrow="TAMIZAJE NEUROFLEX"
+    title="Memoria"
+    progress={`${seconds}s`}
+    instruction="Memoriza las palabras. Después desaparecerán y continuarás con otra actividad antes de recordarlas."
+  >
+    <div style={{minHeight:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center"}}>
+      <Badge label={`MEMORIZA · ${seconds}s`} color={COLORS.primary}/>
+      <div style={{display:"flex",gap:14,justifyContent:"center",alignItems:"center",flexWrap:"wrap",marginTop:28,maxWidth:650}}>
+        {words.map(w=><span key={w} style={{
+          padding:mayor?"14px 18px":"12px 16px",
+          borderRadius:11,
+          border:`2px solid ${COLORS.border}`,
+          background:"rgba(255,255,255,.94)",
+          fontWeight:850,
+          fontSize:mayor?"1.15rem":"1rem"
+        }}>{w}</span>)}
+      </div>
     </div>
-  </Card></div>;
+  </NFScreeningSpecialShell>;
 
   if(phase==="working")return <NFScreeningWorkingMemoryTrial paciente={paciente} onDone={data=>{
     onDone({type:"working",...data,encodedWords:words});
@@ -10222,38 +10295,109 @@ function NFScreeningDelayedMemory({ encodedWords, paciente, onDone }) {
     }));
     onDone({observations});
   };
-  return <div style={{maxWidth:860,margin:"0 auto"}}><Card style={{padding:mayor?38:32}}>
-    <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIA DIFERIDA</div>
-    <h2>¿Qué palabras viste antes?</h2>
-    <p style={{fontSize:".75rem",color:COLORS.textMuted}}>Selecciona únicamente las palabras que recuerdas haber visto.</p>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:14,marginTop:22}}>
-      {pool.map(w=><button key={w} onClick={()=>setSelected(x=>x.includes(w)?x.filter(y=>y!==w):[...x,w])}
-        style={{minHeight:64,padding:16,borderRadius:12,border:`2px solid ${selected.includes(w)?COLORS.primary:COLORS.border}`,background:"#fff",fontWeight:800,fontSize:mayor?"1rem":".88rem"}}>{w}</button>)}
+  return <NFScreeningSpecialShell
+    paciente={paciente}
+    eyebrow="TAMIZAJE NEUROFLEX"
+    title="Memoria diferida"
+    instruction="Selecciona únicamente las palabras que recuerdas haber visto anteriormente."
+  >
+    <div style={{width:"100%",display:"flex",flexDirection:"column",justifyContent:"center"}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:14}}>
+        {pool.map(w=><button key={w} onClick={()=>setSelected(x=>x.includes(w)?x.filter(y=>y!==w):[...x,w])}
+          style={{
+            minHeight:mayor?70:64,
+            padding:16,
+            borderRadius:12,
+            border:`2px solid ${selected.includes(w)?COLORS.primary:COLORS.border}`,
+            background:selected.includes(w)?COLORS.primary+"0D":"rgba(255,255,255,.94)",
+            fontWeight:800,
+            fontSize:mayor?"1rem":".88rem"
+          }}>{w}</button>)}
+      </div>
+      <BtnPrimary onClick={finish} style={{width:"100%",marginTop:16}}>Confirmar</BtnPrimary>
     </div>
-    <BtnPrimary onClick={finish} style={{width:"100%",marginTop:14}}>Confirmar</BtnPrimary>
-  </Card></div>;
+  </NFScreeningSpecialShell>;
 }
-
 function NFScreeningVisualMemory({ paciente, onDone }) {
   const mayor=esModoMayor(paciente);
   const targets=["●▲","■◆","▲□","◆○"];
   const pool=["●▲","■◆","▲□","◆○","●■","■▲","○◆","□▲"];
   const [phase,setPhase]=useState("study"),[seconds,setSeconds]=useState(8),[selected,setSelected]=useState([]);
   useEffect(()=>{if(phase!=="study")return;const tm=setInterval(()=>setSeconds(v=>{if(v<=1){clearInterval(tm);setPhase("recognition");return 0}return v-1}),1000);return()=>clearInterval(tm)},[phase]);
-  if(phase==="study")return <div style={{maxWidth:760,margin:"0 auto"}}><Card style={{textAlign:"center",padding:28}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Memoria visual</div><h2>Memoriza las configuraciones</h2><Badge label={`${seconds}s`} color={COLORS.primary}/><div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:9,maxWidth:500,margin:"20px auto"}}>{targets.map(x=><div key={x} style={{padding:18,border:`1px solid ${COLORS.border}`,borderRadius:10,fontSize:mayor?"2.5rem":"2.15rem",minHeight:92,display:"grid",placeItems:"center"}}>{x}</div>)}</div></Card></div>;
+  if(phase==="study")return <NFScreeningSpecialShell
+    paciente={paciente}
+    eyebrow="TAMIZAJE NEUROFLEX"
+    title="Memoria visual"
+    progress={`${seconds}s`}
+    instruction="Memoriza las configuraciones visuales. Después desaparecerán y tendrás que reconocerlas."
+  >
+    <div style={{minHeight:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+      <Badge label={`MEMORIZA · ${seconds}s`} color={COLORS.primary}/>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,maxWidth:560,width:"100%",margin:"24px auto 0"}}>
+        {targets.map(x=><div key={x} style={{
+          padding:18,
+          border:`2px solid ${COLORS.border}`,
+          borderRadius:12,
+          background:"rgba(255,255,255,.94)",
+          fontSize:mayor?"2.5rem":"2.15rem",
+          minHeight:100,
+          display:"grid",
+          placeItems:"center"
+        }}>{x}</div>)}
+      </div>
+    </div>
+  </NFScreeningSpecialShell>;
   const finish=()=>{
     const set=new Set(targets);
     onDone({observations:pool.map(x=>({domainId:"memoria_visual",pass:set.has(x)?selected.includes(x):!selected.includes(x),valid:true,source:"Memoria visual breve",itemId:x}))});
   };
-  return <div style={{maxWidth:860,margin:"0 auto"}}><Card style={{padding:mayor?38:32}}><h2>Reconoce las configuraciones</h2><div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>{pool.map(x=><button key={x} onClick={()=>setSelected(a=>a.includes(x)?a.filter(y=>y!==x):[...a,x])} style={{minHeight:86,padding:20,borderRadius:12,border:`2px solid ${selected.includes(x)?COLORS.primary:COLORS.border}`,background:"#fff",fontSize:mayor?"2rem":"1.75rem"}}>{x}</button>)}</div><BtnPrimary onClick={finish} style={{width:"100%",marginTop:12}}>Confirmar</BtnPrimary></Card></div>;
+  return <NFScreeningSpecialShell
+    paciente={paciente}
+    eyebrow="TAMIZAJE NEUROFLEX"
+    title="Memoria visual"
+    instruction="Selecciona únicamente las configuraciones que recuerdas haber visto."
+  >
+    <div style={{width:"100%"}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
+        {pool.map(x=><button key={x} onClick={()=>setSelected(a=>a.includes(x)?a.filter(y=>y!==x):[...a,x])}
+          style={{
+            minHeight:mayor?96:86,
+            padding:20,
+            borderRadius:12,
+            border:`2px solid ${selected.includes(x)?COLORS.primary:COLORS.border}`,
+            background:selected.includes(x)?COLORS.primary+"0D":"rgba(255,255,255,.94)",
+            fontSize:mayor?"2rem":"1.75rem"
+          }}>{x}</button>)}
+      </div>
+      <BtnPrimary onClick={finish} style={{width:"100%",marginTop:14}}>Confirmar</BtnPrimary>
+    </div>
+  </NFScreeningSpecialShell>;
 }
-
 function NFScreeningPraxias({ paciente, onDone }) {
   const mayor=esModoMayor(paciente);
   const items=["Haz el gesto de despedirte.","Muestra cómo usarías un peine sin tenerlo en la mano.","Representa cómo abrirías una puerta con una llave.","Muestra en orden cómo prepararías una bebida caliente."];
   const [idx,setIdx]=useState(0),rec=useRef([]);
   const rate=pass=>{rec.current.push(pass);if(idx+1>=items.length)onDone({observations:rec.current.map((x,i)=>({domainId:"praxias",pass:x,valid:true,source:"Observación práxica breve",itemId:`praxis${i+1}`}))});else setIdx(i=>i+1)};
-  return <div style={{maxWidth:860,margin:"0 auto"}}><Card style={{padding:mayor?38:32}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent}}>OBSERVACIÓN PROFESIONAL</div><h2>Praxias</h2><p style={{fontWeight:700,fontSize:"1.05rem",lineHeight:1.6,textAlign:"center",padding:mayor?28:24,background:"#fff",border:`2px solid ${COLORS.border}`,borderRadius:14,minHeight:130,display:"flex",alignItems:"center",justifyContent:"center"}}>{items[idx]}</p><p style={{fontSize:".7rem",color:COLORS.textMuted}}>Registra la ejecución considerando comprensión, movilidad y limitaciones sensoriales.</p><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}><BtnSecondary onClick={()=>rate(false)}>Requiere revisión</BtnSecondary><BtnPrimary onClick={()=>rate(true)}>Adecuado</BtnPrimary></div></Card></div>;
+  return <NFScreeningSpecialShell
+    paciente={paciente}
+    eyebrow="TAMIZAJE NEUROFLEX"
+    title="Praxias"
+    progress={`${idx+1} de ${items.length}`}
+    instruction="Realiza la acción indicada. El profesional registrará cómo fue la ejecución."
+    footer={<div style={{fontSize:".7rem",color:COLORS.textMuted,lineHeight:1.5,textAlign:"center"}}>
+      El registro profesional considera comprensión, movilidad y posibles limitaciones sensoriales.
+    </div>}
+  >
+    <div style={{minHeight:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center"}}>
+      <div style={{fontWeight:800,fontSize:mayor?"1.3rem":"1.12rem",lineHeight:1.6,maxWidth:620,marginBottom:28}}>
+        {items[idx]}
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,width:"100%",maxWidth:520}}>
+        <BtnSecondary onClick={()=>rate(false)}>Requiere revisión</BtnSecondary>
+        <BtnPrimary onClick={()=>rate(true)}>Adecuado</BtnPrimary>
+      </div>
+    </div>
+  </NFScreeningSpecialShell>;
 }
 
 
