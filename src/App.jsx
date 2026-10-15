@@ -561,6 +561,260 @@ body{background:
 
 
 
+
+
+/* ─── F77.5 · BANCO VISUAL PROPIO NEUROFLEX ──────────────────────────────── */
+.nf-object-stimulus svg{filter:drop-shadow(0 2px 3px rgba(19,42,86,.04))}
+.nf-object-bank-label{
+  margin-top:8px;
+  text-align:center;
+  color:#50627C;
+  font-size:.72rem;
+  font-weight:800;
+}
+.nf-visual-bank-choice{
+  min-height:118px;
+}
+.nf-exercise-focus.is-senior .nf-visual-bank-choice{
+  min-height:142px;
+}
+
+/* ─── F77.4 · EVALUACIÓN NEUROFLEX · PRESENTACIÓN UNIFICADA ───────────────── */
+.nf-evaluation-focus.nf-v2-evaluation{
+  width:100%;
+}
+.nf-eval-brandbar{
+  display:grid;
+  grid-template-columns:minmax(210px,1fr) minmax(320px,1.3fr) minmax(120px,.75fr);
+  align-items:center;
+  gap:24px;
+  margin-bottom:20px;
+  padding:0 8px;
+}
+.nf-eval-brandbar__logo{display:flex;align-items:center;justify-content:flex-start;min-width:0}
+.nf-eval-brandbar__center{text-align:center;min-width:0}
+.nf-eval-brandbar__title{
+  font-size:.98rem;
+  font-weight:800;
+  color:#122554;
+  margin-bottom:9px;
+  letter-spacing:-.01em;
+}
+.nf-eval-brandbar__progress-row{display:flex;align-items:center;gap:12px;justify-content:center}
+.nf-eval-brandbar__track{
+  position:relative;
+  height:9px;
+  flex:1;
+  max-width:420px;
+  min-width:170px;
+  background:#E6ECF5;
+  border-radius:999px;
+  overflow:hidden;
+}
+.nf-eval-brandbar__fill{
+  position:absolute;
+  inset:0 auto 0 0;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#765EF0 0%,#4F7BEE 55%,#2C99D7 100%);
+  transition:width .25s ease;
+}
+.nf-eval-brandbar__count{
+  flex-shrink:0;
+  color:#53617A;
+  font-size:.82rem;
+  font-weight:800;
+}
+.nf-eval-brandbar__side{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+}
+.nf-eval-brandbar__domain{
+  padding:8px 12px;
+  border:1px solid #DCE5F0;
+  border-radius:999px;
+  background:rgba(255,255,255,.8);
+  color:#54637E;
+  font-size:.72rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.nf-eval-stage-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #D8E2F0!important;
+  border-radius:22px!important;
+  background:rgba(255,255,255,.985)!important;
+  box-shadow:0 14px 38px rgba(38,65,105,.07)!important;
+}
+.nf-eval-stage-card::after{
+  content:"";
+  position:absolute;
+  right:-72px;
+  top:72px;
+  width:360px;
+  height:360px;
+  background:url("/neuroflex-assets/neuroflex-mark.png") center/contain no-repeat;
+  opacity:.025;
+  pointer-events:none;
+  z-index:0;
+}
+.nf-eval-stage-card>*{position:relative;z-index:1}
+
+.nf-eval-task-head{
+  align-items:flex-start;
+  margin-bottom:20px;
+  padding:0 4px;
+}
+.nf-eval-task-identity{
+  gap:0;
+}
+.nf-eval-task-mark{
+  display:none!important;
+}
+.nf-eval-eyebrow{
+  color:#2466D7;
+  font-size:.72rem;
+  font-weight:900;
+  letter-spacing:.045em;
+}
+.nf-eval-task-head h2{
+  color:#10214D;
+  font-size:1.72rem;
+  line-height:1.18;
+  margin:7px 0 0;
+  font-weight:850;
+  letter-spacing:-.03em;
+}
+.nf-eval-domain-pill{
+  margin-top:2px;
+}
+
+.nf-eval-instruction,
+.nf-screening-instruction{
+  position:relative;
+  overflow:hidden;
+  margin:0 0 22px;
+  padding:20px 24px 20px 28px;
+  border-radius:15px;
+  border:1px solid #BFD2EC;
+  background:linear-gradient(110deg,#F5F9FF 0%,#F8FBFF 65%,#F3F8FD 100%);
+  box-shadow:0 5px 16px rgba(49,92,182,.045);
+}
+.nf-eval-instruction:before,
+.nf-screening-instruction:before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  opacity:1;
+  background:linear-gradient(180deg,#1F73F1,#2B63DB);
+}
+.nf-eval-instruction__label,
+.nf-screening-instruction__label{
+  display:block;
+  margin:0 0 9px;
+  color:#1760D5;
+  font-size:.76rem;
+  font-weight:900;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+  text-align:left;
+}
+.nf-eval-instruction__text,
+.nf-screening-instruction__text{
+  margin:0;
+  max-width:900px;
+  color:#172747;
+  font-size:1.03rem;
+  line-height:1.58;
+  font-weight:650;
+  text-align:left;
+}
+
+.nf-unified-exercise-panel{
+  height:440px;
+  min-height:440px;
+  max-height:440px;
+  border:1px solid #CBD8E9;
+  border-radius:17px;
+  background:
+    linear-gradient(rgba(255,255,255,.965),rgba(255,255,255,.965)),
+    url("/neuroflex-assets/neuroflex-mark.png") 88% 54% / 285px auto no-repeat;
+  box-shadow:0 7px 22px rgba(26,53,91,.045);
+  padding:30px 34px;
+}
+.nf-unified-exercise-panel__content{
+  max-width:900px;
+}
+.nf-unified-exercise-panel.is-wide .nf-unified-exercise-panel__content{
+  max-width:940px;
+}
+.nf-unified-exercise-panel.is-compact .nf-unified-exercise-panel__content{
+  max-width:760px;
+}
+
+.nf-protected-stimulus-zone{
+  background:transparent!important;
+  color:#152444;
+}
+.nf-protected-stimulus-zone h3,
+.nf-unified-exercise-panel h3{
+  color:#10214D;
+  font-weight:850;
+  letter-spacing:-.02em;
+}
+.nf-protected-stimulus-zone button,
+.nf-unified-exercise-panel button{
+  border-radius:12px!important;
+}
+.nf-screening-helper{
+  margin:-10px 0 20px;
+  padding:10px 13px;
+  border-radius:10px;
+  background:#F4F7FB;
+  border:1px solid #E5EBF3;
+  color:#7B889D;
+  font-size:.72rem;
+  line-height:1.5;
+}
+
+.nf-evaluation-focus.is-senior .nf-eval-task-head h2{font-size:1.95rem}
+.nf-evaluation-focus.is-senior .nf-eval-instruction__label,
+.nf-evaluation-focus.is-senior .nf-screening-instruction__label{font-size:.9rem}
+.nf-evaluation-focus.is-senior .nf-eval-instruction__text,
+.nf-evaluation-focus.is-senior .nf-screening-instruction__text{font-size:1.2rem;line-height:1.6}
+
+@media(max-width:900px){
+  .nf-eval-brandbar{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+  .nf-eval-brandbar__logo,
+  .nf-eval-brandbar__side{justify-content:center}
+  .nf-eval-brandbar__track{max-width:520px}
+  .nf-eval-task-head{flex-direction:column}
+  .nf-eval-domain-pill{margin-left:0}
+}
+@media(max-width:720px){
+  .nf-eval-brandbar{padding:0}
+  .nf-eval-brandbar__logo img{max-width:230px!important}
+  .nf-eval-stage-card{border-radius:17px!important}
+  .nf-eval-instruction,
+  .nf-screening-instruction{padding:17px 17px 17px 21px}
+  .nf-eval-task-head h2{font-size:1.45rem}
+  .nf-unified-exercise-panel{
+    height:auto;
+    min-height:390px;
+    max-height:none;
+    padding:22px 18px;
+    background-size:180px auto;
+  }
+}
+
 /* ─── F77.2 · PANEL UNIVERSAL DE EJERCICIO NEUROFLEX ─────────────────────── */
 .nf-unified-exercise-panel{
   position:relative;
@@ -1251,6 +1505,68 @@ function NFStimulusObject({kind,size=58,stroke="#12265A",accent="#2A9D8F",label=
   })();
   return <svg viewBox="0 0 48 52" style={style} role="img" aria-label={label||NF_STIMULUS_OBJECTS[kind]||"Estímulo visual"}>{icon}</svg>;
 }
+
+
+const NF_VISUAL_OBJECT_BANK = [
+  {id:"apple",label:"manzana",category:"alimentos",complexity:1},
+  {id:"lemon",label:"limón",category:"alimentos",complexity:1},
+  {id:"house",label:"casa",category:"lugares",complexity:1},
+  {id:"car",label:"carro",category:"transporte",complexity:1},
+  {id:"book",label:"libro",category:"objetos",complexity:1},
+  {id:"clock",label:"reloj",category:"objetos",complexity:1},
+  {id:"key",label:"llave",category:"objetos",complexity:1},
+  {id:"umbrella",label:"paraguas",category:"objetos",complexity:2},
+  {id:"flower",label:"flor",category:"naturaleza",complexity:1},
+  {id:"phone",label:"teléfono",category:"objetos",complexity:1},
+  {id:"scissors",label:"tijeras",category:"objetos",complexity:2},
+  {id:"ball",label:"balón",category:"objetos",complexity:1},
+  {id:"gift",label:"regalo",category:"objetos",complexity:2},
+  {id:"balloon",label:"globo",category:"objetos",complexity:1},
+  {id:"cactus",label:"cactus",category:"naturaleza",complexity:2},
+  {id:"thermometer",label:"termómetro",category:"objetos",complexity:2},
+  {id:"anchor",label:"ancla",category:"objetos",complexity:2},
+  {id:"violin",label:"violín",category:"instrumentos",complexity:3},
+  {id:"magnet",label:"imán",category:"objetos",complexity:2},
+  {id:"accordion",label:"acordeón",category:"instrumentos",complexity:3},
+];
+
+const NF_VISUAL_OBJECT_BY_ID = Object.fromEntries(NF_VISUAL_OBJECT_BANK.map(x=>[x.id,x]));
+
+function nfVisualBankPool(maxComplexity=3){
+  return NF_VISUAL_OBJECT_BANK.filter(x=>x.complexity<=maxComplexity);
+}
+
+function nfVisualBankDistractors(targetId,count=3,{sameCategory=false}={}){
+  const target=NF_VISUAL_OBJECT_BY_ID[targetId];
+  const source=NF_VISUAL_OBJECT_BANK.filter(x=>
+    x.id!==targetId && (!sameCategory || !target || x.category===target.category)
+  );
+  const fallback=source.length>=count?source:NF_VISUAL_OBJECT_BANK.filter(x=>x.id!==targetId);
+  return shuffle(fallback).slice(0,count);
+}
+
+function NeuroFlexObjectStimulus({id,size=96,senior=false,label}){
+  const item=NF_VISUAL_OBJECT_BY_ID[id];
+  return <div
+    className="nf-object-stimulus"
+    role="img"
+    aria-label={label || item?.label || "Estímulo visual"}
+    style={{
+      width:senior?Math.max(size,112):size,
+      height:senior?Math.max(size,112):size,
+      display:"grid",
+      placeItems:"center",
+      margin:"0 auto",
+    }}
+  >
+    <NFStimulusObject
+      kind={id}
+      size={senior?Math.max(size,112):size}
+      label={label || item?.label || "Estímulo visual"}
+    />
+  </div>;
+}
+
 
 const NF_SHAPE_IDS=["circle_f","circle_o","square_f","square_o","triangle_f","triangle_o","diamond_f","diamond_o","star_f","star_o"];
 function NFStimulusShape({id,size=48,stroke="#12265A",fillColor="#2A9D8F"}) {
@@ -4215,17 +4531,13 @@ const EX_ADULTO = {
       instruccion: "Observa el elemento y di su nombre en voz alta. Si no lo recuerdas, puedes pedir opciones y seleccionar la palabra correcta. No necesitas escribir.",
       Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const itemCount=nfDifficultyValue(difficultyProfile,"item_count",[0,4,5,6,7,8][L]); const lexicalFrequency=nfDifficultyValue(difficultyProfile,"lexical_frequency",3);
-        const EASY=[
-          {kind:"clock",label:"reloj"},{kind:"scissors",label:"tijeras"},{kind:"key",label:"llave"},{kind:"cactus",label:"cactus"}
-        ];
-        const HARD=[
-          {kind:"thermometer",label:"termómetro"},{kind:"anchor",label:"ancla"},{kind:"violin",label:"violín"},
-          {kind:"otter",label:"nutria"},{kind:"magnet",label:"imán"},{kind:"accordion",label:"acordeón"}
-        ];
+        const EASY=nfVisualBankPool(1).map(x=>({kind:x.id,label:x.label}));
+        const MEDIUM=nfVisualBankPool(2).filter(x=>x.complexity===2).map(x=>({kind:x.id,label:x.label}));
+        const HARD=NF_VISUAL_OBJECT_BANK.filter(x=>x.complexity>=3).map(x=>({kind:x.id,label:x.label}));
         const count=itemCount;
-        const source=lexicalFrequency>=4?[...EASY,...HARD.slice(0,2)]:lexicalFrequency>=3?[...EASY,...HARD]:[...HARD,...EASY];
+        const source=lexicalFrequency>=4?[...EASY,...MEDIUM.slice(0,3)]:lexicalFrequency>=3?[...EASY,...MEDIUM,...HARD]:[...HARD,...MEDIUM,...EASY];
         const [ITEMS]=useState(()=>shuffle(source).slice(0,count));
-        const LABELS=[...EASY,...HARD].map(x=>x.label);
+        const LABELS=NF_VISUAL_OBJECT_BANK.map(x=>x.label);
         const [cur,setCur]=useState(0),[mode,setMode]=useState("spontaneous"),[spontaneous,setSpontaneous]=useState(0),[supported,setSupported]=useState(0),[missed,setMissed]=useState(0),[locked,setLocked]=useState(false);
         const t0=useRef(Date.now());
         const item=ITEMS[cur];
@@ -4268,7 +4580,7 @@ const EX_ADULTO = {
           <NFTrainingStimulusCard modoMayor={M} minHeight={300}>
             <div className="nf-naming-stimulus-wrap">
               <NeuroFlexCard size="l" senior={M} ariaLabel="Elemento para denominar">
-                <NFStimulusObject kind={item.kind} size={M?148:128} label="Elemento para denominar"/>
+                <NeuroFlexObjectStimulus id={item.kind} size={M?148:128} senior={M} label="Elemento para denominar"/>
               </NeuroFlexCard>
             </div>
           </NFTrainingStimulusCard>
@@ -4397,13 +4709,21 @@ const EX_ADULTO = {
       instruccion: "Observa con atención la figura modelo y toca la opción exactamente igual. Fíjate en la forma y en si está rellena o vacía.",
       Component: ({ onDone, modoMayor, difficultyLevel = 2, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+        const useObjects=L<=3;
         const SHAPES=NF_SHAPE_IDS;
+        const OBJECTS=nfVisualBankPool(L<=2?1:2).map(x=>x.id);
         const ROUNDS=nfDifficultyValue(difficultyProfile,"trial_count",[0,4,5,6,7,8][L]);
         const optionCount=Math.max(3,nfDifficultyValue(difficultyProfile,"distractor_count",[0,2,3,3,4,5][L])+1);
         const [data]=useState(()=>Array.from({length:ROUNDS},()=>{
+          if(useObjects){
+            const target=OBJECTS[Math.floor(Math.random()*OBJECTS.length)];
+            const sameCategory=L>=3;
+            const distractors=nfVisualBankDistractors(target,optionCount-1,{sameCategory}).map(x=>x.id);
+            return {target,opts:shuffle([target,...distractors]),stimulusType:"object"};
+          }
           const target=SHAPES[Math.floor(Math.random()*SHAPES.length)];
           const opts=shuffle([target,...shuffle(SHAPES.filter(x=>x!==target)).slice(0,optionCount-1)]);
-          return {target,opts};
+          return {target,opts,stimulusType:"shape"};
         }));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now()),locked=useRef(false);
@@ -4420,7 +4740,7 @@ const EX_ADULTO = {
               const rs=records.current;
               onDone({
                 correct:ns,total:ROUNDS,errors:ROUNDS-ns,seconds:Math.round((Date.now()-t0.current)/1000),
-                specificMetrics:{meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),exactVisualMatching:true,optionCount,clinicalProcess:"discriminación visuoperceptiva"}
+                specificMetrics:{meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),exactVisualMatching:true,optionCount,stimulusType:item.stimulusType==="object"?"objetos NeuroFlex":"formas geométricas",clinicalProcess:"discriminación visuoperceptiva"}
               });
             }else{
               setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false;trialT0.current=Date.now();
@@ -4438,7 +4758,9 @@ const EX_ADULTO = {
             <div className="nf-visual-model-wrap">
               <div className="nf-visual-model-label">MODELO</div>
               <NeuroFlexCard size="l" senior={M} ariaLabel="Figura modelo">
-                <NFStimulusShape id={item.target} size={M?100:84}/>
+                {item.stimulusType==="object"
+                  ? <NeuroFlexObjectStimulus id={item.target} size={M?118:100} senior={M}/>
+                  : <NFStimulusShape id={item.target} size={M?100:84}/>}
               </NeuroFlexCard>
             </div>
           </NFTrainingStimulusCard>
@@ -4455,7 +4777,9 @@ const EX_ADULTO = {
                 onClick={()=>pick(opt)}
                 ariaLabel="Opción visual"
               >
-                <NFStimulusShape id={opt} size={M?62:52}/>
+                {item.stimulusType==="object"
+                  ? <NeuroFlexObjectStimulus id={opt} size={M?72:62} senior={M}/>
+                  : <NFStimulusShape id={opt} size={M?62:52}/>}
               </NeuroFlexStimulusTile>;
             })}
           </div>
@@ -5960,6 +6284,8 @@ const NEUROFLEX_VISUAL_CARD_SYSTEM_VERSION = "NF-VISUAL-CARDS-1.0";
 const NEUROFLEX_UNIFIED_INSTRUCTION_VERSION = "NF-INSTRUCTION-UNIFIED-1.0";
 const NEUROFLEX_UNIFIED_EXERCISE_PANEL_VERSION = "NF-PANEL-1.0";
 const NEUROFLEX_SCREENING_PANEL_COMPLETION_VERSION = "NF-PANEL-SCREEN-1.0";
+const NEUROFLEX_EVALUATION_VISUAL_VERSION = "NF-EVAL-VISUAL-1.0";
+const NEUROFLEX_VISUAL_STIMULUS_BANK_VERSION = "NF-VISUAL-BANK-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -6788,11 +7114,18 @@ function NF63ProspectiveEvent({onDone,modoMayor,difficultyLevel=3,difficultyProf
 }
 
 function NF63VisualMemory({onDone,modoMayor,difficultyLevel=3,difficultyProfile}){
-  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel); const stimulusCount=nfDifficultyValue(difficultyProfile,"stimulus_count",6); const exposureTime=nfDifficultyValue(difficultyProfile,"exposure_time",8); const distractorCount=Math.max(2,Math.min(5,nfDifficultyValue(difficultyProfile,"stimulus_similarity",L)));
-  const ALL=["circle_f","triangle_f","square_f","diamond_f","circle_o","square_o","star_f","diamond_o","triangle_o","star_o"];
-  const [target]=useState(()=>shuffle(ALL).slice(0,stimulusCount));
+  const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
+  const stimulusCount=nfDifficultyValue(difficultyProfile,"stimulus_count",6);
+  const exposureTime=nfDifficultyValue(difficultyProfile,"exposure_time",8);
+  const distractorCount=Math.max(2,Math.min(5,nfDifficultyValue(difficultyProfile,"stimulus_similarity",L)));
+  const maxComplexity=L<=2?1:L<=4?2:3;
+  const ALL=nfVisualBankPool(maxComplexity).map(x=>x.id);
+  const [target]=useState(()=>shuffle(ALL).slice(0,Math.min(stimulusCount,ALL.length)));
   const [phase,setPhase]=useState("study"),[seconds,setSeconds]=useState(exposureTime),[selected,setSelected]=useState(new Set());
-  const [pool]=useState(()=>shuffle([...target,...shuffle(ALL.filter(x=>!target.includes(x))).slice(0,distractorCount)]));
+  const [pool]=useState(()=>{
+    const distractorSource=nfVisualBankPool(Math.min(3,maxComplexity+1)).map(x=>x.id).filter(x=>!target.includes(x));
+    return shuffle([...target,...shuffle(distractorSource).slice(0,distractorCount)]);
+  });
   const t0=useRef(Date.now()),doneRef=useRef(false);
   useEffect(()=>{if(phase!=="study")return;const tm=setInterval(()=>setSeconds(v=>{if(v<=1){clearInterval(tm);setPhase("recognition");return 0}return v-1}),1000);return()=>clearInterval(tm)},[phase]);
   const toggle=x=>setSelected(prev=>{const n=new Set(prev);n.has(x)?n.delete(x):n.add(x);return n});
@@ -6801,40 +7134,59 @@ function NF63VisualMemory({onDone,modoMayor,difficultyLevel=3,difficultyProfile}
     const hits=[...selected].filter(x=>target.includes(x)).length;
     const falseAlarms=[...selected].filter(x=>!target.includes(x)).length;
     const omissions=target.length-hits;
-    onDone({correct:hits,total:target.length,errors:falseAlarms+omissions,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{recognitionHits:hits,falseAlarms,omissions,visualRecognition:true,clinicalProcess:"memoria visual de reconocimiento",errorProfile:{omissions,commissions:falseAlarms}}});
+    onDone({
+      correct:hits,total:target.length,errors:falseAlarms+omissions,
+      seconds:Math.round((Date.now()-t0.current)/1000),
+      specificMetrics:{
+        recognitionHits:hits,falseAlarms,omissions,visualRecognition:true,
+        stimulusType:"objetos NeuroFlex",
+        clinicalProcess:"memoria visual de reconocimiento",
+        errorProfile:{omissions,commissions:falseAlarms}
+      }
+    });
   };
   if(phase==="study")return <div style={{textAlign:"center",padding:"4px 0"}}>
-    <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Memoria visual</div>
-    <p style={{fontSize:M?".95rem":".8rem",color:COLORS.textMuted}}>Observa las figuras · {seconds}s</p>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
+      <div style={{textAlign:"left"}}>
+        <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIA VISUAL</div>
+        <div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>Memoriza los objetos que aparecen.</div>
+      </div>
+      <Badge label={`${seconds}s`} color={COLORS.primary}/>
+    </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={285}>
-      <div className="nf-visual-card-grid nf-visual-card-grid--memory" style={{maxWidth:470,width:"100%"}}>
-        {target.map((x,i)=><NeuroFlexMemoryCard key={i} faceUp size="m" senior={M} ariaLabel="Figura para memorizar">
-          <NFStimulusShape id={x} size={M?60:52}/>
+      <div className="nf-visual-card-grid nf-visual-card-grid--memory" style={{maxWidth:700,width:"100%"}}>
+        {target.map((x,i)=><NeuroFlexMemoryCard key={x} faceUp size="m" senior={M} ariaLabel={NF_VISUAL_OBJECT_BY_ID[x]?.label || "Objeto para memorizar"}>
+          <NeuroFlexObjectStimulus id={x} size={M?74:64} senior={M}/>
         </NeuroFlexMemoryCard>)}
       </div>
     </NFTrainingStimulusCard>
   </div>;
+
   return <div style={{textAlign:"center",padding:"4px 0"}}>
-    <h3 style={{margin:"0 0 5px"}}>Selecciona las figuras que viste</h3>
-    <p style={{fontSize:M?".92rem":".78rem",color:COLORS.textMuted,marginTop:0}}>Puedes seleccionar varias. Algunas son distractores.</p>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
+      <div style={{textAlign:"left"}}>
+        <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>RECONOCIMIENTO VISUAL</div>
+        <div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>Selecciona únicamente los objetos que viste.</div>
+      </div>
+      <Badge label={`${selected.size} seleccionados`} color={COLORS.info}/>
+    </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={300}>
-      <div className="nf-visual-card-grid nf-visual-card-grid--choices" style={{width:"100%",maxWidth:650}}>
+      <div className="nf-visual-card-grid nf-visual-card-grid--choices" style={{width:"100%",maxWidth:760}}>
         {pool.map(x=><NeuroFlexStimulusTile
           key={x}
           size="m"
           senior={M}
           state={selected.has(x)?"selected":"normal"}
           onClick={()=>toggle(x)}
-          ariaLabel="Opción de memoria visual"
+          ariaLabel={NF_VISUAL_OBJECT_BY_ID[x]?.label || "Opción de memoria visual"}
         >
-          <NFStimulusShape id={x} size={M?58:48}/>
+          <NeuroFlexObjectStimulus id={x} size={M?70:58} senior={M}/>
         </NeuroFlexStimulusTile>)}
       </div>
     </NFTrainingStimulusCard>
     <div style={{maxWidth:520,margin:"0 auto"}}><BtnPrimary onClick={finish} style={{width:"100%"}}>Confirmar selección</BtnPrimary></div>
   </div>;
 }
-
 
 function nfPlayToneSequence(sequence,{duration=.22,gap=.12,gain=.055}={}){
   try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return false;const ctx=new C();sequence.forEach((tone,i)=>{const o=ctx.createOscillator(),g=ctx.createGain(),freq=typeof tone==="number"?tone:tone.freq,dur=typeof tone==="object"&&tone.dur?tone.dur:duration,amp=typeof tone==="object"&&tone.gain?tone.gain:gain;o.type="sine";o.frequency.value=freq;o.connect(g);g.connect(ctx.destination);g.gain.value=amp;const st=ctx.currentTime+i*(duration+gap);o.start(st);o.stop(st+dur)});setTimeout(()=>ctx.close(),sequence.length*(duration+gap)*1000+450);return true}catch(e){return false}
@@ -7452,19 +7804,42 @@ function AssessmentTaskShell({ taskId, paciente, children, note }) {
   const task = getAssessmentTaskDefinition(taskId);
   const mayor = esModoMayor(paciente);
   const domainVisual=nfAssessmentDomainVisual(task?.primaryDomain);
+  const taskNumber=Math.max(1,Math.min(34,Number(String(taskId||"").replace(/\D/g,""))||1));
+  const progressPct=Math.round((taskNumber/34)*100);
+  const domainLabel=ASSESSMENT_DOMAINS_V2[task?.primaryDomain]?.label || "Evaluación cognitiva";
+
   return (
-    <div className={`nf-evaluation-focus nf-v2-evaluation ${mayor ? "is-senior" : ""}`} style={{maxWidth:900,margin:'0 auto'}}>
-      <div className="nf-eval-task-head nf-v2-eval-head">
-        <div className="nf-eval-task-identity">
-          <span className="nf-eval-task-mark nf-v2-eval-mark" style={{color:domainVisual.color,background:`linear-gradient(145deg,${domainVisual.color}14,#fff)`}}><NFLineIcon name={domainVisual.icon || "brain"} size={21}/></span>
-          <div>
-            <div className="nf-eval-eyebrow">Evaluación NeuroFlex</div>
-            <h2>{task?.name}</h2>
+    <div className={`nf-evaluation-focus nf-v2-evaluation ${mayor ? "is-senior" : ""}`} style={{maxWidth:1180,margin:'0 auto'}}>
+      <div className="nf-eval-brandbar" aria-label="Progreso de evaluación">
+        <div className="nf-eval-brandbar__logo">
+          <NeuroFlexBrandLogo width={mayor?285:250} compact />
+        </div>
+        <div className="nf-eval-brandbar__center">
+          <div className="nf-eval-brandbar__title">Evaluación · {domainLabel}</div>
+          <div className="nf-eval-brandbar__progress-row">
+            <div className="nf-eval-brandbar__track" aria-hidden="true">
+              <span className="nf-eval-brandbar__fill" style={{width:`${progressPct}%`}} />
+            </div>
+            <span className="nf-eval-brandbar__count">{taskNumber} de 34</span>
           </div>
         </div>
-        <div className="nf-eval-domain-pill nf-v2-domain-pill" style={{color:domainVisual.color,borderColor:domainVisual.color+"30",background:domainVisual.color+"0B"}}>{ASSESSMENT_DOMAINS_V2[task?.primaryDomain]?.label}</div>
+        <div className="nf-eval-brandbar__side">
+          <span className="nf-eval-brandbar__domain" style={{color:domainVisual.color,borderColor:domainVisual.color+"30"}}>
+            {domainLabel}
+          </span>
+        </div>
       </div>
-      <Card className="nf-eval-task-card" style={{padding:mayor?24:20}}>
+
+      <Card className="nf-eval-task-card nf-eval-stage-card" style={{padding:mayor?36:30}}>
+        <div className="nf-eval-task-head nf-v2-eval-head">
+          <div className="nf-eval-task-identity">
+            <div>
+              <div className="nf-eval-eyebrow">Evaluación NeuroFlex</div>
+              <h2>{task?.name}</h2>
+            </div>
+          </div>
+        </div>
+
         {/* Las notas técnicas/clinimétricas pertenecen al registro profesional y no se muestran al paciente durante la administración. */}
         <NeuroFlexExercisePanel senior={mayor} variant="wide" ariaLabel="Panel de evaluación">
           <div className="nf-protected-stimulus-zone" style={{background:"transparent",color:COLORS.textPrimary}}>
@@ -10067,16 +10442,29 @@ function NFScreeningSpecialShell({
   footer=null,
 }){
   const mayor=esModoMayor(paciente);
-  return <div style={{maxWidth:860,margin:"0 auto"}}>
-    <Card style={{padding:mayor?38:32}}>
-      <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",marginBottom:18}}>
-        <div>
-          <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary,letterSpacing:".04em"}}>{eyebrow}</div>
-          <h2 style={{margin:"5px 0 0",fontSize:mayor?"1.55rem":"1.35rem"}}>{title}</h2>
+  return <div className={`nf-evaluation-focus nf-v2-evaluation ${mayor?"is-senior":""}`} style={{maxWidth:1180,margin:"0 auto"}}>
+    <div className="nf-eval-brandbar">
+      <div className="nf-eval-brandbar__logo"><NeuroFlexBrandLogo width={mayor?285:250} compact /></div>
+      <div className="nf-eval-brandbar__center">
+        <div className="nf-eval-brandbar__title">Tamizaje NeuroFlex · {title}</div>
+        <div className="nf-eval-brandbar__progress-row">
+          <div className="nf-eval-brandbar__track" aria-hidden="true">
+            <span className="nf-eval-brandbar__fill" style={{width:progress?"58%":"36%"}} />
+          </div>
+          {progress&&<span className="nf-eval-brandbar__count">{progress}</span>}
         </div>
-        {progress&&<div style={{padding:"6px 10px",borderRadius:999,background:COLORS.bg,color:COLORS.textMuted,fontSize:".68rem",fontWeight:700}}>
-          {progress}
-        </div>}
+      </div>
+      <div className="nf-eval-brandbar__side">
+        <span className="nf-eval-brandbar__domain">Tamizaje</span>
+      </div>
+    </div>
+
+    <Card className="nf-eval-stage-card" style={{padding:mayor?36:30}}>
+      <div className="nf-eval-task-head">
+        <div>
+          <div className="nf-eval-eyebrow">{eyebrow}</div>
+          <h2>{title}</h2>
+        </div>
       </div>
 
       {instruction&&<div className="nf-screening-instruction">
