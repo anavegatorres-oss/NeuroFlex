@@ -563,6 +563,333 @@ body{background:
 
 
 
+
+
+
+
+/* ─── F77.10 · BANCO GRÁFICO DEFINITIVO NEUROFLEX ───────────────────────── */
+.nf-object-stimulus--png img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  object-position:center;
+}
+.nf-visual-card img,
+.nf-stimulus-tile img{
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+/* ─── F77.9 · PREPARACIÓN Y PRÁCTICA GUIADA UNIFICADAS ───────────────────── */
+.nf-preparation-focus{
+  width:100%;
+  max-width:1180px;
+  margin:0 auto;
+}
+.nf-preparation-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #D8E2F0!important;
+  border-radius:22px!important;
+  background:rgba(255,255,255,.985)!important;
+  box-shadow:0 14px 38px rgba(38,65,105,.07)!important;
+}
+.nf-preparation-card::after{
+  content:"";
+  position:absolute;
+  right:-72px;
+  top:96px;
+  width:340px;
+  height:340px;
+  background:url("/neuroflex-assets/neuroflex-mark.png") center/contain no-repeat;
+  opacity:.018;
+  pointer-events:none;
+  z-index:0;
+}
+.nf-preparation-card>*{position:relative;z-index:1}
+.nf-preparation-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:18px;
+  padding-bottom:16px;
+  border-bottom:1px solid #E5EBF3;
+}
+.nf-preparation-head__main{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.nf-preparation-head__icon{
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background:#EEF4FF;
+  color:#2C65D8;
+  border:1px solid #D9E5F7;
+  flex-shrink:0;
+}
+.nf-preparation-eyebrow{
+  color:#2466D7;
+  font-size:.7rem;
+  font-weight:900;
+  letter-spacing:.045em;
+  text-transform:uppercase;
+}
+.nf-preparation-title{
+  margin:4px 0 0;
+  color:#10214D;
+  font-size:1.5rem;
+  line-height:1.2;
+  font-weight:850;
+  letter-spacing:-.025em;
+}
+.nf-preparation-subtitle{
+  margin:5px 0 0;
+  color:#6F7C91;
+  font-size:.78rem;
+  line-height:1.5;
+}
+.nf-preparation-workspace{
+  min-height:430px;
+  border:1px solid #CBD8E9;
+  border-radius:18px;
+  background:
+    linear-gradient(rgba(255,255,255,.978),rgba(255,255,255,.978)),
+    url("/neuroflex-assets/neuroflex-mark.png") 88% 52% / 250px auto no-repeat;
+  padding:24px 26px;
+  overflow:auto;
+  box-shadow:0 7px 22px rgba(26,53,91,.04);
+}
+.nf-preparation-section{
+  max-width:820px;
+  margin:0 auto;
+}
+.nf-preparation-note{
+  padding:11px 13px;
+  border-radius:11px;
+  border:1px solid #E3EAF3;
+  background:#F8FAFD;
+  color:#738098;
+  font-size:.73rem;
+  line-height:1.5;
+}
+.nf-preparation-response{
+  padding:15px 16px;
+  border-radius:12px;
+  border:1px solid #DDE6F0;
+  background:#FAFCFE;
+}
+.nf-preparation-response__label{
+  font-size:.68rem;
+  font-weight:900;
+  color:#53627B;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.nf-preparation-actions{
+  display:grid;
+  grid-template-columns:minmax(150px,1fr) minmax(220px,1.45fr);
+  gap:10px;
+  margin-top:18px;
+}
+.nf-practice-options{
+  display:grid;
+  gap:10px;
+  margin-top:16px;
+}
+.nf-practice-option{
+  min-height:58px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:2px solid #DDE5EF;
+  background:#fff;
+  text-align:left;
+  font-family:inherit;
+  font-weight:760;
+  color:#1C3157;
+  cursor:pointer;
+}
+.nf-practice-feedback{
+  margin-top:14px;
+  padding:13px 14px;
+  border-radius:11px;
+  line-height:1.5;
+  font-size:.8rem;
+}
+.nf-preparation-focus.is-senior .nf-preparation-title{font-size:1.8rem}
+.nf-preparation-focus.is-senior .nf-preparation-subtitle{font-size:.95rem}
+.nf-preparation-focus.is-senior .nf-preparation-workspace{min-height:490px;padding:28px 30px}
+.nf-preparation-focus.is-senior .nf-preparation-note{font-size:.88rem}
+.nf-preparation-focus.is-senior .nf-practice-option{min-height:68px;font-size:1rem}
+@media(max-width:900px){
+  .nf-preparation-head{flex-direction:column}
+}
+@media(max-width:720px){
+  .nf-preparation-card{border-radius:17px!important}
+  .nf-preparation-workspace,.nf-preparation-focus.is-senior .nf-preparation-workspace{
+    min-height:390px;
+    padding:18px 16px;
+  }
+  .nf-preparation-actions{grid-template-columns:1fr}
+}
+
+/* ─── F77.8 · INTERVENCIÓN VISUAL UNIFICADA ──────────────────────────────── */
+.nf-v2-session-focus{
+  width:100%;
+  max-width:1180px!important;
+}
+.nf-session-brandbar{
+  display:grid;
+  grid-template-columns:minmax(210px,1fr) minmax(320px,1.35fr) minmax(150px,.8fr);
+  align-items:center;
+  gap:24px;
+  margin-bottom:20px;
+  padding:0 8px;
+}
+.nf-session-brandbar__logo{display:flex;align-items:center}
+.nf-session-brandbar__center{text-align:center}
+.nf-session-brandbar__title{
+  color:#122554;font-size:.98rem;font-weight:850;margin-bottom:9px;letter-spacing:-.015em;
+}
+.nf-session-brandbar__progress{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.nf-session-brandbar__track{
+  flex:1;max-width:430px;min-width:180px;height:9px;border-radius:999px;
+  background:#E6ECF5;overflow:hidden;position:relative;
+}
+.nf-session-brandbar__fill{
+  position:absolute;inset:0 auto 0 0;border-radius:inherit;
+  background:linear-gradient(90deg,#765EF0 0%,#4F7BEE 55%,#2C99D7 100%);
+  transition:width .25s ease;
+}
+.nf-session-brandbar__count{
+  color:#53617A;font-size:.82rem;font-weight:850;white-space:nowrap;
+}
+.nf-session-brandbar__side{
+  display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.nf-session-pill{
+  padding:8px 12px;border:1px solid #DCE5F0;border-radius:999px;
+  background:rgba(255,255,255,.86);font-size:.7rem;font-weight:850;color:#53617A;
+}
+.nf-v2-session-card{
+  position:relative;overflow:hidden;
+  border:1px solid #D8E2F0!important;border-radius:22px!important;
+  background:rgba(255,255,255,.985)!important;
+  box-shadow:0 14px 38px rgba(38,65,105,.07)!important;
+}
+.nf-v2-session-card::after{
+  content:"";position:absolute;right:-78px;top:100px;width:340px;height:340px;
+  background:url("/neuroflex-assets/neuroflex-mark.png") center/contain no-repeat;
+  opacity:.018;pointer-events:none;z-index:0;
+}
+.nf-v2-session-card>*{position:relative;z-index:1}
+.nf-v2-session-domain{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid #E5EBF3;
+}
+.nf-session-domain-main{display:flex;align-items:center;gap:12px}
+.nf-session-exercise-title{
+  margin:2px 0 0;color:#10214D;font-weight:850;
+  font-size:1.52rem;line-height:1.2;letter-spacing:-.025em;
+}
+.nf-session-domain-label{
+  color:#2466D7;font-size:.7rem;font-weight:900;letter-spacing:.045em;text-transform:uppercase;
+}
+.nf-v2-session-instruction{
+  position:relative;overflow:hidden;margin:0 0 16px!important;
+  padding:20px 24px 20px 28px!important;border-radius:15px!important;
+  border:1px solid #BFD2EC!important;
+  background:linear-gradient(110deg,#F5F9FF 0%,#F8FBFF 65%,#F3F8FD 100%)!important;
+  box-shadow:0 5px 16px rgba(49,92,182,.045)!important;
+}
+.nf-v2-session-instruction::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+  background:linear-gradient(180deg,#1F73F1,#2B63DB);
+}
+.nf-v2-session-instruction .nf-exercise-instruction__label{
+  display:block!important;margin:0 0 9px!important;color:#1760D5!important;
+  font-size:.76rem!important;font-weight:900!important;letter-spacing:.035em!important;
+  text-transform:uppercase!important;text-align:left!important;
+}
+.nf-v2-session-instruction .nf-session-instruction-text{
+  margin:0;color:#172747;font-size:1.03rem;line-height:1.58;font-weight:650;text-align:left;
+}
+.nf-session-instruction-actions{
+  display:flex;justify-content:flex-end;margin-top:12px;
+}
+.nf-session-supportbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin:0 0 18px;padding:10px 12px;border-radius:12px;
+  background:#F8FAFD;border:1px solid #E7EDF5;
+}
+.nf-session-supportbar__status{color:#738098;font-size:.72rem}
+.nf-session-supportbar__actions{display:flex;gap:8px;flex-wrap:wrap}
+.nf-session-support-btn{
+  min-height:42px!important;border:1px solid #DDE5EF!important;background:#fff!important;
+  color:#315782!important;border-radius:10px!important;padding:7px 11px!important;
+  font-family:inherit!important;font-size:.73rem!important;font-weight:750!important;
+  display:inline-flex!important;align-items:center!important;gap:6px!important;cursor:pointer!important;
+}
+.nf-session-workspace{
+  position:relative;
+  min-height:510px;
+  border:1px solid #CBD8E9;
+  border-radius:18px;
+  background:
+    linear-gradient(rgba(255,255,255,.978),rgba(255,255,255,.978)),
+    url("/neuroflex-assets/neuroflex-mark.png") 88% 52% / 260px auto no-repeat;
+  padding:20px 22px;
+  overflow:auto;
+  box-shadow:0 7px 22px rgba(26,53,91,.04);
+}
+.nf-session-workspace .nf-unified-exercise-panel{
+  background:
+    linear-gradient(rgba(255,255,255,.985),rgba(255,255,255,.985)),
+    url("/neuroflex-assets/neuroflex-mark.png") 88% 52% / 190px auto no-repeat;
+  box-shadow:none;
+}
+.nf-exercise-focus.is-senior .nf-session-exercise-title{font-size:1.82rem}
+.nf-exercise-focus.is-senior .nf-v2-session-instruction .nf-session-instruction-text{
+  font-size:1.18rem;line-height:1.62;
+}
+.nf-exercise-focus.is-senior .nf-session-supportbar__status{font-size:.86rem}
+.nf-exercise-focus.is-senior .nf-session-workspace{min-height:560px;padding:24px 26px}
+
+@media(max-width:900px){
+  .nf-session-brandbar{grid-template-columns:1fr;gap:12px}
+  .nf-session-brandbar__logo,.nf-session-brandbar__side{justify-content:center}
+  .nf-session-brandbar__track{max-width:540px}
+}
+@media(max-width:720px){
+  .nf-session-brandbar{padding:0}
+  .nf-v2-session-card{border-radius:17px!important}
+  .nf-v2-session-domain{align-items:flex-start}
+  .nf-session-exercise-title{font-size:1.35rem}
+  .nf-v2-session-instruction{padding:17px 17px 17px 21px!important}
+  .nf-session-supportbar{align-items:flex-start}
+  .nf-session-supportbar__actions{width:100%}
+  .nf-session-support-btn{flex:1;justify-content:center!important}
+  .nf-session-workspace,.nf-exercise-focus.is-senior .nf-session-workspace{
+    min-height:430px;padding:16px 14px;
+  }
+}
+
+/* ─── F77.7 · REVISIÓN CLÍNICA DE TAREAS VISUALES ────────────────────────── */
+.nf-abstract-stimulus-box{
+  display:grid;place-items:center;background:rgba(255,255,255,.96);
+  border:2px solid #D6E0EC;border-radius:17px;box-shadow:0 4px 14px rgba(30,55,95,.035);
+}
+.nf-functional-question{
+  color:#14284E;font-weight:850;line-height:1.55;text-align:left;
+}
+
 /* ─── F77.5 · BANCO VISUAL PROPIO NEUROFLEX ──────────────────────────────── */
 .nf-object-stimulus svg{filter:drop-shadow(0 2px 3px rgba(19,42,86,.04))}
 .nf-object-bank-label{
@@ -1457,10 +1784,56 @@ const NF_STIMULUS_OBJECTS = {
   apple:"Manzana",scissors:"Tijeras",moon:"Luna",key:"Llave",umbrella:"Sombrilla",
   ball:"Balón",puzzle:"Rompecabezas",lemon:"Limón",phone:"Teléfono",gift:"Regalo",
   cactus:"Cactus",thermometer:"Termómetro",anchor:"Ancla",violin:"Violín",otter:"Nutria",
+
   magnet:"Imán",accordion:"Acordeón",sun:"Sol"
 };
 
-function NFStimulusObject({kind,size=58,stroke="#12265A",accent="#2A9D8F",label=null}) {
+// F77.10 · Banco gráfico definitivo NeuroFlex.
+// PNGs propios primero; los SVG existentes permanecen como respaldo técnico.
+const NF_VISUAL_IMAGE_BANK = {
+  apple:"/neuroflex-assets/stimuli/objects/apple.png",
+  lemon:"/neuroflex-assets/stimuli/objects/lemon.png",
+  house:"/neuroflex-assets/stimuli/objects/house.png",
+  car:"/neuroflex-assets/stimuli/objects/car.png",
+  book:"/neuroflex-assets/stimuli/objects/book.png",
+  clock:"/neuroflex-assets/stimuli/objects/clock.png",
+  key:"/neuroflex-assets/stimuli/objects/key.png",
+  umbrella:"/neuroflex-assets/stimuli/objects/umbrella.png",
+  flower:"/neuroflex-assets/stimuli/objects/flower.png",
+  phone:"/neuroflex-assets/stimuli/objects/phone.png",
+  scissors:"/neuroflex-assets/stimuli/objects/scissors.png",
+  ball:"/neuroflex-assets/stimuli/objects/ball.png",
+  puzzle:"/neuroflex-assets/stimuli/objects/puzzle.png",
+  gift:"/neuroflex-assets/stimuli/objects/gift.png",
+  balloon:"/neuroflex-assets/stimuli/objects/balloon.png",
+  cactus:"/neuroflex-assets/stimuli/objects/cactus.png",
+  thermometer:"/neuroflex-assets/stimuli/objects/thermometer.png",
+  anchor:"/neuroflex-assets/stimuli/objects/anchor.png",
+  violin:"/neuroflex-assets/stimuli/objects/violin.png",
+  magnet:"/neuroflex-assets/stimuli/objects/magnet.png",
+  accordion:"/neuroflex-assets/stimuli/objects/accordion.png",
+  sun:"/neuroflex-assets/stimuli/objects/sun.png",
+  moon:"/neuroflex-assets/stimuli/objects/moon.png",
+
+  dog:"/neuroflex-assets/stimuli/objects/dog.png",
+  cat:"/neuroflex-assets/stimuli/objects/cat.png",
+
+  bird:"/neuroflex-assets/stimuli/animals/bird.png",
+  fish:"/neuroflex-assets/stimuli/animals/fish.png",
+  rabbit:"/neuroflex-assets/stimuli/animals/rabbit.png",
+  butterfly:"/neuroflex-assets/stimuli/animals/butterfly.png",
+  turtle:"/neuroflex-assets/stimuli/animals/turtle.png",
+  cow:"/neuroflex-assets/stimuli/animals/cow.png",
+  elephant:"/neuroflex-assets/stimuli/animals/elephant.png",
+  frog:"/neuroflex-assets/stimuli/animals/frog.png",
+  penguin:"/neuroflex-assets/stimuli/animals/penguin.png",
+  bee:"/neuroflex-assets/stimuli/animals/bee.png",
+  otter:"/neuroflex-assets/stimuli/animals/otter.png",
+};
+
+
+
+function NFStimulusObjectVector({kind,size=58,stroke="#12265A",accent="#2A9D8F",label=null}) {
   const c={fill:"none",stroke,strokeWidth:2.15,strokeLinecap:"round",strokeLinejoin:"round"};
   const a={...c,stroke:accent};
   const style={width:size,height:size,display:"block"};
@@ -1507,27 +1880,86 @@ function NFStimulusObject({kind,size=58,stroke="#12265A",accent="#2A9D8F",label=
 }
 
 
+function NFStimulusObject({
+  kind,
+  size=58,
+  stroke="#12265A",
+  accent="#2A9D8F",
+  label=null,
+  fit="contain",
+  imagePadding=2,
+}) {
+  const src=NF_VISUAL_IMAGE_BANK[kind];
+  const [imageFailed,setImageFailed]=useState(false);
+  const aria=label || NF_STIMULUS_OBJECTS[kind] || "Estímulo visual";
+  const dimension=Math.max(1,Number(size)||58);
+
+  useEffect(()=>{ setImageFailed(false); },[kind,src]);
+
+  if(!src || imageFailed){
+    return <NFStimulusObjectVector
+      kind={kind}
+      size={dimension}
+      stroke={stroke}
+      accent={accent}
+      label={aria}
+    />;
+  }
+
+  return <img
+    src={src}
+    alt={aria}
+    draggable={false}
+    onError={()=>setImageFailed(true)}
+    style={{
+      width:dimension,
+      height:dimension,
+      display:"block",
+      objectFit:fit,
+      objectPosition:"center",
+      padding:imagePadding,
+      boxSizing:"border-box",
+      userSelect:"none",
+      WebkitUserDrag:"none",
+    }}
+  />;
+}
+
+
 const NF_VISUAL_OBJECT_BANK = [
   {id:"apple",label:"manzana",category:"alimentos",complexity:1},
   {id:"lemon",label:"limón",category:"alimentos",complexity:1},
+
   {id:"house",label:"casa",category:"lugares",complexity:1},
   {id:"car",label:"carro",category:"transporte",complexity:1},
+
   {id:"book",label:"libro",category:"objetos",complexity:1},
   {id:"clock",label:"reloj",category:"objetos",complexity:1},
   {id:"key",label:"llave",category:"objetos",complexity:1},
   {id:"umbrella",label:"paraguas",category:"objetos",complexity:2},
-  {id:"flower",label:"flor",category:"naturaleza",complexity:1},
   {id:"phone",label:"teléfono",category:"objetos",complexity:1},
   {id:"scissors",label:"tijeras",category:"objetos",complexity:2},
   {id:"ball",label:"balón",category:"objetos",complexity:1},
+  {id:"puzzle",label:"rompecabezas",category:"objetos",complexity:2},
   {id:"gift",label:"regalo",category:"objetos",complexity:2},
   {id:"balloon",label:"globo",category:"objetos",complexity:1},
-  {id:"cactus",label:"cactus",category:"naturaleza",complexity:2},
   {id:"thermometer",label:"termómetro",category:"objetos",complexity:2},
   {id:"anchor",label:"ancla",category:"objetos",complexity:2},
-  {id:"violin",label:"violín",category:"instrumentos",complexity:3},
   {id:"magnet",label:"imán",category:"objetos",complexity:2},
+
+  {id:"flower",label:"flor",category:"naturaleza",complexity:1},
+  {id:"cactus",label:"cactus",category:"naturaleza",complexity:2},
+  {id:"sun",label:"sol",category:"naturaleza",complexity:1},
+  {id:"moon",label:"luna",category:"naturaleza",complexity:1},
+
+  {id:"violin",label:"violín",category:"instrumentos",complexity:3},
   {id:"accordion",label:"acordeón",category:"instrumentos",complexity:3},
+
+  {id:"dog",label:"perro",category:"animales",complexity:1},
+  {id:"cat",label:"gato",category:"animales",complexity:1},
+  {id:"bird",label:"ave",category:"animales",complexity:1},
+  {id:"fish",label:"pez",category:"animales",complexity:1},
+  {id:"rabbit",label:"conejo",category:"animales",complexity:1},
   {id:"butterfly",label:"mariposa",category:"animales",complexity:1},
   {id:"turtle",label:"tortuga",category:"animales",complexity:2},
   {id:"cow",label:"vaca",category:"animales",complexity:1},
@@ -1536,8 +1968,6 @@ const NF_VISUAL_OBJECT_BANK = [
   {id:"penguin",label:"pingüino",category:"animales",complexity:2},
   {id:"bee",label:"abeja",category:"animales",complexity:2},
   {id:"otter",label:"nutria",category:"animales",complexity:3},
-  {id:"sun",label:"sol",category:"naturaleza",complexity:1},
-  {id:"moon",label:"luna",category:"naturaleza",complexity:1},
 ];
 
 const NF_VISUAL_OBJECT_BY_ID = Object.fromEntries(NF_VISUAL_OBJECT_BANK.map(x=>[x.id,x]));
@@ -1557,22 +1987,25 @@ function nfVisualBankDistractors(targetId,count=3,{sameCategory=false}={}){
 
 function NeuroFlexObjectStimulus({id,size=96,senior=false,label}){
   const item=NF_VISUAL_OBJECT_BY_ID[id];
+  const dimension=senior?Math.max(size,112):size;
   return <div
-    className="nf-object-stimulus"
-    role="img"
+    className="nf-object-stimulus nf-object-stimulus--png"
+    role="group"
     aria-label={label || item?.label || "Estímulo visual"}
     style={{
-      width:senior?Math.max(size,112):size,
-      height:senior?Math.max(size,112):size,
+      width:dimension,
+      height:dimension,
       display:"grid",
       placeItems:"center",
       margin:"0 auto",
+      overflow:"hidden",
     }}
   >
     <NFStimulusObject
       kind={id}
-      size={senior?Math.max(size,112):size}
+      size={dimension}
       label={label || item?.label || "Estímulo visual"}
+      imagePadding={3}
     />
   </div>;
 }
@@ -1594,6 +2027,68 @@ function NeuroFlexObjectChoice({id,senior=false,size="m",state="normal",disabled
       {showLabel&&<div className="nf-object-bank-label">{item?.label || id}</div>}
     </div>
   </NeuroFlexStimulusTile>;
+}
+
+
+function NFAbstractRotationShape({kind="arrow",rotation=0,size=120,senior=false}){
+  const s=senior?Math.max(size,138):size;
+  const stroke="#18345F";
+  const fill="#EAF2FF";
+  const common={stroke,strokeWidth:3,strokeLinecap:"round",strokeLinejoin:"round"};
+  let node=null;
+  if(kind==="arrow") node=<><path d="M13 30h27" {...common}/><path d="m31 18 12 12-12 12" {...common}/></>;
+  else if(kind==="triangle") node=<path d="M11 42 26 10l17 32Z" fill={fill} {...common}/>;
+  else if(kind==="corner") node=<path d="M13 12v29h29" fill="none" {...common}/>;
+  else if(kind==="flag") node=<><path d="M15 44V10" {...common}/><path d="M16 12h25l-8 9 8 9H16Z" fill={fill} {...common}/></>;
+  else node=<path d="m14 10 18 20-18 20M27 10l18 20-18 20" fill="none" {...common}/>;
+  return <svg viewBox="0 0 56 56" aria-hidden="true" style={{width:s,height:s,display:"block",transform:`rotate(${rotation}deg)`}}>{node}</svg>;
+}
+
+function NFFunctionalDocumentCard({kind="documento",title,text,senior=false}){
+  const iconMap={
+    mensaje:"message",aviso:"alert",horario:"calendar",instruccion:"clipboard",
+    recordatorio:"clock",correo:"mail",documento:"document"
+  };
+  return <div style={{
+    width:"100%",maxWidth:760,margin:"0 auto",textAlign:"left",
+    border:"1px solid #CBD8E9",borderRadius:16,background:"rgba(255,255,255,.95)",
+    boxShadow:"0 8px 22px rgba(30,55,95,.045)",overflow:"hidden"
+  }}>
+    <div style={{
+      display:"flex",alignItems:"center",gap:11,padding:senior?"15px 18px":"12px 16px",
+      borderBottom:"1px solid #E3EAF3",background:"#F7FAFE"
+    }}>
+      <span style={{
+        width:senior?42:36,height:senior?42:36,borderRadius:10,display:"grid",placeItems:"center",
+        background:"#EAF2FF",color:"#2563D8",flexShrink:0
+      }}><NFLineIcon name={iconMap[kind]||"document"} size={senior?22:19}/></span>
+      <div>
+        <div style={{fontSize:senior?".78rem":".67rem",fontWeight:900,color:"#2C66CF",letterSpacing:".04em",textTransform:"uppercase"}}>{kind}</div>
+        <div style={{fontWeight:850,fontSize:senior?"1.08rem":".92rem",color:"#132750"}}>{title}</div>
+      </div>
+    </div>
+    <div style={{padding:senior?"22px 24px":"18px 21px",fontSize:senior?"1.12rem":".96rem",lineHeight:1.85,color:"#263953"}}>
+      {text}
+    </div>
+  </div>;
+}
+
+function NFFunctionalMoneyCard({question,senior=false}){
+  return <div style={{
+    width:"100%",maxWidth:690,margin:"0 auto",border:"1px solid #CBD8E9",
+    borderRadius:16,background:"rgba(255,255,255,.96)",overflow:"hidden",
+    boxShadow:"0 8px 22px rgba(30,55,95,.045)"
+  }}>
+    <div style={{display:"flex",alignItems:"center",gap:10,padding:senior?"14px 18px":"12px 16px",background:"#F7FAFE",borderBottom:"1px solid #E3EAF3"}}>
+      <span style={{width:senior?42:36,height:senior?42:36,borderRadius:10,display:"grid",placeItems:"center",background:"#E9F7F3",color:"#268777"}}>
+        <NFLineIcon name="wallet" size={senior?22:19}/>
+      </span>
+      <strong style={{color:"#18345F",fontSize:senior?"1.05rem":".9rem"}}>Situación cotidiana</strong>
+    </div>
+    <div style={{padding:senior?"28px 26px":"23px 22px",fontSize:senior?"1.25rem":"1.05rem",fontWeight:850,lineHeight:1.65,color:"#14284E"}}>
+      {question}
+    </div>
+  </div>;
 }
 
 const NF_SHAPE_IDS=["circle_f","circle_o","square_f","square_o","triangle_f","triangle_o","diamond_f","diamond_o","star_f","star_o"];
@@ -1631,14 +2126,29 @@ function NFColoredRuleStimulus({shape="circle",color="#2D4E8A",size=112}) {
 
 function NFPartialObject({kind,size=120,mask="right"}) {
   const masks={
-    right:{right:0,top:"20%",width:"28%",height:"56%"},
-    left:{left:0,top:"24%",width:"26%",height:"54%"},
-    top:{left:"26%",top:0,width:"48%",height:"27%"},
-    bottom:{left:"24%",bottom:0,width:"52%",height:"28%"},
+    right:{right:"3%",top:"19%",width:"29%",height:"58%"},
+    left:{left:"3%",top:"23%",width:"28%",height:"56%"},
+    top:{left:"25%",top:"3%",width:"50%",height:"29%"},
+    bottom:{left:"23%",bottom:"3%",width:"54%",height:"30%"},
   };
-  return <div style={{position:"relative",width:size,height:size,display:"inline-flex",alignItems:"center",justifyContent:"center"}}>
-    <NFStimulusObject kind={kind} size={size}/>
-    <span aria-hidden="true" style={{position:"absolute",background:"#fff",...masks[mask],borderRadius:4}}/>
+  return <div
+    style={{
+      position:"relative",width:size,height:size,display:"inline-flex",
+      alignItems:"center",justifyContent:"center",overflow:"hidden"
+    }}
+    aria-label={`${NF_STIMULUS_OBJECTS[kind]||"Objeto"} incompleto`}
+  >
+    <NFStimulusObject kind={kind} size={size} imagePadding={4}/>
+    <span
+      aria-hidden="true"
+      style={{
+        position:"absolute",
+        background:"rgba(255,255,255,.995)",
+        border:"1px solid rgba(230,235,242,.5)",
+        ...masks[mask],
+        borderRadius:5
+      }}
+    />
   </div>;
 }
 
@@ -4821,11 +5331,7 @@ const EX_ADULTO = {
       Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
         const SHAPES=[
-          {id:"arrow",glyph:"➤"},
-          {id:"triangle",glyph:"◢"},
-          {id:"corner",glyph:"⌞"},
-          {id:"flag",glyph:"⚑"},
-          {id:"chevron",glyph:"❯"}
+          {id:"arrow"},{id:"triangle"},{id:"corner"},{id:"flag"},{id:"chevron"}
         ];
         const ROUNDS=[0,6,7,8,9,10][L];
         const maxAngle=nfDifficultyValue(difficultyProfile,"rotation_angle",180); const angles=[0,45,60,90,135,180,270].filter(a=>a===0||a<=maxAngle||a===270);
@@ -4869,8 +5375,8 @@ const EX_ADULTO = {
         };
 
         const shapeBox=(shape,rotation)=>(
-          <div style={{width:M?145:125,height:M?145:125,display:"grid",placeItems:"center",borderRadius:18,border:`2px solid ${COLORS.border}`,background:"#fff"}}>
-            <span style={{display:"inline-block",fontSize:M?"5.6rem":"4.7rem",lineHeight:1,transform:`rotate(${rotation}deg)`}}>{shape.glyph}</span>
+          <div className="nf-abstract-stimulus-box" style={{width:M?165:145,height:M?165:145}}>
+            <NFAbstractRotationShape kind={shape.id} rotation={rotation} size={M?128:112} senior={M}/>
           </div>
         );
 
@@ -4900,7 +5406,8 @@ const EX_ADULTO = {
       instruccion: "Observa la figura modelo, busca únicamente las figuras exactamente iguales dentro de la cuadrícula y toca la cantidad correcta.",
       Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel);
-        const POOL=NF_SHAPE_IDS;
+        const useObjects=L<=3;
+        const POOL=useObjects?nfVisualBankPool(L<=2?1:2).map(x=>x.id):NF_SHAPE_IDS;
         const ROUNDS=nfDifficultyValue(difficultyProfile,"trial_count",[0,4,5,6,7,8][L]);
         const totalStimuli=nfDifficultyValue(difficultyProfile,"stimulus_count",[0,10,12,16,20,24][L]);
         const [data]=useState(()=>Array.from({length:ROUNDS},()=>{
@@ -4910,7 +5417,7 @@ const EX_ADULTO = {
           const items=Array(count).fill(target);
           while(items.length<totalStimuli)items.push(similar[Math.floor(Math.random()*similar.length)]);
           const candidates=[count,Math.max(1,count-1),count+1,count+2];
-          return {target,count,items:shuffle(items),opts:shuffle([...new Set(candidates)])};
+          return {target,count,items:shuffle(items),opts:shuffle([...new Set(candidates)]),stimulusType:useObjects?"object":"shape"};
         }));
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[feedback,setFeedback]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now()),locked=useRef(false);
@@ -4928,7 +5435,7 @@ const EX_ADULTO = {
               const rs=records.current;
               onDone({
                 correct:ns,total:ROUNDS,errors:ROUNDS-ns,seconds:Math.round((Date.now()-t0.current)/1000),
-                specificMetrics:{visualCounting:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),gridSize:totalStimuli,clinicalProcess:"exploración visual / cuantificación"}
+                specificMetrics:{visualCounting:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),gridSize:totalStimuli,stimulusType:d.stimulusType==="object"?"objetos NeuroFlex":"formas geométricas",clinicalProcess:"exploración visual / cuantificación"}
               });
             }else{
               setScore(ns);setCur(c=>c+1);setFeedback(null);locked.current=false;trialT0.current=Date.now();
@@ -4940,14 +5447,20 @@ const EX_ADULTO = {
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <span style={{fontSize:".68rem",fontWeight:800,color:COLORS.textMuted}}>BUSCA</span>
-              <NFStimulusShape id={d.target} size={M?52:44}/>
+              {d.stimulusType==="object"
+                ? <NeuroFlexObjectStimulus id={d.target} size={M?58:48} senior={M}/>
+                : <NFStimulusShape id={d.target} size={M?52:44}/>}
             </div>
             <Badge label={`${cur+1}/${ROUNDS}`} color={COLORS.info}/>
           </div>
 
           <NFTrainingStimulusCard modoMayor={M} minHeight={300}>
             <div style={{display:"grid",gridTemplateColumns:`repeat(${cols},1fr)`,gap:M?13:9,width:"100%",maxWidth:680}}>
-              {d.items.map((x,i)=><div key={i} style={{minHeight:M?62:52,display:"grid",placeItems:"center",borderRadius:10,background:"#fff",border:`1px solid ${COLORS.border}`}}>{x}</div>)}
+              {d.items.map((x,i)=><div key={i} style={{minHeight:M?74:62,display:"grid",placeItems:"center",borderRadius:10,background:"#fff",border:`1px solid ${COLORS.border}`}}>
+                {d.stimulusType==="object"
+                  ? <NeuroFlexObjectStimulus id={x} size={M?48:40} senior={M}/>
+                  : <NFStimulusShape id={x} size={M?44:36}/>}
+              </div>)}
             </div>
           </NFTrainingStimulusCard>
 
@@ -5510,11 +6023,17 @@ const EX_ADULTO = {
       instruccion: "Observa cómo cambian las figuras y descubre la regla. Toca la opción que completa la secuencia.",
       Component: ({ onDone, modoMayor, difficultyLevel = 3, difficultyProfile }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L],visualComplexity=nfDifficultyValue(difficultyProfile,"visual_complexity",L),ruleCount=nfDifficultyValue(difficultyProfile,"rule_count",1);
-        const shapes=["circle","square","triangle","diamond","star"].slice(0,Math.min(5,3+Math.floor((visualComplexity-1)/2)));
-        const make=()=>{const start=Math.floor(Math.random()*shapes.length),step=ruleCount>=2?2:1,seq=[0,1,2].map(i=>shapes[(start+i*step)%shapes.length]),ans=shapes[(start+3*step)%shapes.length],opts=shuffle(shapes);return{seq,ans,opts}};
+        const shapes=["circle_o","square_o","triangle_o","diamond_o","star_o"].slice(0,Math.min(5,3+Math.floor((visualComplexity-1)/2)));
+        const make=()=>{
+          const start=Math.floor(Math.random()*shapes.length),step=ruleCount>=2?2:1;
+          const seq=[0,1,2].map(i=>shapes[(start+i*step)%shapes.length]);
+          const ans=shapes[(start+3*step)%shapes.length];
+          const opts=shuffle(shapes);
+          return{seq,ans,opts};
+        };
         const [items]=useState(()=>Array.from({length:count},make)),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
-        const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"razonamiento no verbal / matrices lógicas",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa la secuencia de figuras y elige cuál continúa la regla." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div style={{display:"flex",gap:16,alignItems:"center"}}>{item.seq.map((x,i)=><div key={i} style={{width:M?88:72,height:M?88:72,border:`2px solid ${COLORS.border}`,borderRadius:12,display:"grid",placeItems:"center"}}><NFStimulusShape shape={x} size={M?58:48}/></div>)}<div style={{width:M?88:72,height:M?88:72,border:`2px dashed ${COLORS.primary}`,borderRadius:12,display:"grid",placeItems:"center",fontWeight:900,fontSize:"1.5rem",color:COLORS.primary}}>?</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,maxWidth:500,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} aria-label="Opción de figura" style={{minHeight:M?92:78,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape shape={v} size={M?56:46}/></button>)}</div></div>;
+        const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{abstractVisualReasoning:true,stimulusType:"formas geométricas",clinicalProcess:"razonamiento no verbal / matrices lógicas",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa la secuencia de figuras y elige cuál continúa la regla." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div style={{display:"flex",gap:16,alignItems:"center"}}>{item.seq.map((x,i)=><div key={i} style={{width:M?88:72,height:M?88:72,border:`2px solid ${COLORS.border}`,borderRadius:12,display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?58:48}/></div>)}<div style={{width:M?88:72,height:M?88:72,border:`2px dashed ${COLORS.primary}`,borderRadius:12,display:"grid",placeItems:"center",fontWeight:900,fontSize:"1.5rem",color:COLORS.primary}}>?</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,maxWidth:500,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} aria-label="Opción de figura" style={{minHeight:M?92:78,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape id={v} size={M?56:46}/></button>)}</div></div>;
       }
     },
   ],
@@ -5746,8 +6265,8 @@ const EX_ADULTO = {
           {q:"Tres entradas cuestan $18.000 cada una. ¿Total?",ans:54000,opts:[36000,48000,54000,56000]},
         ];
         const [items]=useState(()=>shuffle(stepCount>=2?pool:pool.slice(0,4)).slice(0,Math.min(pool.length,itemCount)).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
-        const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"cálculo funcional / manejo de dinero",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text={`${item.q} Opciones: ${item.opts.map(v=>v.toLocaleString("es-CO")).join(", ")} pesos.`} label="Escuchar situación" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={210}><p style={{fontSize:M?"1.2rem":"1rem",fontWeight:850,lineHeight:1.6,margin:0}}>{item.q}</p></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:580,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} style={{minHeight:66,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:850}}>${v.toLocaleString("es-CO")}</button>)}</div></div>;
+        const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{functionalMoney:true,presentationMode:"situación cotidiana",clinicalProcess:"cálculo funcional / manejo de dinero",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text={`${item.q} Opciones: ${item.opts.map(v=>v.toLocaleString("es-CO")).join(", ")} pesos.`} label="Escuchar situación" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={210}><NFFunctionalMoneyCard question={item.q} senior={M}/></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:580,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} style={{minHeight:66,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:850}}>${v.toLocaleString("es-CO")}</button>)}</div></div>;
       }
     },
   ],
@@ -6165,8 +6684,8 @@ const EX_ADULTO = {
         ];
         const count=Math.min(pool.length,[0,3,4,5,6,6][L]);
         const [items]=useState(()=>shuffle(pool.slice(0,Math.min(pool.length,Math.max(3,2+documentComplexity)))).slice(0,count).map(x=>({...x,text:stepCount>=2?`${x.text} Revisa toda la información antes de responder.`:x.text,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
-        const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,functionalReading:true,audioSupportAvailable:true,clinicalProcess:"comprensión lectora funcional / aplicación de información",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},450)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.text} label={`Escuchar ${item.kind}`} mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={245}><div style={{maxWidth:720,textAlign:"left",width:"100%"}}><div style={{fontSize:".68rem",fontWeight:850,color:COLORS.primary,marginBottom:9}}>{item.title.toUpperCase()}</div><p style={{margin:0,fontSize:M?"1.12rem":".96rem",lineHeight:1.85}}>{item.text}</p></div></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:720,margin:"0 auto 10px",gap:8}}><strong style={{textAlign:"left"}}>{item.q}</strong><NFAudioReadButton text={item.q} label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?82:70,padding:12,textAlign:"left",borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:760,lineHeight:1.45}}>{v}</button>)}</div></div>;
+        const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,functionalReading:true,documentPresentation:true,audioSupportAvailable:true,clinicalProcess:"comprensión lectora funcional / aplicación de información",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},450)};
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.text} label={`Escuchar ${item.kind}`} mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={245}><NFFunctionalDocumentCard kind={item.kind} title={item.title} text={item.text} senior={M}/></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:720,margin:"0 auto 10px",gap:8}}><strong style={{textAlign:"left"}}>{item.q}</strong><NFAudioReadButton text={item.q} label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?82:70,padding:12,textAlign:"left",borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:760,lineHeight:1.45}}>{v}</button>)}</div></div>;
       }
     },
   ],
@@ -6338,6 +6857,10 @@ const NEUROFLEX_SCREENING_PANEL_COMPLETION_VERSION = "NF-PANEL-SCREEN-1.0";
 const NEUROFLEX_EVALUATION_VISUAL_VERSION = "NF-EVAL-VISUAL-1.0";
 const NEUROFLEX_VISUAL_STIMULUS_BANK_VERSION = "NF-VISUAL-BANK-1.0";
 const NEUROFLEX_VISUAL_STIMULUS_EXPANSION_VERSION = "NF-VISUAL-BANK-2.0";
+const NEUROFLEX_VISUAL_TASK_REVIEW_VERSION = "NF-VISUAL-TASKS-1.0";
+const NEUROFLEX_INTERVENTION_VISUAL_VERSION = "NF-INTERVENTION-VISUAL-1.0";
+const NEUROFLEX_PREPARATION_VISUAL_VERSION = "NF-PREPARATION-VISUAL-1.0";
+const NEUROFLEX_GRAPHIC_BANK_VERSION = "NF-GRAPHIC-BANK-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -7558,7 +8081,7 @@ function NF63SocialInference({onDone,modoMayor,difficultyLevel=3,difficultyProfi
     setTimeout(()=>{
       if(i+1>=activeItems.length){
         const rs=records.current;
-        onDone({correct:n,total:activeItems.length,errors:activeItems.length-n,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{socialInference:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),clinicalProcess:"inferencia social / interpretación contextual"}});
+        onDone({correct:n,total:activeItems.length,errors:activeItems.length-n,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{socialInference:true,meanReactionMs:Math.round(rs.reduce((a,r)=>a+r.rt,0)/Math.max(1,rs.length)),presentationMode:"texto contextual sin claves visuales emocionales",clinicalProcess:"inferencia social / interpretación contextual"}});
       }else{setSc(n);setI(v=>v+1);setSel(null);locked.current=false;trialT0.current=Date.now()}
     },430);
   };
@@ -7568,7 +8091,15 @@ function NF63SocialInference({onDone,modoMayor,difficultyLevel=3,difficultyProfi
       <NFAudioReadButton text={`${it.p} Opciones: ${it.o.join(", ")}.`} label="Escuchar situación" mayor={modoMayor}/>
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
-      <p style={{margin:0,maxWidth:720,fontWeight:800,fontSize:M?"1.12rem":".96rem",lineHeight:1.75,textAlign:"left"}}>{it.p}</p>
+      <div style={{width:"100%",maxWidth:760,textAlign:"left"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,color:COLORS.primary}}>
+          <span style={{width:M?44:38,height:M?44:38,borderRadius:10,display:"grid",placeItems:"center",background:COLORS.primary+"0D"}}>
+            <NFLineIcon name="message" size={M?23:20}/>
+          </span>
+          <strong style={{fontSize:M?".95rem":".78rem"}}>Situación para interpretar</strong>
+        </div>
+        <p style={{margin:0,fontWeight:800,fontSize:M?"1.12rem":".96rem",lineHeight:1.75,textAlign:"left"}}>{it.p}</p>
+      </div>
     </NFTrainingStimulusCard>
     <div style={{display:"grid",gap:11,maxWidth:720,margin:"0 auto"}}>
       {it.o.map((o,j)=><button key={o} disabled={locked.current} onClick={()=>pick(j)} style={{
@@ -9664,11 +10195,11 @@ function NFE22VisualClosure({ paciente, onDone }) {
     rows.current.push({correct:i===items[idx].ans,rt:Date.now()-trial.current});
     if(idx+1>=items.length){
       const rs=rows.current,ok=rs.filter(x=>x.correct).length;
-      onDone(nfTaskResult("NF-E22",{precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,meanResponseMs:meanNum(rs.map(x=>x.rt)),taskVersionAdministered:"NF-E22-2.1"},{notes:"Figuras incompletas vectoriales NeuroFlex con segmentos omitidos de forma controlada. Interpretación descriptiva; no diagnostica agnosia."}));
+      onDone(nfTaskResult("NF-E22",{precision:pctSafe(ok,rs.length),correct:ok,total:rs.length,errors:rs.length-ok,meanResponseMs:meanNum(rs.map(x=>x.rt)),taskVersionAdministered:"NF-E22-2.1"},{notes:"Figuras incompletas NeuroFlex construidas a partir del banco gráfico propio, con segmentos omitidos de forma controlada y respaldo vectorial técnico. Interpretación descriptiva; no diagnostica agnosia."}));
     }else setTimeout(()=>{setIdx(x=>x+1);trial.current=Date.now();locked.current=false},260);
   };
   const item=items[idx];
-  return <AssessmentTaskShell taskId="NF-E22" paciente={paciente} note="Estímulos vectoriales propios NeuroFlex.">
+  return <AssessmentTaskShell taskId="NF-E22" paciente={paciente} note="Estímulos gráficos propios NeuroFlex con respaldo vectorial técnico.">
     <p style={{fontWeight:700,textAlign:"center"}}>¿Qué objeto completa mejor esta figura?</p>
     <div style={{display:"flex",justifyContent:"center",margin:"20px auto",padding:20,borderRadius:14,border:`1px solid ${COLORS.border}`,background:"#fff",maxWidth:240}}>
       <NFPartialObject kind={item.kind} mask={item.mask} size={mayor?150:128}/>
@@ -9695,11 +10226,11 @@ function NFE23FigureGround({ paciente, onDone }) {
     rec.current.push({correct:ok,rt:Date.now()-t.current});
     if(idx+1>=scenes.length){
       const rs=rec.current,okn=rs.filter(x=>x.correct).length;
-      onDone(nfTaskResult("NF-E23",{precision:pctSafe(okn,rs.length),correct:okn,total:rs.length,errors:rs.length-okn,omissions:0,commissions:rs.length-okn,meanResponseMs:meanNum(rs.map(x=>x.rt)),taskVersionAdministered:"NF-E23-2.1"},{notes:"Escenas de figura-fondo construidas con iconografía vectorial propia NeuroFlex y densidad visual estable."}));
+      onDone(nfTaskResult("NF-E23",{precision:pctSafe(okn,rs.length),correct:okn,total:rs.length,errors:rs.length-okn,omissions:0,commissions:rs.length-okn,meanResponseMs:meanNum(rs.map(x=>x.rt)),taskVersionAdministered:"NF-E23-2.1"},{notes:"Escenas de figura-fondo construidas con el banco gráfico propio NeuroFlex y densidad visual estable."}));
     }else setTimeout(()=>{setIdx(x=>x+1);t.current=Date.now();locked.current=false},260);
   };
   const scene=scenes[idx];
-  return <AssessmentTaskShell taskId="NF-E23" paciente={paciente} note="Escenas vectoriales originales NeuroFlex.">
+  return <AssessmentTaskShell taskId="NF-E23" paciente={paciente} note="Escenas gráficas originales NeuroFlex.">
     <p style={{fontWeight:700,textAlign:"center"}}>Encuentra el objeto escondido entre las figuras superpuestas.</p>
     <div style={{position:"relative",width:mayor?330:290,height:mayor?245:215,margin:"18px auto 24px",border:`1px solid ${COLORS.border}`,borderRadius:14,background:"#fff",overflow:"hidden"}}>
       {scene.items.map((kind,i)=><div key={`${kind}_${i}`} style={{position:"absolute",left:`${12+(i%2)*31+(i===2?13:0)}%`,top:`${12+Math.floor(i/2)*34+(i===1?15:0)}%`,transform:`rotate(${[-18,15,24,-10][i]}deg)`,opacity:.78}}>
@@ -15710,6 +16241,8 @@ function EvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }) {
     <DemoScreen
       exId={curEx?.id}
       mayor={mayor}
+      current={cur+1}
+      total={queue.length}
       onContinuar={() => {
         if (curEx?.id) setDemoSeen(prev => new Set([...prev, curEx.id]));
         setPhase("exercise");
@@ -20659,7 +21192,7 @@ const DEMOS = {
 
 };
 
-function DemoScreen({ exId, onContinuar, mayor }) {
+function DemoScreen({ exId, onContinuar, mayor, current=1, total=1 }) {
   const demo = DEMOS[exId];
 
   useEffect(() => {
@@ -20667,60 +21200,49 @@ function DemoScreen({ exId, onContinuar, mayor }) {
   }, [demo, onContinuar]);
 
   if (!demo) return null;
+  const ex=Object.values(EX_ADULTO).flat().find(x=>x.id===exId);
 
-  return (
-    <div className={`nf-demo-screen ${mayor ? "is-senior" : ""}`} style={{ maxWidth: 560, margin: "0 auto" }}>
-      <Card className="nf-demo-card" style={{ padding: mayor ? 32 : 26 }}>
-        {/* Header */}
-        <div className="nf-demo-head">
-          <div className="nf-demo-mark"><NFIcon name="example" size={24}/></div>
-          <div className="nf-eval-eyebrow">Antes de comenzar</div>
-          <h3 style={{ fontWeight: 700, fontSize: mayor ? "1.3rem" : "1.1rem", marginBottom: 4 }}>
-            Cómo hacer: {demo.titulo}
-          </h3>
-          <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".9rem" : ".78rem" }}>
-            Sigue estos pasos
-          </p>
-        </div>
-
-        {/* Pasos */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
-          {demo.pasos.map((paso, i) => (
-            <div key={i} className="nf-demo-step">
-              <span className="nf-demo-step__num">{i + 1}</span>
-              <div>
-                <span style={{ fontSize: mayor ? "1rem" : ".9rem", color: COLORS.textPrimary, fontWeight: 500, lineHeight: 1.5 }}>
-                  <strong style={{ color: COLORS.primary }}>Paso {i + 1}:</strong> {paso.texto}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Ejemplo */}
-        {demo.ejemplo && (
-          <div style={{ background: COLORS.primary + "08", borderRadius: 14, padding: mayor ? "18px 20px" : "14px 16px", marginBottom: 24, border: `1px solid ${COLORS.primary}20` }}>
-            <p style={{ fontWeight: 700, fontSize: mayor ? ".95rem" : ".82rem", color: COLORS.primary, marginBottom: 10, display:"flex",alignItems:"center",gap:7 }}><NFIcon name="example" size={17}/>Ejemplo</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <div style={{ background: COLORS.white, borderRadius: 10, padding: "8px 14px", border: `1px solid ${COLORS.border}` }}>
-                <p style={{ margin: 0, fontSize: mayor ? "1rem" : ".85rem", color: COLORS.textSecond }}>{demo.ejemplo.muestra}</p>
-              </div>
-              <span style={{ color: COLORS.textMuted, fontSize: "1.2rem" }}>→</span>
-              <div style={{ background: COLORS.success + "12", borderRadius: 10, padding: "8px 14px", border: `1px solid ${COLORS.success}30` }}>
-                <p style={{ margin: 0, fontSize: mayor ? "1rem" : ".85rem", color: COLORS.success, fontWeight: 600 }}>{demo.ejemplo.respuesta}</p>
-              </div>
-            </div>
+  return <NFPreparationFrame
+    exId={exId}
+    mayor={mayor}
+    current={current}
+    total={total}
+    stage="Modelado · No puntuable"
+    title={`Cómo hacer: ${demo.titulo}`}
+    subtitle="Revisa los pasos antes de comenzar."
+    instruction={ex?.instruccion}
+    icon="example"
+    footer={<BtnPrimary onClick={onContinuar} style={{width:"100%"}}>Entendido, comenzar</BtnPrimary>}
+  >
+    <div style={{display:"flex",flexDirection:"column",gap:11}}>
+      {demo.pasos.map((paso,i)=>(
+        <div key={i} className="nf-demo-step" style={{margin:0}}>
+          <span className="nf-demo-step__num">{i+1}</span>
+          <div style={{fontSize:mayor?"1rem":".86rem",color:COLORS.textPrimary,lineHeight:1.55}}>
+            <strong style={{color:COLORS.primary}}>Paso {i+1}:</strong> {paso.texto}
           </div>
-        )}
-
-        <BtnPrimary onClick={onContinuar} style={{ width: "100%", padding: mayor ? "18px" : "14px", fontSize: mayor ? "1.1rem" : ".95rem" }}>
-          Entendido, comenzar
-        </BtnPrimary>
-      </Card>
+        </div>
+      ))}
     </div>
-  );
-}
 
+    {demo.ejemplo&&<div className="nf-preparation-response" style={{marginTop:16}}>
+      <div className="nf-preparation-response__label">Ejemplo</div>
+      <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+        <div style={{background:"#fff",borderRadius:10,padding:"9px 13px",border:`1px solid ${COLORS.border}`}}>
+          {demo.ejemplo.muestra}
+        </div>
+        <span style={{color:COLORS.textMuted}}>→</span>
+        <div style={{background:COLORS.success+"10",borderRadius:10,padding:"9px 13px",border:`1px solid ${COLORS.success}30`,color:COLORS.success,fontWeight:700}}>
+          {demo.ejemplo.respuesta}
+        </div>
+      </div>
+    </div>}
+
+    <div className="nf-preparation-note" style={{marginTop:14}}>
+      El modelado sirve como apoyo de preparación y queda separado del desempeño puntuable.
+    </div>
+  </NFPreparationFrame>;
+}
 
 
 // ─── PRESCRIPCIÓN DE SESIÓN ────────────────────────────────────────────────────
@@ -22273,7 +22795,84 @@ function emptyTaskPreparationRecord(){
   };
 }
 
-function GenericTaskPreparationScreen({item,mayor,mode="review",onListen,onContinue,onDirect}){
+
+function NFPreparationFrame({
+  exId,
+  mayor,
+  stage="Preparación",
+  title,
+  subtitle,
+  instruction,
+  current=1,
+  total=1,
+  children,
+  footer=null,
+  icon="reading",
+}){
+  const found=Object.entries(EX_ADULTO).find(([,list])=>(list||[]).some(x=>x.id===exId));
+  const domId=found?.[0] || null;
+  const ex=(found?.[1]||[]).find(x=>x.id===exId);
+  const dom=domId?DOMINIOS_ADULTO[domId]:null;
+  const pct=total>0?Math.max(0,Math.min(100,Math.round(((current-1)/total)*100))):0;
+
+  return <div className={`nf-preparation-focus ${mayor?"is-senior":""}`}>
+    <div className="nf-session-brandbar">
+      <div className="nf-session-brandbar__logo">
+        <NeuroFlexBrandLogo width={mayor?285:250} compact />
+      </div>
+      <div className="nf-session-brandbar__center">
+        <div className="nf-session-brandbar__title">
+          Preparación de sesión · {dom?.label || "Entrenamiento cognitivo"}
+        </div>
+        <div className="nf-session-brandbar__progress">
+          <div className="nf-session-brandbar__track" aria-hidden="true">
+            <span className="nf-session-brandbar__fill" style={{width:`${pct}%`}} />
+          </div>
+          <span className="nf-session-brandbar__count">Ejercicio {current} de {total}</span>
+        </div>
+      </div>
+      <div className="nf-session-brandbar__side">
+        <span className="nf-session-pill">No puntuable</span>
+      </div>
+    </div>
+
+    <Card className="nf-preparation-card" style={{padding:mayor?36:30}}>
+      <div className="nf-preparation-head">
+        <div className="nf-preparation-head__main">
+          <div className="nf-preparation-head__icon"><NFLineIcon name={icon} size={mayor?24:21}/></div>
+          <div>
+            <div className="nf-preparation-eyebrow">{stage}</div>
+            <h2 className="nf-preparation-title">{title || ex?.nombre || "Preparación de la actividad"}</h2>
+            {subtitle&&<p className="nf-preparation-subtitle">{subtitle}</p>}
+          </div>
+        </div>
+        {dom?.label&&<span className="nf-session-pill">{dom.label}</span>}
+      </div>
+
+      {instruction&&<div className="nf-eval-instruction" style={{marginBottom:18}}>
+        <span className="nf-eval-instruction__label">Qué debes hacer</span>
+        <p className="nf-eval-instruction__text">{instruction}</p>
+      </div>}
+
+      <div className="nf-preparation-workspace">
+        <div className="nf-preparation-section">{children}</div>
+      </div>
+
+      {footer&&<div style={{marginTop:16}}>{footer}</div>}
+    </Card>
+  </div>;
+}
+
+function GenericTaskPreparationScreen({
+  item,
+  mayor,
+  mode="review",
+  onListen,
+  onContinue,
+  onDirect,
+  current=1,
+  total=1,
+}){
   const [confirmed,setConfirmed]=useState(false);
   const exId=item?.ex?.id;
   const title=mode==="orientation"?"Preparación de la actividad":"Revisión de la consigna";
@@ -22281,126 +22880,188 @@ function GenericTaskPreparationScreen({item,mayor,mode="review",onListen,onConti
     ?"Antes de puntuar, revisa cómo funciona la actividad."
     :"Esta revisión no forma parte del resultado de la sesión.";
 
-  return <div style={{maxWidth:620,margin:"0 auto"}}>
-    <Card style={{padding:mayor?32:25}}>
-      <div style={{textAlign:"center",marginBottom:20}}>
-        <div className="nf-task-ready-mark"><NFLineIcon name="reading" size={26}/></div>
-        <div style={{fontSize:".68rem",fontWeight:850,color:COLORS.primary,letterSpacing:".05em",textTransform:"uppercase",marginBottom:4}}>Preparación · No puntuable</div>
-        <h3 style={{margin:"0 0 6px",fontSize:mayor?"1.4rem":"1.15rem"}}>{title}</h3>
-        <p style={{margin:0,color:COLORS.textMuted,fontSize:mayor?".96rem":".8rem",lineHeight:1.55}}>{subtitle}</p>
-      </div>
-
-      <div className="nf-eval-instruction" style={{marginBottom:14}}>
-        <span className="nf-eval-instruction__label">Qué debes hacer</span>
-        <p className="nf-eval-instruction__text">{item?.ex?.instruccion}</p>
-      </div>
-
-      <div style={{padding:mayor?16:13,borderRadius:11,border:`1px solid ${COLORS.border}`,background:COLORS.bg,marginBottom:14}}>
-        <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.textSecond,marginBottom:5}}>FORMA DE RESPONDER</div>
-        <p style={{margin:0,color:COLORS.textSecond,lineHeight:1.55,fontSize:mayor?".96rem":".79rem"}}>
-          {nfPreparationResponseText(exId)}
-        </p>
-      </div>
-
-      <div style={{padding:12,borderRadius:10,background:"#FAFCFB",border:`1px solid ${COLORS.border}`,fontSize:mayor?".86rem":".72rem",color:COLORS.textMuted,lineHeight:1.5,marginBottom:16}}>
-        Esta fase sirve para comprobar la comprensión de la consigna y el manejo de la respuesta. <strong>No suma ni resta puntos</strong> y no debe utilizarse para enseñar la solución cognitiva de la tarea.
-      </div>
-
-      <button onClick={onListen} style={{width:"100%",minHeight:46,background:"#fff",border:`1px solid ${COLORS.border}`,borderRadius:10,padding:"9px 12px",cursor:"pointer",fontFamily:"inherit",color:COLORS.primaryDark,fontWeight:750,display:"flex",alignItems:"center",justifyContent:"center",gap:7,marginBottom:14}}>
-        <NFIcon name="volume" size={18}/> Escuchar instrucción
-      </button>
-
-      <label style={{display:"flex",alignItems:"center",gap:10,padding:"12px 13px",borderRadius:10,border:`1px solid ${confirmed?COLORS.primary:COLORS.border}`,background:confirmed?COLORS.primary+"08":"#fff",fontWeight:750,fontSize:mayor?".95rem":".8rem",cursor:"pointer"}}>
-        <input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
-        Comprendió qué debe hacer y cómo responder
-      </label>
-
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1.4fr",gap:10,marginTop:16}}>
+  return <NFPreparationFrame
+    exId={exId}
+    mayor={mayor}
+    current={current}
+    total={total}
+    stage="Preparación · No puntuable"
+    title={title}
+    subtitle={subtitle}
+    instruction={item?.ex?.instruccion}
+    icon="reading"
+    footer={
+      <div className="nf-preparation-actions">
         <BtnSecondary onClick={onDirect}>Ir directo a la tarea</BtnSecondary>
         <BtnPrimary disabled={!confirmed} onClick={()=>onContinue?.({comprehensionConfirmed:true})} style={{opacity:confirmed?1:.5}}>
           Comenzar actividad
         </BtnPrimary>
       </div>
-    </Card>
-  </div>;
-}
-
-function TaskLearningScreen({ exId, mayor, onContinue, onSkip }) {
-  const p = getTaskLearningProtocol(exId);
-  if (!p) { onContinue?.(); return null; }
-
-  return (
-    <div style={{ maxWidth: 540, margin: "0 auto" }}>
-      <Card style={{ padding: mayor ? 32 : 24 }}>
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <div className="nf-task-ready-mark"><NFLineIcon name="reading" size={26}/></div>
-          <h3 style={{ margin: "0 0 5px", fontSize: mayor ? "1.35rem" : "1.1rem" }}>Aprendamos la regla</h3>
-          <p style={{ color: COLORS.textMuted, margin: 0, fontSize: mayor ? ".95rem" : ".78rem" }}>{p.title}</p>
-        </div>
-        <div style={{ padding: mayor ? 18 : 14, background: COLORS.primary+"07", borderRadius: 12, border:`1px solid ${COLORS.primary}18`, marginBottom: 14 }}>
-          <p style={{ margin: 0, lineHeight: 1.65, fontSize: mayor ? "1.05rem" : ".86rem" }}>{p.teaching}</p>
-        </div>
-        <div style={{ padding: mayor ? 18 : 14, background: COLORS.bg, borderRadius: 12, marginBottom: 20 }}>
-          <div style={{ fontSize: ".7rem", color: COLORS.textMuted, fontWeight: 700, marginBottom: 5 }}>EJEMPLO</div>
-          <p style={{ margin: 0, lineHeight: 1.6, fontSize: mayor ? "1rem" : ".83rem" }}>{p.example}</p>
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <BtnPrimary onClick={onContinue} style={{ flex: 2, padding: mayor ? 16 : 12 }}>Practicar →</BtnPrimary>
-          <BtnSecondary onClick={onSkip} style={{ flex: 1 }}>Ir a la tarea</BtnSecondary>
-        </div>
-      </Card>
+    }
+  >
+    <div className="nf-preparation-response" style={{marginBottom:14}}>
+      <div className="nf-preparation-response__label">Forma de responder</div>
+      <p style={{margin:0,color:COLORS.textSecond,lineHeight:1.6,fontSize:mayor?".98rem":".82rem"}}>
+        {nfPreparationResponseText(exId)}
+      </p>
     </div>
-  );
+
+    <div className="nf-preparation-note" style={{marginBottom:14}}>
+      Esta fase sirve para comprobar la comprensión de la consigna y el manejo de la respuesta.
+      <strong> No suma ni resta puntos</strong> y no debe utilizarse para enseñar la solución cognitiva de la tarea.
+    </div>
+
+    <button
+      onClick={onListen}
+      className="nf-session-support-btn"
+      style={{width:"100%",justifyContent:"center",minHeight:46}}
+    >
+      <NFIcon name="volume" size={18}/> Escuchar instrucción
+    </button>
+
+    <label style={{
+      display:"flex",alignItems:"center",gap:10,padding:"13px 14px",marginTop:14,
+      borderRadius:11,border:`1px solid ${confirmed?COLORS.primary:COLORS.border}`,
+      background:confirmed?COLORS.primary+"08":"#fff",fontWeight:750,
+      fontSize:mayor?".98rem":".82rem",cursor:"pointer"
+    }}>
+      <input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
+      Comprendió qué debe hacer y cómo responder
+    </label>
+  </NFPreparationFrame>;
 }
 
-function GuidedPracticeScreen({ exId, mayor, onComplete }) {
+function TaskLearningScreen({
+  exId,
+  mayor,
+  onContinue,
+  onSkip,
+  current=1,
+  total=1,
+}) {
+  const p = getTaskLearningProtocol(exId);
+  useEffect(() => {
+    if (!p) onContinue?.();
+  }, [p, onContinue]);
+  if (!p) return null;
+
+  const ex=Object.values(EX_ADULTO).flat().find(x=>x.id===exId);
+
+  return <NFPreparationFrame
+    exId={exId}
+    mayor={mayor}
+    current={current}
+    total={total}
+    stage="Aprendizaje de la regla · No puntuable"
+    title="Aprendamos la regla"
+    subtitle={p.title}
+    instruction={ex?.instruccion}
+    icon="reading"
+    footer={
+      <div className="nf-preparation-actions">
+        <BtnSecondary onClick={onSkip}>Ir a la tarea</BtnSecondary>
+        <BtnPrimary onClick={onContinue}>Practicar</BtnPrimary>
+      </div>
+    }
+  >
+    <div style={{
+      padding:mayor?20:16,background:COLORS.primary+"07",borderRadius:13,
+      border:`1px solid ${COLORS.primary}18`,marginBottom:14
+    }}>
+      <div className="nf-preparation-response__label" style={{color:COLORS.primary}}>Regla de la actividad</div>
+      <p style={{margin:0,lineHeight:1.7,fontSize:mayor?"1.08rem":".9rem",color:COLORS.textPrimary}}>
+        {p.teaching}
+      </p>
+    </div>
+
+    <div className="nf-preparation-response">
+      <div className="nf-preparation-response__label">Ejemplo</div>
+      <p style={{margin:0,lineHeight:1.65,fontSize:mayor?"1.02rem":".84rem"}}>
+        {p.example}
+      </p>
+    </div>
+
+    <div className="nf-preparation-note" style={{marginTop:14}}>
+      Esta explicación prepara la mecánica de la actividad. El desempeño puntuable comienza únicamente al entrar al ejercicio.
+    </div>
+  </NFPreparationFrame>;
+}
+
+function GuidedPracticeScreen({
+  exId,
+  mayor,
+  onComplete,
+  current=1,
+  total=1,
+}) {
   const protocol = getTaskLearningProtocol(exId);
   const [selected, setSelected] = useState(null);
-  if (!protocol?.practice) { onComplete?.(); return null; }
+  useEffect(() => {
+    if (!protocol?.practice) onComplete?.();
+  }, [protocol, onComplete]);
+  if (!protocol?.practice) return null;
 
   const p = protocol.practice;
+  const ex=Object.values(EX_ADULTO).flat().find(x=>x.id===exId);
   const correct = selected === p.answer;
 
-  return (
-    <div style={{ maxWidth: 540, margin: "0 auto" }}>
-      <Card style={{ padding: mayor ? 32 : 24 }}>
-        <div style={{ textAlign: "center", marginBottom: 18 }}>
-          <div className="nf-task-ready-mark"><NFLineIcon name="plan" size={26}/></div>
-          <h3 style={{ margin: "0 0 5px", fontSize: mayor ? "1.35rem" : "1.1rem" }}>Práctica guiada</h3>
-          <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".95rem" : ".78rem", margin: 0 }}>Esta práctica no cuenta para el resultado de la sesión.</p>
-        </div>
-
-        <p style={{ fontWeight: 700, lineHeight: 1.55, fontSize: mayor ? "1.1rem" : ".9rem", marginBottom: 14 }}>{p.prompt}</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-          {p.options.map(opt => (
-            <button key={opt} onClick={() => setSelected(opt)} disabled={selected !== null} style={{
-              padding: mayor ? "15px 16px" : "11px 14px",
-              borderRadius: 11,
-              border: "2px solid",
-              borderColor: selected === null ? COLORS.border : opt === p.answer ? COLORS.success : selected === opt ? COLORS.error : COLORS.border,
-              background: selected === null ? COLORS.white : opt === p.answer ? COLORS.success+"12" : selected === opt ? COLORS.error+"10" : COLORS.white,
-              textAlign: "left",
-              fontFamily: "inherit",
-              fontSize: mayor ? "1rem" : ".84rem",
-              cursor: selected === null ? "pointer" : "default"
-            }}>{opt}</button>
-          ))}
-        </div>
-
-        {selected !== null && (
-          <div style={{ marginTop: 14, padding: 12, borderRadius: 10, background: correct ? COLORS.success+"10" : COLORS.warning+"10", fontSize: mayor ? ".98rem" : ".78rem", lineHeight: 1.5 }}>
-            {correct ? <span className="nf-feedback nf-feedback--success"><NFLineIcon name="next" size={18}/>Correcto. La regla está comprendida.</span> : <span className="nf-feedback nf-feedback--info"><NFLineIcon name="reasoning" size={18}/>La respuesta de práctica es <strong>{p.answer}</strong>. Revisa la regla antes de comenzar.</span>}
-          </div>
-        )}
-
-        {selected !== null && (
-          <BtnPrimary onClick={onComplete} style={{ width: "100%", marginTop: 16, padding: mayor ? 16 : 12 }}>
-            Comenzar ejercicio →
-          </BtnPrimary>
-        )}
-      </Card>
+  return <NFPreparationFrame
+    exId={exId}
+    mayor={mayor}
+    current={current}
+    total={total}
+    stage="Práctica guiada · No puntuable"
+    title="Práctica guiada"
+    subtitle="Comprueba la regla antes de comenzar el ejercicio."
+    instruction={ex?.instruccion}
+    icon="plan"
+    footer={selected!==null?
+      <BtnPrimary onClick={onComplete} style={{width:"100%"}}>Comenzar ejercicio</BtnPrimary>
+      :null
+    }
+  >
+    <div style={{
+      padding:mayor?20:16,borderRadius:13,border:`1px solid ${COLORS.border}`,
+      background:"#fff",fontWeight:800,lineHeight:1.6,
+      fontSize:mayor?"1.12rem":".94rem",color:COLORS.textPrimary
+    }}>
+      {p.prompt}
     </div>
-  );
+
+    <div className="nf-practice-options">
+      {p.options.map(opt => {
+        const state=selected===null?"idle":opt===p.answer?"correct":selected===opt?"incorrect":"idle";
+        return <button
+          key={opt}
+          className="nf-practice-option"
+          onClick={() => setSelected(opt)}
+          disabled={selected !== null}
+          style={{
+            borderColor:state==="correct"?COLORS.success:state==="incorrect"?COLORS.error:COLORS.border,
+            background:state==="correct"?COLORS.success+"10":state==="incorrect"?COLORS.error+"0D":"#fff",
+            cursor:selected===null?"pointer":"default"
+          }}
+        >
+          {opt}
+        </button>;
+      })}
+    </div>
+
+    {selected !== null && (
+      <div className="nf-practice-feedback" style={{
+        background:correct?COLORS.success+"10":COLORS.warning+"10",
+        border:`1px solid ${correct?COLORS.success+"35":COLORS.warning+"35"}`
+      }}>
+        {correct
+          ? <span className="nf-feedback nf-feedback--success"><NFLineIcon name="next" size={18}/> Correcto. La regla está comprendida.</span>
+          : <span className="nf-feedback nf-feedback--info"><NFLineIcon name="reasoning" size={18}/> La respuesta de práctica es <strong>{p.answer}</strong>. Revisa la regla antes de comenzar.</span>}
+      </div>
+    )}
+
+    <div className="nf-preparation-note" style={{marginTop:14}}>
+      Esta práctica no cuenta para el resultado de la sesión.
+    </div>
+  </NFPreparationFrame>;
 }
 
 function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
@@ -23221,6 +23882,8 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
         setPhase("practice");
       }}
       onSkip={() => completePreparation({mode:"learning",comprehensionConfirmed:false,skippedToTask:true})}
+      current={cur+1}
+      total={queue.length}
     />
   );
 
@@ -23229,6 +23892,8 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
       exId={curItem?.ex?.id}
       mayor={mayor}
       onComplete={() => completePreparation({mode:"practice",comprehensionConfirmed:true})}
+      current={cur+1}
+      total={queue.length}
     />
   );
 
@@ -23247,6 +23912,8 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
         comprehensionConfirmed:false,
         skippedToTask:true,
       })}
+      current={cur+1}
+      total={queue.length}
     />
   );
 
@@ -23359,62 +24026,75 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
   );
 
   return (
-    <div className="nf-exercise-focus nf-v2-session-focus" style={{ maxWidth: 900, margin: "0 auto" }}>
-      {/* Clinical Focus: progreso discreto, sin decoración alrededor del estímulo */}
-      <div className="nf-exercise-progress-head nf-v2-session-progress">
-        <div className="nf-exercise-progress-row">
-          <div>
-            <span style={{ fontSize: mayor ? ".95rem" : ".78rem", color: COLORS.textMuted }}>Ejercicio {cur + 1} de {queue.length}</span>
-            <div style={{fontWeight:650,fontSize:mayor?"1.2rem":"1rem",color:COLORS.textPrimary,marginTop:2}}>{curItem?.ex?.nombre}</div>
-            <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:5}}>
-              {curItem?.sessionRole&&<span style={{fontSize:mayor?".72rem":".62rem",fontWeight:800,color:COLORS.primary,textTransform:"capitalize"}}>{curItem.sessionRole==="complementario"?"complemento":curItem.sessionRole}</span>}
-              <span style={{fontSize:mayor?".72rem":".62rem",fontWeight:750,color:nfF64CurveLabel(nfF64EffectiveLoad({exId:curItem?.ex?.id,adaptiveLevel:curItem?.adaptiveLevel})).tone}}>{nfF64CurveLabel(nfF64EffectiveLoad({exId:curItem?.ex?.id,adaptiveLevel:curItem?.adaptiveLevel})).label}</span>
-            </div>
-          </div>
-          <button onClick={() => { if (confirm("¿Terminar la sesión?")) setPhase("done"); }}
-            style={{ minHeight:44, padding:"8px 12px", fontSize: mayor ? ".9rem" : ".76rem", color: COLORS.textMuted, background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius:10, cursor: "pointer", fontFamily:"inherit" }}>
-            Terminar sesión
-          </button>
+    <div className={`nf-exercise-focus nf-v2-session-focus ${mayor?"is-senior":""}`} style={{ margin: "0 auto" }}>
+      <div className="nf-session-brandbar">
+        <div className="nf-session-brandbar__logo">
+          <NeuroFlexBrandLogo width={mayor?285:250} compact />
         </div>
-        <ProgressBar value={progress} color={COLORS.primary} height={6} />
+        <div className="nf-session-brandbar__center">
+          <div className="nf-session-brandbar__title">Sesión de intervención · {curDom?.label || "Entrenamiento cognitivo"}</div>
+          <div className="nf-session-brandbar__progress">
+            <div className="nf-session-brandbar__track" aria-hidden="true">
+              <span className="nf-session-brandbar__fill" style={{width:`${progress}%`}} />
+            </div>
+            <span className="nf-session-brandbar__count">Ejercicio {cur + 1} de {queue.length}</span>
+          </div>
+        </div>
+        <div className="nf-session-brandbar__side">
+          {curItem?.sessionRole&&<span className="nf-session-pill" style={{textTransform:"capitalize"}}>{curItem.sessionRole==="complementario"?"Complemento":curItem.sessionRole}</span>}
+          <span className="nf-session-pill" style={{color:nfF64CurveLabel(nfF64EffectiveLoad({exId:curItem?.ex?.id,adaptiveLevel:curItem?.adaptiveLevel})).tone}}>
+            {nfF64CurveLabel(nfF64EffectiveLoad({exId:curItem?.ex?.id,adaptiveLevel:curItem?.adaptiveLevel})).label}
+          </span>
+        </div>
       </div>
 
-      <Card className="nf-exercise-card nf-v2-session-card" style={{padding:mayor?34:28}}>
+      <Card className="nf-exercise-card nf-v2-session-card" style={{padding:mayor?36:30}}>
         <div className="nf-exercise-domain-head nf-v2-session-domain">
-          <div className="nf-exercise-domain-icon" style={{ width: mayor ? 48 : 42, height: mayor ? 48 : 42, color:curDom?.color || COLORS.primary }}><NFLineIcon name={curDom?.icon || "default"} size={mayor?23:20}/></div>
-          <div>
-            <p style={{ fontWeight: 650, margin: 0, fontSize: mayor ? "1.05rem" : ".9rem", color:COLORS.textPrimary }}>{curDom?.label}</p>
-            {config.adaptativo !== false && curItem?.adaptiveLevel ? <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".86rem" : ".72rem", margin: "2px 0 0" }}>Nivel {curItem.adaptiveLevel} de 5</p> : null}
+          <div className="nf-session-domain-main">
+            <div className="nf-exercise-domain-icon" style={{ width: mayor ? 48 : 42, height: mayor ? 48 : 42, color:curDom?.color || COLORS.primary }}>
+              <NFLineIcon name={curDom?.icon || "default"} size={mayor?23:20}/>
+            </div>
+            <div>
+              <div className="nf-session-domain-label">{curDom?.label}</div>
+              <h2 className="nf-session-exercise-title">{curItem?.ex?.nombre}</h2>
+            </div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",justifyContent:"flex-end"}}>
+            {config.adaptativo !== false && curItem?.adaptiveLevel ? <span className="nf-session-pill">Nivel {curItem.adaptiveLevel} de 5</span> : null}
+            <button onClick={() => { if (confirm("¿Terminar la sesión?")) setPhase("done"); }}
+              style={{ minHeight:42, padding:"7px 11px", fontSize: mayor ? ".88rem" : ".72rem", color: COLORS.textMuted, background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius:10, cursor: "pointer", fontFamily:"inherit", fontWeight:700 }}>
+              Terminar sesión
+            </button>
           </div>
         </div>
 
-        <div className="nf-exercise-instruction nf-v2-session-instruction" style={{ padding: mayor ? "18px 20px" : "14px 16px" }}>
-          <div className="nf-exercise-instruction__label"><NFLineIcon name="plan" size={15}/>Instrucción</div>
-          <p style={{ margin: 0, fontSize: mayor ? "1.08rem" : ".9rem", color: COLORS.textPrimary, lineHeight: 1.65, fontWeight: 500 }}>
-            {curItem?.ex?.instruccion}
-          </p>
-          <button onClick={() => { registerSupport("repeat"); speakInstruction(curItem?.ex?.instruccion, { immediate: true }); }} style={{ marginTop: 10, minHeight:44, background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: 9, padding: "7px 12px", cursor: "pointer", fontSize: mayor ? ".9rem" : ".76rem", color: COLORS.primaryDark, fontFamily: "inherit", display:"inline-flex", alignItems:"center", gap:7 }}>
-            <NFIcon name="volume" size={17} /> Escuchar instrucción
-          </button>
+        <div className="nf-exercise-instruction nf-v2-session-instruction">
+          <div className="nf-exercise-instruction__label">Qué debes hacer</div>
+          <p className="nf-session-instruction-text">{curItem?.ex?.instruccion}</p>
+          <div className="nf-session-instruction-actions">
+            <button
+              className="nf-session-support-btn"
+              onClick={() => { registerSupport("repeat"); speakInstruction(curItem?.ex?.instruccion, { immediate: true }); }}
+            >
+              <NFIcon name="volume" size={17}/> Escuchar instrucción
+            </button>
+          </div>
         </div>
 
-        {/* Apoyos funcionales: discretos y separados del estímulo */}
-        <div style={{ marginBottom: 18, display:"flex", justifyContent:"space-between", gap:10, alignItems:"center", flexWrap:"wrap" }}>
-          <span style={{ fontSize: mayor ? ".88rem" : ".73rem", color: COLORS.textMuted }}>
+        {/* Apoyos funcionales: secundarios y consistentes en todos los ejercicios */}
+        <div className="nf-session-supportbar">
+          <span className="nf-session-supportbar__status">
             Apoyo: <strong style={{ color: currentSupport.maxSupportLevel ? COLORS.accent : COLORS.textSecond }}>{supportLabel(currentSupport.maxSupportLevel,NEUROFLEX_SUPPORT_SYSTEM_VERSION)}</strong>
           </span>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button onClick={() => { registerSupport("general"); setSupportOverlay("general"); }}
-              style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
+          <div className="nf-session-supportbar__actions">
+            <button className="nf-session-support-btn" onClick={() => { registerSupport("general"); setSupportOverlay("general"); }}>
               <NFIcon name="hint" size={17}/> Pista general
             </button>
-            <button onClick={() => { registerSupport("specific"); setSupportOverlay("specific"); }}
-              style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
+            <button className="nf-session-support-btn" onClick={() => { registerSupport("specific"); setSupportOverlay("specific"); }}>
               <NFIcon name="hint" size={17}/> Pista específica
             </button>
             {DEMOS[curItem?.ex?.id] && (
-              <button onClick={() => { registerSupport("modeling"); setSupportOverlay("modeling"); }}
-                style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
+              <button className="nf-session-support-btn" onClick={() => { registerSupport("modeling"); setSupportOverlay("modeling"); }}>
                 <NFIcon name="example" size={17}/> Modelado
               </button>
             )}
@@ -23427,16 +24107,18 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar }) 
           </div>
         )}
 
-        {/* Zona cognitiva protegida: sin marca, ilustraciones o movimiento ambiental */}
-        <div className="nf-protected-stimulus-zone" style={{background:COLORS.white,minHeight:220,padding:mayor?"16px 4px":"10px 0"}}>
-          {ExComp && <ExComp
-            onDone={handleExDone}
-            paciente={paciente}
-            modoMayor={mayor}
-            adaptiveLevel={curItem?.adaptiveLevel}
-            difficultyLevel={curItem?.adaptiveLevel}
-            difficultyProfile={nfBuildExerciseDifficultyProfile(curItem?.ex?.id,curItem?.adaptiveLevel)}
-          />}
+        {/* Área estable del ejercicio: el contenido se adapta sin cambiar el marco general */}
+        <div className="nf-session-workspace">
+          <div className="nf-protected-stimulus-zone" style={{background:"transparent",minHeight:0,padding:0}}>
+            {ExComp && <ExComp
+              onDone={handleExDone}
+              paciente={paciente}
+              modoMayor={mayor}
+              adaptiveLevel={curItem?.adaptiveLevel}
+              difficultyLevel={curItem?.adaptiveLevel}
+              difficultyProfile={nfBuildExerciseDifficultyProfile(curItem?.ex?.id,curItem?.adaptiveLevel)}
+            />}
+          </div>
         </div>
 
         {supportOverlay && (
