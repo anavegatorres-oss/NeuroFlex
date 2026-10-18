@@ -6862,6 +6862,7 @@ const NEUROFLEX_INTERVENTION_VISUAL_VERSION = "NF-INTERVENTION-VISUAL-1.0";
 const NEUROFLEX_PREPARATION_VISUAL_VERSION = "NF-PREPARATION-VISUAL-1.0";
 const NEUROFLEX_GRAPHIC_BANK_VERSION = "NF-GRAPHIC-BANK-1.0";
 const NEUROFLEX_F77_10_1_HOTFIX_VERSION = "NF-HOTFIX-E05-E07-E08-1.0";
+const NEUROFLEX_F77_10_2_HOTFIX_VERSION = "NF-HOTFIX-E18-E26-E27-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -10029,6 +10030,13 @@ function EvaluationV2Phase36Block({ paciente, onExit }) {
 
 
 // ─── FASE 37 · NF-E18–NF-E23 · EJECUTIVO, VISUOESPACIAL Y GNÓSICO ──────────
+
+function NFE18PlanningRoute(props) {
+  return <F61EvaluationGate taskId="NF-E18" paciente={props.paciente}>
+    <NFE18PlanningRouteCore {...props}/>
+  </F61EvaluationGate>;
+}
+
 function NFE18PlanningRouteCore({ paciente, onDone }) {
   const levels=[
     {start:0,goal:8,blocked:[4],optimal:4},
@@ -10324,12 +10332,190 @@ function NFE25SmartShopping({ paciente, onDone }) {
 }
 
 
-function NFE26FollowInstructions(props) {
-  return <F61EvaluationGate taskId="NF-E26" paciente={props.paciente}><NFE26FollowInstructionsCore {...props}/></F61EvaluationGate>;
+
+function NFE26FollowInstructions({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
+  const trials=[
+    {
+      instruction:"Selecciona primero el libro, después la llave y al final el reloj.",
+      options:["book","key","clock","apple"],
+      answer:["book","key","clock"],
+    },
+    {
+      instruction:"Selecciona el paraguas, luego el teléfono y termina con las tijeras.",
+      options:["phone","umbrella","scissors","flower"],
+      answer:["umbrella","phone","scissors"],
+    },
+    {
+      instruction:"Selecciona el carro, después la casa y finalmente el balón.",
+      options:["ball","house","car","gift"],
+      answer:["car","house","ball"],
+    },
+  ];
+  const [idx,setIdx]=useState(0);
+  const [sequence,setSequence]=useState([]);
+  const records=useRef([]);
+  const t=useRef(Date.now());
+  const locked=useRef(false);
+  const item=trials[idx];
+
+  const choose=(id)=>{
+    if(locked.current || sequence.includes(id)) return;
+    const next=[...sequence,id];
+    setSequence(next);
+    if(next.length===item.answer.length){
+      locked.current=true;
+      const positionCorrect=next.map((v,i)=>v===item.answer[i]);
+      const correctCount=positionCorrect.filter(Boolean).length;
+      const orderCorrect=correctCount===item.answer.length;
+      records.current.push({
+        orderCorrect,
+        correctCount,
+        sequenceErrors:item.answer.length-correctCount,
+        rt:Date.now()-t.current,
+      });
+      setTimeout(()=>{
+        if(idx+1>=trials.length){
+          const rs=records.current;
+          const ok=rs.filter(r=>r.orderCorrect).length;
+          onDone(nfTaskResult("NF-E26",{
+            precision:pctSafe(rs.reduce((s,r)=>s+r.correctCount,0),rs.length*3),
+            correct:ok,
+            total:rs.length,
+            errors:rs.reduce((s,r)=>s+r.sequenceErrors,0),
+            sequenceErrors:rs.reduce((s,r)=>s+r.sequenceErrors,0),
+            attempts:rs.length,
+            meanResponseMs:meanNum(rs.map(r=>r.rt)),
+            taskVersionAdministered:"NF-E26-1.0",
+          },{
+            notes:"Seguimiento digital de instrucciones de tres pasos. Se registra orden, omisiones/errores de secuencia y tiempo. No equivale a desempeño funcional real."
+          }));
+        }else{
+          setIdx(x=>x+1);
+          setSequence([]);
+          t.current=Date.now();
+          locked.current=false;
+        }
+      },360);
+    }
+  };
+
+  return <AssessmentTaskShell taskId="NF-E26" paciente={paciente}>
+    <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",marginBottom:12}}>
+      <NFAudioReadButton text={item.instruction} label="Escuchar instrucción" mayor={mayor}/>
+      <Badge label={`${idx+1}/${trials.length}`} color={COLORS.info}/>
+    </div>
+    <div style={{
+      padding:mayor?20:16,borderRadius:13,background:COLORS.bg,
+      border:`1px solid ${COLORS.border}`,fontWeight:750,lineHeight:1.6,marginBottom:16
+    }}>{item.instruction}</div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(140px,1fr))",gap:12}}>
+      {item.options.map(id=>{
+        const chosen=sequence.includes(id);
+        return <button key={id} disabled={locked.current||chosen} onClick={()=>choose(id)} style={{
+          minHeight:mayor?150:125,borderRadius:14,border:`2px solid ${chosen?COLORS.primary:COLORS.border}`,
+          background:chosen?COLORS.primary+"0B":"#fff",display:"grid",placeItems:"center",cursor:chosen?"default":"pointer"
+        }}>
+          <NeuroFlexObjectStimulus id={id} size={mayor?88:74} senior={mayor}/>
+        </button>;
+      })}
+    </div>
+    <div style={{marginTop:12,fontSize:mayor?".9rem":".76rem",color:COLORS.textMuted,textAlign:"center"}}>
+      Seleccionados: {sequence.length} de {item.answer.length}
+    </div>
+  </AssessmentTaskShell>;
 }
 
-function NFE27FunctionalProspective(props) {
-  return <F61EvaluationGate taskId="NF-E27" paciente={props.paciente}><NFE27FunctionalProspectiveCore {...props}/></F61EvaluationGate>;
+function NFE27FunctionalProspective({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
+  const [phase,setPhase]=useState("encode");
+  const [selected,setSelected]=useState(null);
+  const encodedAt=useRef(Date.now());
+
+  const intention="Cuando aparezca una luna, selecciona también la llave.";
+  const options=["key","clock","book","flower"];
+
+  const finish=(choice,cued=false)=>{
+    const spontaneous=choice==="key" && !cued;
+    const cuedRecall=choice==="key" && cued;
+    onDone(nfTaskResult("NF-E27",{
+      precision:choice==="key"?100:0,
+      correct:choice==="key"?1:0,
+      total:1,
+      errors:choice==="key"?0:1,
+      spontaneousRecall:spontaneous?1:0,
+      cuedRecall:cuedRecall?1:0,
+      latencyMs:Date.now()-encodedAt.current,
+      taskVersionAdministered:"NF-E27-2.0",
+    },{
+      notes:"Memoria prospectiva funcional simulada. La recuperación espontánea y con clave se registran por separado; no equivale a desempeño cotidiano real."
+    }));
+  };
+
+  if(phase==="encode"){
+    return <AssessmentTaskShell taskId="NF-E27" paciente={paciente}>
+      <div style={{display:"flex",justifyContent:"flex-end",marginBottom:10}}>
+        <NFAudioReadButton text={intention} label="Escuchar instrucción" mayor={mayor}/>
+      </div>
+      <div style={{
+        padding:mayor?24:20,borderRadius:14,border:`1px solid ${COLORS.border}`,
+        background:COLORS.bg,fontWeight:800,lineHeight:1.65,textAlign:"center",
+        fontSize:mayor?"1.12rem":".95rem"
+      }}>
+        {intention}
+      </div>
+      <div style={{marginTop:14,fontSize:mayor?".9rem":".76rem",color:COLORS.textMuted,lineHeight:1.55}}>
+        Recuerda esta intención. A continuación aparecerá una situación breve.
+      </div>
+      <BtnPrimary onClick={()=>{encodedAt.current=Date.now();setPhase("delay")}} style={{width:"100%",marginTop:16}}>
+        Continuar
+      </BtnPrimary>
+    </AssessmentTaskShell>;
+  }
+
+  if(phase==="delay"){
+    return <AssessmentTaskShell taskId="NF-E27" paciente={paciente}>
+      <div style={{textAlign:"center",padding:mayor?24:18}}>
+        <p style={{fontWeight:750,lineHeight:1.6,margin:"0 0 16px"}}>Selecciona el objeto que se utiliza para saber la hora.</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(130px,1fr))",gap:12}}>
+          {["clock","book","apple","ball"].map(id=><button key={id} onClick={()=>setPhase("trigger")} style={{
+            minHeight:mayor?145:120,borderRadius:14,border:`1.5px solid ${COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"
+          }}><NeuroFlexObjectStimulus id={id} size={mayor?84:70} senior={mayor}/></button>)}
+        </div>
+      </div>
+    </AssessmentTaskShell>;
+  }
+
+  if(phase==="trigger"){
+    return <AssessmentTaskShell taskId="NF-E27" paciente={paciente}>
+      <div style={{display:"grid",placeItems:"center",minHeight:190,marginBottom:16}}>
+        <NeuroFlexObjectStimulus id="moon" size={mayor?150:125} senior={mayor}/>
+      </div>
+      <p style={{textAlign:"center",fontWeight:750,lineHeight:1.55}}>
+        ¿Hay algo que debías hacer al aparecer este estímulo?
+      </p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(130px,1fr))",gap:12,marginTop:14}}>
+        {options.map(id=><button key={id} onClick={()=>{setSelected(id);finish(id,false)}} style={{
+          minHeight:mayor?140:116,borderRadius:14,border:`1.5px solid ${COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"
+        }}><NeuroFlexObjectStimulus id={id} size={mayor?82:68} senior={mayor}/></button>)}
+      </div>
+      <button onClick={()=>setPhase("cue")} style={{
+        width:"100%",marginTop:12,minHeight:44,border:`1px solid ${COLORS.border}`,background:"#fff",
+        borderRadius:10,fontFamily:"inherit",fontWeight:700,color:COLORS.textMuted,cursor:"pointer"
+      }}>No lo recuerdo</button>
+    </AssessmentTaskShell>;
+  }
+
+  return <AssessmentTaskShell taskId="NF-E27" paciente={paciente}>
+    <div style={{padding:mayor?20:16,borderRadius:13,background:COLORS.bg,border:`1px solid ${COLORS.border}`,marginBottom:15}}>
+      <strong>Clave:</strong> recuerda la instrucción que recibiste al inicio sobre lo que debías hacer cuando apareciera la luna.
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(130px,1fr))",gap:12}}>
+      {options.map(id=><button key={id} onClick={()=>finish(id,true)} style={{
+        minHeight:mayor?140:116,borderRadius:14,border:`1.5px solid ${COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"
+      }}><NeuroFlexObjectStimulus id={id} size={mayor?82:68} senior={mayor}/></button>)}
+    </div>
+  </AssessmentTaskShell>;
 }
 
 
