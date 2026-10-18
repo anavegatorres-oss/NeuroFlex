@@ -567,6 +567,119 @@ body{background:
 
 
 
+
+
+
+/* ─── F77.10.5 · PULIDO DE SESIÓN Y REPORTE ─────────────────────────────── */
+.nf-balanced-word-grid{
+  justify-content:center;
+  align-items:stretch;
+}
+.nf-visual-card-grid{
+  margin-left:auto!important;
+  margin-right:auto!important;
+  justify-items:center;
+  align-items:center;
+}
+.nf-visual-card-grid > *{
+  justify-self:center;
+  align-self:center;
+}
+.nf-visual-card__content{
+  align-items:center!important;
+  justify-items:center!important;
+}
+.nf-object-stimulus--png,
+.nf-object-stimulus--png img{
+  align-self:center!important;
+  justify-self:center!important;
+}
+#neuroflex-session-report{
+  width:100%;
+}
+@media(max-width:760px){
+  .nf-balanced-word-grid{
+    grid-template-columns:repeat(2,minmax(120px,1fr))!important;
+  }
+}
+
+/* ─── F77.10.4 · TARJETAS UNIFORMES EN MEMORIA VISUAL ───────────────────── */
+.nf-memory-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(120px,1fr));
+  gap:10px;
+  width:100%;
+  max-width:560px;
+  margin:0 auto;
+}
+.nf-memory-grid__cell{
+  min-height:108px;
+  border-radius:12px;
+  border:1px solid #DDE4F0;
+  background:#fff;
+  display:grid;
+  place-items:center;
+  box-sizing:border-box;
+}
+.nf-memory-grid__button{
+  width:100%;
+  padding:10px;
+}
+.nf-memory-grid__button[aria-pressed="true"]{
+  box-shadow:0 0 0 2px rgba(58,99,228,.08) inset;
+}
+.nf-visual-memory-card svg{
+  display:block;
+}
+@media(max-width:720px){
+  .nf-memory-grid{
+    grid-template-columns:repeat(2,minmax(120px,1fr));
+    max-width:420px;
+  }
+}
+
+/* ─── F77.10.3 · EVALUACIÓN SIN PANEL INTERNO DESPLAZABLE ───────────────── */
+.nf-evaluation-focus .nf-unified-exercise-panel.is-assessment-fluid{
+  height:auto!important;
+  min-height:430px!important;
+  max-height:none!important;
+  overflow:visible!important;
+  justify-content:flex-start!important;
+  padding:26px 30px!important;
+}
+.nf-evaluation-focus .nf-unified-exercise-panel.is-assessment-fluid .nf-unified-exercise-panel__content{
+  width:100%!important;
+  max-width:980px!important;
+  margin:0 auto!important;
+}
+.nf-evaluation-focus.is-senior .nf-unified-exercise-panel.is-assessment-fluid{
+  height:auto!important;
+  min-height:480px!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+.nf-e02-search-grid{
+  display:grid;
+  grid-template-columns:repeat(8,minmax(58px,1fr));
+  gap:10px;
+  width:100%;
+}
+.nf-e02-search-cell{
+  min-height:68px!important;
+}
+@media(max-width:900px){
+  .nf-e02-search-grid{grid-template-columns:repeat(6,minmax(54px,1fr))}
+}
+@media(max-width:720px){
+  .nf-evaluation-focus .nf-unified-exercise-panel.is-assessment-fluid,
+  .nf-evaluation-focus.is-senior .nf-unified-exercise-panel.is-assessment-fluid{
+    min-height:390px!important;
+    padding:20px 16px!important;
+  }
+  .nf-e02-search-grid{grid-template-columns:repeat(4,minmax(54px,1fr));gap:8px}
+  .nf-e02-search-cell{min-height:60px!important}
+}
+
 /* ─── F77.10 · BANCO GRÁFICO DEFINITIVO NEUROFLEX ───────────────────────── */
 .nf-object-stimulus--png img{
   max-width:100%;
@@ -1915,9 +2028,10 @@ function NFStimulusObject({
       width:dimension,
       height:dimension,
       display:"block",
+      margin:"auto",
       objectFit:fit,
-      objectPosition:"center",
-      padding:imagePadding,
+      objectPosition:"50% 50%",
+      padding:Math.max(imagePadding,4),
       boxSizing:"border-box",
       userSelect:"none",
       WebkitUserDrag:"none",
@@ -1997,6 +2111,8 @@ function NeuroFlexObjectStimulus({id,size=96,senior=false,label}){
       height:dimension,
       display:"grid",
       placeItems:"center",
+      alignSelf:"center",
+      justifySelf:"center",
       margin:"0 auto",
       overflow:"hidden",
     }}
@@ -4001,6 +4117,26 @@ function chooseAdaptiveExercise(paciente, domId, exs, usedIds = []) {
 }
 
 
+
+function nfBalancedGridColumns(count,{maxColumns=5,minColumns=2}={}){
+  const n=Math.max(1,Number(count)||1);
+  if(n<=2)return n;
+  const max=Math.max(minColumns,Math.min(maxColumns,n));
+  let best=Math.min(3,max);
+  let bestScore=Infinity;
+  for(let cols=minColumns;cols<=max;cols++){
+    const rem=n%cols;
+    const rows=Math.ceil(n/cols);
+    const orphanPenalty=rem===1?100:0;
+    const imbalance=rem===0?0:(cols-rem);
+    const rowPenalty=Math.max(0,rows-3)*2;
+    const widthPenalty=cols>4?0.4:0;
+    const score=orphanPenalty+imbalance+rowPenalty+widthPenalty;
+    if(score<bestScore){bestScore=score;best=cols;}
+  }
+  return best;
+}
+
 function NFTrainingStimulusCard({children,modoMayor=false,minHeight=170}){
   return <NeuroFlexExercisePanel
     senior={!!modoMayor}
@@ -4404,8 +4540,15 @@ const EX_ADULTO = {
           <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIZA</div>
           <p style={{color:COLORS.textMuted,fontSize:M?".95rem":".8rem",margin:"4px 0 12px"}}>Estas palabras desaparecerán · {tl}s</p>
           <NFTrainingStimulusCard modoMayor={M} minHeight={250}>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(110px,1fr))",gap:12,width:"100%",maxWidth:650}}>
-              {WORDS.map(w=><div key={w} style={{padding:M?"14px 16px":"11px 14px",borderRadius:12,border:`2px solid ${COLORS.primary}25`,background:COLORS.primary+"08",fontSize:M?"1.05rem":".88rem",fontWeight:800}}>{w}</div>)}
+            <div
+              className="nf-balanced-word-grid"
+              style={{
+                display:"grid",
+                gridTemplateColumns:`repeat(${nfBalancedGridColumns(WORDS.length,{maxColumns:5})},minmax(110px,1fr))`,
+                gap:12,width:"100%",maxWidth:650,margin:"0 auto"
+              }}
+            >
+              {WORDS.map(w=><div key={w} style={{padding:M?"14px 16px":"11px 14px",borderRadius:12,border:`2px solid ${COLORS.primary}25`,background:COLORS.primary+"08",fontSize:M?"1.05rem":".88rem",fontWeight:800,display:"grid",placeItems:"center",minHeight:M?58:52}}>{w}</div>)}
             </div>
           </NFTrainingStimulusCard>
         </div>;
@@ -4422,7 +4565,14 @@ const EX_ADULTO = {
             <NFAudioReadButton text={`Selecciona todas las palabras que recuerdes haber visto. Opciones: ${recognition.join(", ")}.`} label="Escuchar opciones" mayor={modoMayor}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={280}>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(125px,1fr))",gap:11,width:"100%"}}>
+            <div
+              className="nf-balanced-word-grid"
+              style={{
+                display:"grid",
+                gridTemplateColumns:`repeat(${nfBalancedGridColumns(recognition.length,{maxColumns:5})},minmax(125px,1fr))`,
+                gap:11,width:"100%",maxWidth:760,margin:"0 auto"
+              }}
+            >
               {recognition.map(w=><button key={w} onClick={()=>toggle(w)} style={{minHeight:M?62:54,padding:10,borderRadius:11,border:`2px solid ${selected.has(w)?COLORS.primary:COLORS.border}`,background:selected.has(w)?COLORS.primary+"10":"#fff",fontFamily:"inherit",fontSize:M?".98rem":".84rem",fontWeight:800,cursor:"pointer"}}>{w}</button>)}
             </div>
           </NFTrainingStimulusCard>
@@ -6284,9 +6434,7 @@ const EX_ADULTO = {
           {shape:"circle",hex:"#DC4C4C",color:"rojo",forma:"círculo"},
           {shape:"circle",hex:"#3D6FBD",color:"azul",forma:"círculo"},
           {shape:"square",hex:"#DC4C4C",color:"rojo",forma:"cuadrado"},
-          {shape:"square",hex:"#3D6FBD",color:"azul",forma:"cuadrado"},
-          {shape:"circle",hex:"#D8A51B",color:"amarillo",forma:"círculo"},
-          {shape:"square",hex:"#D8A51B",color:"amarillo",forma:"cuadrado"}
+          {shape:"square",hex:"#3D6FBD",color:"azul",forma:"cuadrado"}
         ];
         const [queue]=useState(()=>{
           const q=[];let regla="color";
@@ -6299,7 +6447,7 @@ const EX_ADULTO = {
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[feedback,setFeedback]=useState(null);
         const records=useRef([]),t0=useRef(Date.now()),trialT0=useRef(Date.now());
         const q=queue[cur],previousRule=cur>0?queue[cur-1].regla:null,isSwitch=previousRule&&previousRule!==q.regla;
-        const opts=q?.regla==="color"?["rojo","azul","amarillo"]:["círculo","cuadrado"];
+        const opts=q?.regla==="color"?["rojo","azul"]:["círculo","cuadrado"];
 
         const pick=(opt)=>{
           if(feedback)return;
@@ -6337,7 +6485,9 @@ const EX_ADULTO = {
           </div>
           {isSwitch&&<div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent,marginTop:5}}>La regla cambió</div>}
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
-            <NFColoredRuleStimulus shape={q.item.shape} color={q.item.hex} size={M?142:122}/>
+            <div style={{width:"100%",minHeight:M?250:220,display:"grid",placeItems:"center"}}>
+              <NFColoredRuleStimulus shape={q.item.shape} color={q.item.hex} size={M?142:122}/>
+            </div>
           </NFTrainingStimulusCard>
           {feedback&&<div style={{minHeight:25,fontWeight:800,color:feedback==="ok"?COLORS.success:COLORS.error,marginBottom:8}}>
             {feedback==="ok"?"Correcto":`Respuesta: ${q.item[q.regla]}`}
@@ -6863,6 +7013,9 @@ const NEUROFLEX_PREPARATION_VISUAL_VERSION = "NF-PREPARATION-VISUAL-1.0";
 const NEUROFLEX_GRAPHIC_BANK_VERSION = "NF-GRAPHIC-BANK-1.0";
 const NEUROFLEX_F77_10_1_HOTFIX_VERSION = "NF-HOTFIX-E05-E07-E08-1.0";
 const NEUROFLEX_F77_10_2_HOTFIX_VERSION = "NF-HOTFIX-E18-E26-E27-1.0";
+const NEUROFLEX_F77_10_3_EVAL_LAYOUT_VERSION = "NF-EVAL-FLUID-LAYOUT-1.0";
+const NEUROFLEX_F77_10_4_MEMORY_CARD_UNIFORM_VERSION = "NF-MEMORY-CARD-UNIFORM-1.0";
+const NEUROFLEX_F77_10_5_SESSION_UX_VERSION = "NF-SESSION-UX-POLISH-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -8588,6 +8741,8 @@ function AssessmentTaskShell({ taskId, paciente, children, note }) {
   const taskNumber=Math.max(1,Math.min(34,Number(String(taskId||"").replace(/\D/g,""))||1));
   const progressPct=Math.round((taskNumber/34)*100);
   const domainLabel=ASSESSMENT_DOMAINS_V2[task?.primaryDomain]?.label || "Evaluación cognitiva";
+  const prepInstruction=F61_EVALUATION_PREP?.[taskId]?.instruction || null;
+  const patientInstruction=prepInstruction || note || null;
 
   return (
     <div className={`nf-evaluation-focus nf-v2-evaluation ${mayor ? "is-senior" : ""}`} style={{maxWidth:1180,margin:'0 auto'}}>
@@ -8621,8 +8776,20 @@ function AssessmentTaskShell({ taskId, paciente, children, note }) {
           </div>
         </div>
 
-        {/* Las notas técnicas/clinimétricas pertenecen al registro profesional y no se muestran al paciente durante la administración. */}
-        <NeuroFlexExercisePanel senior={mayor} variant="wide" ariaLabel="Panel de evaluación">
+        {patientInstruction&&(
+          <div className="nf-eval-instruction">
+            <span className="nf-eval-instruction__label">Qué debes hacer</span>
+            <p className="nf-eval-instruction__text">{patientInstruction}</p>
+          </div>
+        )}
+
+        {/* El contenido puntuable usa una superficie fluida: la página puede desplazarse, el ejercicio no se recorta. */}
+        <NeuroFlexExercisePanel
+          senior={mayor}
+          variant="wide"
+          className="is-assessment-fluid"
+          ariaLabel="Panel de evaluación"
+        >
           <div className="nf-protected-stimulus-zone" style={{background:"transparent",color:COLORS.textPrimary}}>
             {children}
           </div>
@@ -8837,8 +9004,21 @@ function NFE02Cancellation({ paciente, onDone }) {
         <div style={{fontSize:mayor?".9rem":".8rem",color:COLORS.textMuted,marginTop:3}}>Toca todos los ◆ que encuentres. No selecciones figuras vacías ni otras formas.</div>
       </div>
     </div>
-    <div style={{display:'grid',gridTemplateColumns:mayor?'repeat(6,1fr)':'repeat(8,1fr)',gap:mayor?11:9}}>
-      {items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} aria-label={`Figura ${it.symbol}`} style={{aspectRatio:'1',minHeight:mayor?68:56,borderRadius:10,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:mayor?'1.75rem':'1.45rem',fontWeight:800}}>{it.symbol}</button>)}
+    <div className="nf-e02-search-grid">
+      {items.map(it=><button
+        key={it.id}
+        className="nf-e02-search-cell"
+        onClick={()=>toggle(it.id)}
+        aria-label={`Figura ${it.symbol}`}
+        style={{
+          aspectRatio:'1',
+          borderRadius:10,
+          border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,
+          background:selected.includes(it.id)?COLORS.primary+'12':'#fff',
+          fontSize:mayor?'1.75rem':'1.45rem',
+          fontWeight:800
+        }}
+      >{it.symbol}</button>)}
     </div>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:18,gap:10}}>
       <span style={{fontSize:mayor?'.88rem':'.78rem',color:COLORS.textMuted}}>Seleccionados: {selected.length}</span>
@@ -9353,13 +9533,29 @@ function NFVisualMemoryShape({ kind, filled = false, size = 34 }) {
 
 function NFVisualMemoryCard({ item, size = 42 }) {
   const vertical=item.layout==="vertical";
-  return <div style={{
-    display:"flex",flexDirection:vertical?"column":"row",
-    alignItems:"center",justifyContent:"center",
-    gap:vertical?2:5,minHeight:size*1.7
-  }}>
-    <NFVisualMemoryShape kind={item.a} filled={!!item.fillA} size={size}/>
-    <NFVisualMemoryShape kind={item.b} filled={!!item.fillB} size={size}/>
+  const frame=Math.round(size*2.55);
+  return <div
+    className="nf-visual-memory-card"
+    style={{
+      width:frame,
+      height:frame,
+      margin:"0 auto",
+      display:"grid",
+      placeItems:"center",
+    }}
+  >
+    <div style={{
+      width:"100%",
+      height:"100%",
+      display:"flex",
+      flexDirection:vertical?"column":"row",
+      alignItems:"center",
+      justifyContent:"center",
+      gap:vertical?Math.max(6,Math.round(size*0.18)):Math.max(8,Math.round(size*0.24)),
+    }}>
+      <NFVisualMemoryShape kind={item.a} filled={!!item.fillA} size={size}/>
+      <NFVisualMemoryShape kind={item.b} filled={!!item.fillB} size={size}/>
+    </div>
   </div>;
 }
 
@@ -9446,8 +9642,8 @@ function NFE10VisualMemory({ paciente, onDone }) {
     {phase==="study" && <div style={{textAlign:"center"}}>
       <Badge label={`MEMORIZA · ${seconds}s`} color={COLORS.primary}/>
       <p style={{fontWeight:700}}>Observa cuidadosamente estas configuraciones.</p>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,maxWidth:500,margin:"18px auto"}}>
-        {targets.map(item=><div key={item.id} style={{padding:mayor?15:12,borderRadius:12,border:`1px solid ${COLORS.border}`,background:"#fff"}}>
+      <div className="nf-memory-grid" style={{maxWidth:560,margin:"18px auto"}}>
+        {targets.map(item=><div key={item.id} className="nf-memory-grid__cell" style={{padding:mayor?14:12}}>
           <NFVisualMemoryCard item={item} size={mayor?44:36}/>
         </div>)}
       </div>
@@ -9466,12 +9662,20 @@ function NFE10VisualMemory({ paciente, onDone }) {
     {phase==="recognition" && <div>
       <Badge label="RECONOCIMIENTO VISUAL" color={COLORS.info}/>
       <p style={{fontWeight:700}}>Selecciona únicamente las configuraciones que viste al inicio.</p>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:9}}>
+      <div className="nf-memory-grid">
         {recognitionItems.map(item=>{
           const active=selected.includes(item.id);
-          return <button key={item.id} onClick={()=>setSelected(s=>s.includes(item.id)?s.filter(v=>v!==item.id):[...s,item.id])}
+          return <button
+            key={item.id}
+            className="nf-memory-grid__cell nf-memory-grid__button"
+            onClick={()=>setSelected(s=>s.includes(item.id)?s.filter(v=>v!==item.id):[...s,item.id])}
             aria-pressed={active}
-            style={{padding:10,borderRadius:10,border:`2px solid ${active?COLORS.primary:COLORS.border}`,background:active?COLORS.primary+"10":"#fff",cursor:"pointer"}}>
+            style={{
+              border:`2px solid ${active?COLORS.primary:COLORS.border}`,
+              background:active?COLORS.primary+"10":"#fff",
+              cursor:"pointer"
+            }}
+          >
             <NFVisualMemoryCard item={item} size={mayor?42:34}/>
           </button>;
         })}
@@ -16762,7 +16966,7 @@ function FunctionalTransferCard({ paciente }) {
           Propuestas para practicar fuera de NeuroFlex las estrategias trabajadas. No significan que la transferencia se haya producido; el profesional decide cuáles son pertinentes para cada caso.
         </p>
       </div>
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(250px, 1fr))",gap:10 }}>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))",gap:12,alignItems:"stretch" }}>
         {items.map(item => (
           <div key={item.domId} style={{ padding:12,border:`1px solid ${COLORS.border}`,borderRadius:11 }}>
             <div style={{ fontWeight:800,fontSize:".8rem" }}><NFLineIcon name={DOMINIOS_ADULTO[item.domId]?.icon || "default"} size={17}/> {DOMINIOS_ADULTO[item.domId]?.label}</div>
@@ -24392,7 +24596,7 @@ function ReporteSesion({ sesion, paciente, onVolver }) {
     } catch(e) {}
   };
   return (
-    <div id="neuroflex-session-report" style={{ maxWidth: 600, margin: "0 auto" }}>
+    <div id="neuroflex-session-report" style={{ maxWidth: 1120, width:"100%", margin: "0 auto" }}>
       <style>{`
         @media print {
           body * { visibility: hidden !important; }
