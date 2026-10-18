@@ -6861,6 +6861,7 @@ const NEUROFLEX_VISUAL_TASK_REVIEW_VERSION = "NF-VISUAL-TASKS-1.0";
 const NEUROFLEX_INTERVENTION_VISUAL_VERSION = "NF-INTERVENTION-VISUAL-1.0";
 const NEUROFLEX_PREPARATION_VISUAL_VERSION = "NF-PREPARATION-VISUAL-1.0";
 const NEUROFLEX_GRAPHIC_BANK_VERSION = "NF-GRAPHIC-BANK-1.0";
+const NEUROFLEX_F77_10_1_HOTFIX_VERSION = "NF-HOTFIX-E05-E07-E08-1.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -8879,6 +8880,26 @@ function TimedSignalTask(props) {
 }
 function NFE06Switching(props) {
   return <F61EvaluationGate taskId="NF-E06" paciente={props.paciente}><NFE06SwitchingCore {...props}/></F61EvaluationGate>;
+}
+
+
+// F77.10.1 · Restauración de wrappers F61 perdidos durante integración.
+// Los Core conservan toda la lógica original; estos contenedores únicamente
+// restablecen la puerta de evaluación y evitan referencias indefinidas.
+function NFE05Interference(props) {
+  return <F61EvaluationGate taskId="NF-E05" paciente={props.paciente}>
+    <NFE05InterferenceCore {...props}/>
+  </F61EvaluationGate>;
+}
+function NFE07ActiveSpan(props) {
+  return <F61EvaluationGate taskId="NF-E07" paciente={props.paciente}>
+    <NFE07ActiveSpanCore {...props}/>
+  </F61EvaluationGate>;
+}
+function NFE08SpatialSpan(props) {
+  return <F61EvaluationGate taskId="NF-E08" paciente={props.paciente}>
+    <NFE08SpatialSpanCore {...props}/>
+  </F61EvaluationGate>;
 }
 
 function NFE05InterferenceCore({ paciente, onDone }) {
