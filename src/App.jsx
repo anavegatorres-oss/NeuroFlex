@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, query, where, orderBy, addDoc, updateDoc } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
@@ -569,6 +570,18 @@ body{background:
 
 
 
+
+
+/* ─── F77.10.6 · MODO PROTEGIDO DE EVALUACIÓN ───────────────────────────── */
+.nf-evaluation-protected-root{
+  position:fixed;
+  inset:0;
+  z-index:2147483000;
+  background:#F7F9FC;
+}
+body:has(.nf-evaluation-protected-root) .nf-v2-sidebar{
+  pointer-events:none!important;
+}
 
 /* ─── F77.10.5 · PULIDO DE SESIÓN Y REPORTE ─────────────────────────────── */
 .nf-balanced-word-grid{
@@ -7016,6 +7029,7 @@ const NEUROFLEX_F77_10_2_HOTFIX_VERSION = "NF-HOTFIX-E18-E26-E27-1.0";
 const NEUROFLEX_F77_10_3_EVAL_LAYOUT_VERSION = "NF-EVAL-FLUID-LAYOUT-1.0";
 const NEUROFLEX_F77_10_4_MEMORY_CARD_UNIFORM_VERSION = "NF-MEMORY-CARD-UNIFORM-1.0";
 const NEUROFLEX_F77_10_5_SESSION_UX_VERSION = "NF-SESSION-UX-POLISH-1.0";
+const NEUROFLEX_F77_10_6_EVALUATION_LOCK_VERSION = "NF-EVAL-LOCK-2.0";
 
 const NF_SUPPORT_LEVELS = {
   0:{id:"independent",label:"Independiente",short:"Sin ayuda"},
@@ -19520,24 +19534,28 @@ function PerfilPaciente({ paciente: pacienteInit, onVolver, profesionalUid, onIn
     setPac({...paciente,longitudinalClinicalDecisions:next});
   };
 
-  if (showEval) return (
+  if (showEval) return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Evaluación cognitiva en curso"
+      className="nf-evaluation-protected-root"
       style={{
         position:"fixed",
         inset:0,
-        zIndex:100000,
+        zIndex:2147483000,
         background:COLORS.bg,
         overflowY:"auto",
-        overscrollBehavior:"contain"
+        overscrollBehavior:"contain",
+        isolation:"isolate",
+        pointerEvents:"auto",
+        touchAction:"pan-y"
       }}
     >
       <div style={{
         position:"sticky",
         top:0,
-        zIndex:100001,
+        zIndex:2147483001,
         display:"flex",
         alignItems:"center",
         justifyContent:"space-between",
@@ -19560,7 +19578,7 @@ function PerfilPaciente({ paciente: pacienteInit, onVolver, profesionalUid, onIn
               Evaluación en curso
             </strong>
             <span style={{display:"block",fontSize:".72rem",color:COLORS.textMuted}}>
-              Navegación externa bloqueada para proteger el progreso.
+              Modo protegido: el menú y la navegación externa están desactivados durante la evaluación.
             </span>
           </div>
         </div>
@@ -19591,6 +19609,8 @@ function PerfilPaciente({ paciente: pacienteInit, onVolver, profesionalUid, onIn
         />
       </div>
     </div>
+  ,
+    document.body
   );
 
   return (
