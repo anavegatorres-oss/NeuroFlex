@@ -6732,6 +6732,23 @@ function NFE06Switching(props) {
   return <F61EvaluationGate taskId="NF-E06" paciente={props.paciente}><NFE06SwitchingCore {...props}/></F61EvaluationGate>;
 }
 
+// Restored F61 evaluation gates for existing assessment components.
+function NFE05Interference(props) {
+  return <F61EvaluationGate taskId="NF-E05" paciente={props.paciente}><NFE05InterferenceCore {...props}/></F61EvaluationGate>;
+}
+
+function NFE07ActiveSpan(props) {
+  return <F61EvaluationGate taskId="NF-E07" paciente={props.paciente}><NFE07ActiveSpanCore {...props}/></F61EvaluationGate>;
+}
+
+function NFE08SpatialSpan(props) {
+  return <F61EvaluationGate taskId="NF-E08" paciente={props.paciente}><NFE08SpatialSpanCore {...props}/></F61EvaluationGate>;
+}
+
+function NFE18PlanningRoute(props) {
+  return <F61EvaluationGate taskId="NF-E18" paciente={props.paciente}><NFE18PlanningRouteCore {...props}/></F61EvaluationGate>;
+}
+
 function NFE05InterferenceCore({ paciente, onDone }) {
   const labels=['AZUL','VERDE','NARANJA','MORADO'];
   const css={AZUL:'#2563EB',VERDE:'#16845B',NARANJA:'#D97706',MORADO:'#7C3AED'};
