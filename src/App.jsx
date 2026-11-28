@@ -469,6 +469,29 @@ body{background:
 .nf-v2-session-instruction{background:linear-gradient(135deg,#FAFBFF,#F6FAFF)!important;border:1px solid #E2E8F2!important;border-radius:14px!important}
 .nf-v2-session-instruction .nf-exercise-instruction__label{color:#315CB6!important}
 .nf-v2-session-focus .nf-protected-stimulus-zone{border-top:1px solid #EEF1F6;padding-top:20px!important}
+.nf-session-workspace{
+  display:grid;
+  grid-template-rows:38px minmax(0,1fr);
+  height:clamp(320px,calc(100dvh - 156px),850px);
+  max-width:1180px;
+  margin:0 auto;
+  border:1px solid #DFE6F0;
+  border-radius:20px;
+  background:linear-gradient(125deg,#FAF8FF,#F4F8FD 60%,#F2FAF8);
+}
+.nf-session-workspace::before{
+  content:"";
+  background:url("/android-chrome-512x512.png") right 18px center / 34px no-repeat;
+  opacity:.26;
+  pointer-events:none;
+}
+.nf-session-workspace__body{
+  min-width:0;
+  overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable both-edges;
+  padding:0 clamp(8px,2vw,24px) 18px;
+}
 
 @media(max-width:820px){
   .nf-v2-dashboard-network{display:none}.nf-v2-dashboard-hero__mark{display:none}
@@ -19754,7 +19777,18 @@ function getMetacognitiveSummary(results = []) {
   };
 }
 
-function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar, restoreDraft = null, onCheckpoint = null }) {
+function SesionActiva(props) {
+  const workspaceBody = useRef(null);
+  return (
+    <section className="nf-session-workspace" aria-label="Área de actividades">
+      <div className="nf-session-workspace__body" ref={workspaceBody}>
+        <ContenidoSesionActiva {...props} workspaceBody={workspaceBody} />
+      </div>
+    </section>
+  );
+}
+
+function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar, restoreDraft = null, onCheckpoint = null, workspaceBody }) {
   const mayor = config.modoMayor || false;
   const avanceManual = config.avanceManual !== false; // default true
   const ST = getStyles(mayor);
@@ -20070,6 +20104,10 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar, re
   const curDom = curItem ? DOMINIOS_ADULTO[curItem.domId] : null;
   const ExComp = curItem?.ex?.Component;
 
+  useEffect(() => {
+    workspaceBody.current?.scrollTo(0, 0);
+  }, [workspaceBody, cur, phase]);
+
   if (queue.length === 0) return (
     <Card style={{ textAlign: "center", padding: 40 }}>
       <p style={{ color: COLORS.textMuted }}>No hay ejercicios disponibles para las áreas seleccionadas.</p>
@@ -20203,7 +20241,7 @@ function SesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar, re
   );
 
   return (
-    <div className="nf-exercise-focus nf-v2-session-focus" style={{ maxWidth: 900, margin: "0 auto" }}>
+    <div className="nf-exercise-focus nf-v2-session-focus">
       {/* Clinical Focus: progreso discreto, sin decoración alrededor del estímulo */}
       <div className="nf-exercise-progress-head nf-v2-session-progress">
         <div className="nf-exercise-progress-row">
