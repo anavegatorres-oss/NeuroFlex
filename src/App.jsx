@@ -6978,7 +6978,9 @@ function NFE02Cancellation({ paciente, onDone }) {
     </div>
     <div>
     <div className={`nf-cancellation-grid${mayor ? ' is-senior' : ''}`}>
-      {items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} aria-label={`Figura ${it.symbol}`} style={{borderRadius:10,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:mayor?'1.75rem':'1.45rem',fontWeight:800}}>{it.symbol}</button>)}
+      {items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} aria-label={it.symbol === "◌" ? "Círculo punteado" : `Figura ${it.symbol}`} style={{borderRadius:10,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:mayor?'2rem':'1.7rem',fontWeight:800,lineHeight:1}}>{it.symbol === "◌"
+        ? <svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 32 32"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="0.5 5" /></svg>
+        : it.symbol}</button>)}
     </div>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:6,gap:10}}>
       <span style={{fontSize:mayor?'var(--nf-activity-text, .88rem)':'var(--nf-activity-text, .78rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Seleccionados: {selected.length}</span>
