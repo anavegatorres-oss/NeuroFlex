@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useContext, createContext } from "react";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, query, where, orderBy, addDoc, updateDoc } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
@@ -471,8 +471,8 @@ body{background:
 .nf-v2-session-focus .nf-protected-stimulus-zone{border-top:1px solid #EEF1F6;padding-top:20px!important}
 .nf-session-workspace{
   display:grid;
-  grid-template-rows:38px minmax(0,1fr);
-  height:clamp(320px,calc(100dvh - 156px),850px);
+  grid-template-rows:30px minmax(0,1fr);
+  height:calc(100dvh - 24px);
   max-width:1180px;
   margin:0 auto;
   border:1px solid #DFE6F0;
@@ -481,7 +481,7 @@ body{background:
 }
 .nf-session-workspace::before{
   content:"";
-  background:url("/android-chrome-512x512.png") right 18px center / 34px no-repeat;
+  background:url("/android-chrome-512x512.png") right 18px center / 26px no-repeat;
   opacity:.26;
   pointer-events:none;
 }
@@ -490,8 +490,25 @@ body{background:
   overflow:auto;
   overscroll-behavior:contain;
   scrollbar-gutter:stable both-edges;
-  padding:0 clamp(8px,2vw,24px) 18px;
+  padding:0 clamp(8px,2vw,24px) 8px;
 }
+#root:has(.nf-session-workspace) :is(.nf-v2-sidebar,.nf-mobile-backdrop,.nf-v2-topbar){
+  display:none!important;
+}
+#root:has(.nf-session-workspace) .nf-v2-shell{margin-left:0!important}
+#root:has(.nf-session-workspace) .nf-main-content{padding:12px!important}
+.nf-session-workspace .nf-eval-task-head{padding-bottom:4px!important;margin-bottom:6px!important}
+.nf-session-workspace .nf-eval-task-card{padding-block:clamp(12px,2dvh,24px)!important}
+.nf-cancellation-grid{
+  --nf-grid-rows:6;
+  --nf-grid-columns:8;
+  display:grid;
+  grid-template-columns:repeat(var(--nf-grid-columns),minmax(0,1fr));
+  grid-auto-rows:clamp(44px,calc((100dvh - 400px) / var(--nf-grid-rows)),76px);
+  gap:3px;
+}
+.nf-cancellation-grid.is-senior{--nf-grid-rows:8;--nf-grid-columns:6}
+.nf-evaluation-focus .nf-cancellation-grid button{min-width:0;min-height:0}
 
 @media(max-width:820px){
   .nf-v2-dashboard-network{display:none}.nf-v2-dashboard-hero__mark{display:none}
@@ -6699,20 +6716,20 @@ function NFE02Cancellation({ paciente, onDone }) {
     onDone(nfTaskResult('NF-E02',{precision:pctSafe(correct,targetIds.length+commissions),correct,total:targetIds.length,omissions,commissions,errors:omissions+commissions,meanResponseMs:meanNum(rts),medianResponseMs:medianNum(rts),responseVariabilityMs:sdNum(rts),blockPerformance:[pctSafe(b1,block1Targets.length),pctSafe(b2,block2Targets.length)],latencyMs:Date.now()-started.current,taskVersionAdministered:'NF-E02-1.1'}));
   };
   return <AssessmentTaskShell taskId='NF-E02' paciente={paciente}>
-    <div style={{display:"grid",gridTemplateColumns:mayor?"1fr":"auto 1fr",gap:16,alignItems:"center",padding:14,border:`1px solid ${COLORS.border}`,borderRadius:14,background:COLORS.bg,marginBottom:24}}>
+    <div style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:12,alignItems:"center",padding:"6px 10px",border:`1px solid ${COLORS.border}`,borderRadius:14,background:COLORS.bg,marginBottom:8}}>
       <div style={{textAlign:"center"}}>
         <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,marginBottom:5}}>Figura objetivo</div>
-        <div style={{fontSize:mayor?"2.8rem":"2.35rem",fontWeight:900,lineHeight:1}}>◆</div>
+        <div style={{fontSize:mayor?"2.15rem":"1.9rem",fontWeight:900,lineHeight:1}}>◆</div>
       </div>
       <div>
         <div style={{fontSize:mayor?"1.08rem":".96rem",fontWeight:800}}>Busca únicamente los rombos rellenos.</div>
         <div style={{fontSize:mayor?".9rem":".8rem",color:COLORS.textMuted,marginTop:3}}>Toca todos los ◆ que encuentres. No selecciones figuras vacías ni otras formas.</div>
       </div>
     </div>
-    <div style={{display:'grid',gridTemplateColumns:mayor?'repeat(6,1fr)':'repeat(8,1fr)',gap:mayor?11:9}}>
-      {items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} aria-label={`Figura ${it.symbol}`} style={{aspectRatio:'1',minHeight:mayor?68:56,borderRadius:10,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:mayor?'1.75rem':'1.45rem',fontWeight:800}}>{it.symbol}</button>)}
+    <div className={`nf-cancellation-grid${mayor ? ' is-senior' : ''}`}>
+      {items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} aria-label={`Figura ${it.symbol}`} style={{borderRadius:10,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:mayor?'1.75rem':'1.45rem',fontWeight:800}}>{it.symbol}</button>)}
     </div>
-    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:18,gap:10}}>
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:6,gap:10}}>
       <span style={{fontSize:mayor?'.88rem':'.78rem',color:COLORS.textMuted}}>Seleccionados: {selected.length}</span>
       <BtnPrimary onClick={finish}>Finalizar búsqueda</BtnPrimary>
     </div>
@@ -9291,6 +9308,7 @@ class NFScreeningErrorBoundary extends React.Component {
 
 function NeuroFlexScreeningProtocolV2({ paciente, familiarization, onSave, onExit }) {
   const [step,setStep]=useState(0);
+  useWorkspaceScrollReset(step);
   const [observations,setObservations]=useState([]);
   const [encodedWords,setEncodedWords]=useState([]);
   const [finalRecord,setFinalRecord]=useState(null);
@@ -9433,6 +9451,7 @@ function PersonalizedAssessmentProtocolV2({ paciente, familiarization, selection
     "NF-E33":NFE33PraxiasProfessional,"NF-E34":NFE34VisualLearning,
   };
   const [step,setStep]=useState(0),[taskResults,setTaskResults]=useState([]);
+  useWorkspaceScrollReset(step);
   const [verbalMemory,setVerbalMemory]=useState(null),[prospective,setProspective]=useState(null);
   const [pauses,setPauses]=useState([]),[interruptions,setInterruptions]=useState([]),[finalRecord,setFinalRecord]=useState(null);
   const startedAt=useRef(new Date().toISOString());
@@ -9551,6 +9570,7 @@ function EvaluationV2FullProtocol({ paciente, familiarization, onSave, onExit, r
   };
 
   const [step,setStep]=useState(()=>resumeDraft?.assessmentMode==="full"?Math.min(resumeDraft.step||0,protocol.length-1):0);
+  useWorkspaceScrollReset(step);
   const [taskResults,setTaskResults]=useState(()=>resumeDraft?.assessmentMode==="full"?(resumeDraft.taskResults||[]):[]);
   const [verbalMemory,setVerbalMemory]=useState(()=>resumeDraft?.assessmentMode==="full"?(resumeDraft.verbalMemory||null):null);
   const [prospective,setProspective]=useState(()=>resumeDraft?.assessmentMode==="full"?(resumeDraft.prospective||null):null);
@@ -11798,6 +11818,7 @@ function SelectiveReassessmentProtocolV2({ paciente, familiarization, onSave, on
   const plan=buildSelectiveReassessmentPlanV2(paciente);
   const baseline=getActiveEvaluation(paciente);
   const [step,setStep]=useState(0);
+  useWorkspaceScrollReset(step);
   const [taskResults,setTaskResults]=useState([]);
   const [verbalMemory,setVerbalMemory]=useState(null);
   const [prospective,setProspective]=useState(null);
@@ -12976,12 +12997,21 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 }
 
 // ─── EVALUACIÓN COGNITIVA ADULTOS ────────────────────────────────────────────
-function EvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }) {
+function EvaluacionAdulto(props) {
+  return (
+    <ActivityWorkspace label="Área de evaluación">
+      <ContenidoEvaluacionAdulto {...props} />
+    </ActivityWorkspace>
+  );
+}
+
+function ContenidoEvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }) {
   const dominios = Object.keys(DOMINIOS_ADULTO);
   const [domIdx, setDomIdx] = useState(0);
   const [exIdx, setExIdx] = useState(0);
   const [results, setResults] = useState({});
   const [phase, setPhase] = useState("intro"); // intro | familiarization | phase34 | phase35 | phase36 | phase37 | phase38 | phase39 | phase44 | demo | exercise | done
+  useWorkspaceScrollReset(phase, domIdx);
   const [demoSeen, setDemoSeen] = useState(new Set());
   const [familiarization, setFamiliarization] = useState(null);
   const [evaluationPath, setEvaluationPath] = useState("legacy");
@@ -19777,18 +19807,37 @@ function getMetacognitiveSummary(results = []) {
   };
 }
 
-function SesionActiva(props) {
+const ActivityWorkspaceContext = createContext(null);
+
+function ActivityWorkspace({ label, children }) {
   const workspaceBody = useRef(null);
   return (
-    <section className="nf-session-workspace" aria-label="Área de actividades">
+    <section className="nf-session-workspace" aria-label={label}>
       <div className="nf-session-workspace__body" ref={workspaceBody}>
-        <ContenidoSesionActiva {...props} workspaceBody={workspaceBody} />
+        <ActivityWorkspaceContext.Provider value={workspaceBody}>
+          {children}
+        </ActivityWorkspaceContext.Provider>
       </div>
     </section>
   );
 }
 
-function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar, restoreDraft = null, onCheckpoint = null, workspaceBody }) {
+function useWorkspaceScrollReset(step, phase) {
+  const workspaceBody = useContext(ActivityWorkspaceContext);
+  useEffect(() => {
+    workspaceBody?.current?.scrollTo(0, 0);
+  }, [workspaceBody, step, phase]);
+}
+
+function SesionActiva(props) {
+  return (
+    <ActivityWorkspace label="Área de entrenamiento">
+      <ContenidoSesionActiva {...props} />
+    </ActivityWorkspace>
+  );
+}
+
+function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCancelar, restoreDraft = null, onCheckpoint = null }) {
   const mayor = config.modoMayor || false;
   const avanceManual = config.avanceManual !== false; // default true
   const ST = getStyles(mayor);
@@ -20104,9 +20153,7 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
   const curDom = curItem ? DOMINIOS_ADULTO[curItem.domId] : null;
   const ExComp = curItem?.ex?.Component;
 
-  useEffect(() => {
-    workspaceBody.current?.scrollTo(0, 0);
-  }, [workspaceBody, cur, phase]);
+  useWorkspaceScrollReset(cur, phase);
 
   if (queue.length === 0) return (
     <Card style={{ textAlign: "center", padding: 40 }}>
