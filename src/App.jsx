@@ -473,7 +473,7 @@ body{background:
   display:grid;
   grid-template-rows:30px minmax(0,1fr);
   height:calc(100dvh - 24px);
-  max-width:1180px;
+  max-width:1320px;
   margin:0 auto;
   border:1px solid #DFE6F0;
   border-radius:20px;
@@ -573,6 +573,37 @@ body{background:
 .nf-session-workspace__body :is(.nf-eval-task-head h2,.nf-workspace-familiarization h2){
   font-size:clamp(1.35rem,2.15vw,1.65rem)!important;
   line-height:1.25;
+}
+.nf-workspace-familiarization-layout{
+  width:min(100%,920px);
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+  margin-inline:auto;
+}
+.nf-workspace-familiarization{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding:clamp(14px,3vw,30px)!important;
+}
+.nf-familiarization-stimulus{
+  flex:1;
+  min-height:clamp(128px,28dvh,220px);
+  padding-block:16px;
+  display:grid;
+  place-items:center;
+}
+.nf-familiarization-choices{
+  width:min(100%,680px);
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(6px,1.5vw,16px);
+}
+.nf-familiarization-choices button{
+  min-width:0;
+  min-height:clamp(68px,15dvh,120px);
+  overflow-wrap:anywhere;
 }
 .nf-session-workspace .nf-workspace-notice{
   background:#EFF5FC;
@@ -13014,8 +13045,8 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
   };
 
   return (
-    <div style={{ maxWidth: 680, margin: "0 auto" }}>
-      <Card className="nf-workspace-familiarization" style={{ padding: mayor ? 32 : 26 }}>
+    <div className="nf-workspace-familiarization-layout">
+      <Card className="nf-workspace-familiarization">
         <div style={{ display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",marginBottom:18 }}>
           <div>
             <div style={{ fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary,letterSpacing:".04em",textTransform:"uppercase" }}>
@@ -13031,7 +13062,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 
         <ProgressBar value={Math.round(((step + 1) / steps.length) * 100)} color={COLORS.primary} />
 
-        <div style={{ marginTop:24,minHeight:210,display:"flex",alignItems:"center",justifyContent:"center" }}>
+        <div className="nf-familiarization-stimulus">
           {current.id === "touch" && (
             <button
               onClick={() => { addAttempt("touch"); next(); }}
@@ -13046,7 +13077,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
           )}
 
           {current.id === "select" && (
-            <div style={{ display:"flex",gap:18,flexWrap:"wrap",justifyContent:"center" }}>
+            <div className="nf-familiarization-choices">
               {[
                 { id:"square", shape:"■", label:"Cuadrado" },
                 { id:"circle", shape:"●", label:"Círculo" },
@@ -13060,7 +13091,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                     if (opt.id === "circle") setTimeout(next, 300);
                   }}
                   style={{
-                    minWidth:mayor?130:112,padding:mayor?"18px 16px":"14px",
+                    padding:mayor?"14px 5px":"10px 5px",
                     borderRadius:14,border:`2px solid ${selected===opt.id?COLORS.primary:COLORS.border}`,
                     background:selected===opt.id?COLORS.primary+"10":"#fff",cursor:"pointer"
                   }}
@@ -13154,7 +13185,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
           )}
 
           {current.id === "respondConfirm" && (
-            <div style={{ width:"100%",maxWidth:430 }}>
+            <div style={{ width:"100%",maxWidth:680 }}>
               <p style={{fontWeight:700,textAlign:"center",marginBottom:14}}>Elige la palabra “AZUL”</p>
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
                 {["ROJO","AZUL","VERDE"].map(x => (
@@ -13185,7 +13216,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
           )}
         </div>
 
-        <div className="nf-workspace-notice" style={{marginTop:22,padding:12,borderRadius:10,lineHeight:1.5}}>
+        <div className="nf-workspace-notice" style={{marginTop:6,padding:12,borderRadius:10,lineHeight:1.5}}>
           Esta fase comprueba el manejo básico de la interfaz. <strong>No genera puntuación cognitiva</strong> y los intentos adicionales se registran únicamente como contexto de administración.
         </div>
 
