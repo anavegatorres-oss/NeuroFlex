@@ -714,6 +714,26 @@ body{background:
 .nf-orientation-fields{background:#F5F8FC}
 .nf-orientation-fields > p,.nf-orientation-register > p{margin:0 0 10px}
 .nf-orientation-inputs{display:grid;gap:8px}
+.nf-orientation-menu{background:#fff;border:1px solid #B5C8DD;border-radius:10px}
+.nf-orientation-menu summary{padding:12px;color:#253B55;font-size:1.08rem;font-weight:650;cursor:pointer}
+.nf-orientation-menu summary::marker{color:#2858A1}
+.nf-orientation-menu__options{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,110px),1fr));
+  gap:6px;
+  padding:8px;
+  border-top:1px solid #DDE6F1;
+}
+.nf-orientation-menu__options button{
+  background:#F4F8FD;
+  border:1px solid #C9D8E9;
+  border-radius:8px;
+  padding:6px;
+  color:#253B55;
+  font-size:1.08rem!important;
+  cursor:pointer;
+}
+.nf-orientation-menu__options button[aria-pressed="true"]{background:#DBEAFE;border-color:#2858A1}
 .nf-orientation-inputs > *{width:100%;min-width:0}
 .nf-cancellation-instruction{margin-bottom:12px}
 .nf-assessment-action{display:flex;justify-content:flex-end;margin-top:12px}
@@ -6906,6 +6926,24 @@ function F61EvaluationGate({ taskId, paciente, children }) {
   return ready ? children : <F61EvaluationPreparation taskId={taskId} paciente={paciente} onReady={()=>setReady(true)}/>;
 }
 
+function OrientationMenu({ label, options, value, onChange }) {
+  return (
+    <details className="nf-orientation-menu" name="orientation-choice">
+      <summary>{value ? `${label}: ${value}` : label}</summary>
+      <div className="nf-orientation-menu__options">
+        {options.map(option => (
+          <button key={option} type="button" aria-pressed={value===option} onClick={event => {
+            const menu = event.currentTarget.closest("details");
+            onChange(option);
+            menu.open = false;
+            menu.querySelector("summary").focus();
+          }}>{option}</button>
+        ))}
+      </div>
+    </details>
+  );
+}
+
 function NFE01Orientation({ paciente, onDone }) {
   const now = new Date();
   const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -6931,9 +6969,9 @@ function NFE01Orientation({ paciente, onDone }) {
     <section className="nf-orientation-fields">
     <p style={{fontWeight:700}}>Responde sin consultar reloj ni calendario.</p>
     <div className="nf-orientation-inputs">
-      <select aria-label='Mes actual' value={month} onChange={e=>setMonth(e.target.value)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}><option value=''>Mes actual…</option>{months.map(x=><option key={x}>{x}</option>)}</select>
+      <OrientationMenu label="Mes actual" options={months} value={month} onChange={setMonth}/>
       <input aria-label='Año actual' value={year} onChange={e=>setYear(e.target.value)} inputMode='numeric' placeholder='Año actual' style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}/>
-      <select aria-label='Día de la semana' value={weekday} onChange={e=>setWeekday(e.target.value)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}><option value=''>Día de la semana…</option>{weekdays.map(x=><option key={x}>{x}</option>)}</select>
+      <OrientationMenu label="Día de la semana" options={weekdays} value={weekday} onChange={setWeekday}/>
     </div>
     </section>
     <section className="nf-orientation-register">
