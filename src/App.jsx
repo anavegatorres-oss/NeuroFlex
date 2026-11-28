@@ -13047,6 +13047,11 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
   const [selected, setSelected] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [dragOffset, setDragOffset] = useState(null);
+  const dragGesture = useRef(null);
+  const dropZone = useRef(null);
+  const suppressDragClick = useRef(false);
+  const dragCompleted = useRef(false);
   const [response, setResponse] = useState("");
   const [heard, setHeard] = useState(false);
   const [listenChoice, setListenChoice] = useState(null);
@@ -13115,10 +13120,48 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
   };
 
   const completeDrag = () => {
+    if (dragCompleted.current) return;
+    dragCompleted.current = true;
     addAttempt("drag");
     setDragging(false);
     setDragOver(false);
     setTimeout(next, 250);
+  };
+
+  const overDropZone = ({clientX, clientY}) => {
+    const bounds = dropZone.current?.getBoundingClientRect();
+    return !!bounds && clientX >= bounds.left && clientX <= bounds.right &&
+      clientY >= bounds.top && clientY <= bounds.bottom;
+  };
+
+  const startDrag = event => {
+    if (!event.isPrimary || event.button !== 0 || dragCompleted.current) return;
+    suppressDragClick.current = false;
+    dragGesture.current = {id:event.pointerId, x:event.clientX, y:event.clientY, moved:false};
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const moveDrag = event => {
+    const gesture = dragGesture.current;
+    if (gesture?.id !== event.pointerId) return;
+    const x = event.clientX - gesture.x;
+    const y = event.clientY - gesture.y;
+    if (!gesture.moved && Math.hypot(x,y) < 6) return;
+    gesture.moved = true;
+    setDragging(true);
+    setDragOffset({x,y});
+    setDragOver(overDropZone(event));
+  };
+
+  const endDrag = (event, cancelled = false) => {
+    const gesture = dragGesture.current;
+    if (gesture?.id !== event.pointerId) return;
+    dragGesture.current = null;
+    suppressDragClick.current = gesture.moved || cancelled;
+    setDragOffset(null);
+    setDragOver(false);
+    if (gesture.moved || cancelled) setDragging(false);
+    if (!cancelled && gesture.moved && overDropZone(event)) completeDrag();
   };
 
   return (
@@ -13130,14 +13173,22 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
               Familiarización · No puntuable
             </div>
             <h2 style={{ margin:"5px 0 6px",fontSize:mayor?"1.45rem":"1.25rem" }}>{current.title}</h2>
-            <p style={{ margin:0,color:"#405574",lineHeight:1.6,fontSize:mayor?"1.05rem":"var(--nf-activity-text, .95rem)" }}>
-              {current.instruction}
-            </p>
+            {current.id !== "select" && (
+              <p style={{ margin:0,color:"#405574",lineHeight:1.6,fontSize:mayor?"1.05rem":"var(--nf-activity-text, .95rem)" }}>
+                {current.instruction}
+              </p>
+            )}
           </div>
           <div style={{ fontSize:"var(--nf-activity-text, .76rem)",color:"#405574",whiteSpace:"nowrap" }}>{step+1}/{steps.length}</div>
         </div>
 
         <ProgressBar value={Math.round(((step + 1) / steps.length) * 100)} color={COLORS.primary} />
+
+        {(current.id === "select" || current.id === "respondConfirm") && (
+          <p style={{fontSize:"1.2rem",fontWeight:700,textAlign:"center",margin:"16px 0 0"}}>
+            {current.id === "select" ? current.instruction : "Elige la palabra “AZUL”"}
+          </p>
+        )}
 
         {current.id === "listen" && (
           <div className="nf-familiarization-audio">
@@ -13187,24 +13238,28 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 
           {current.id === "drag" && (
             <div style={{ width:"100%",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:18,alignItems:"center" }}>
-              <div
-                draggable
-                onDragStart={() => setDragging(true)}
-                onDragEnd={() => setDragging(false)}
-                onClick={() => setDragging(true)}
+              <button
+                type="button"
+                onPointerDown={startDrag}
+                onPointerMove={moveDrag}
+                onPointerUp={event => endDrag(event)}
+                onPointerCancel={event => endDrag(event, true)}
+                onLostPointerCapture={event => endDrag(event, true)}
+                onClick={event => { if (event.detail === 0 || !suppressDragClick.current) setDragging(true); }}
                 style={{
                   padding:18,borderRadius:14,border:`2px solid ${dragging?COLORS.primary:COLORS.border}`,
                   background:dragging?COLORS.primary+"10":"#fff",textAlign:"center",fontWeight:800,
-                  cursor:"grab",userSelect:"none"
+                  cursor:dragOffset?"grabbing":"grab",userSelect:"none",touchAction:"none",
+                  position:"relative",zIndex:dragOffset?1:undefined,
+                  transform:dragOffset?`translate(${dragOffset.x}px, ${dragOffset.y}px)`:undefined
                 }}
               >
                 ↔ Tarjeta
                 <div style={{fontSize:"var(--nf-activity-meta, .7rem)",color:"#405574",marginTop:5}}>Arrastra o toca</div>
-              </div>
-              <div
-                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={e => { e.preventDefault(); completeDrag(); }}
+              </button>
+              <button
+                type="button"
+                ref={dropZone}
                 onClick={() => { if (dragging) completeDrag(); }}
                 style={{
                   minHeight:105,borderRadius:14,
@@ -13215,7 +13270,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                 }}
               >
                 Suelta aquí
-              </div>
+              </button>
             </div>
           )}
 
@@ -13262,15 +13317,11 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 
           {current.id === "respondConfirm" && (
             <div style={{ width:"100%",maxWidth:680 }}>
-              <p style={{fontWeight:700,textAlign:"center",marginBottom:14}}>Elige la palabra “AZUL”</p>
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
                 {["ROJO","AZUL","VERDE"].map(x => (
-                  <button key={x} onClick={() => { addAttempt("respondConfirm"); setResponse(x); }}
-                    style={{
-                      padding:mayor?"15px 8px":"12px 8px",borderRadius:10,
-                      border:`2px solid ${response===x?COLORS.primary:COLORS.border}`,
-                      background:response===x?COLORS.primary+"10":"#fff",fontWeight:700,cursor:"pointer"
-                    }}>{x}</button>
+                  <button key={x} className="nf-visual-choice" aria-pressed={response===x}
+                    onClick={() => { addAttempt("respondConfirm"); setResponse(x); }}
+                    style={{fontSize:"clamp(1.1rem,2.5vw,1.35rem)",fontWeight:750,color:COLORS.primary}}>{x}</button>
                 ))}
               </div>
               <BtnPrimary
