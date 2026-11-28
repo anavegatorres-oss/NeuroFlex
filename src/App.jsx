@@ -604,7 +604,7 @@ body{background:
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:clamp(8px,3vw,32px);
 }
-.nf-familiarization-shape{
+.nf-visual-choice{
   display:grid;
   place-items:center;
   min-width:0;
@@ -615,10 +615,13 @@ body{background:
   border-radius:12px;
   cursor:pointer;
 }
-.nf-familiarization-shape:focus-visible{outline:2px solid #2858A1;outline-offset:3px}
-.nf-familiarization-shape[aria-pressed="true"]{background:#EEF4FF}
-.nf-familiarization-shape span{font-size:clamp(3.3rem,8vw,5rem);line-height:1}
-.nf-familiarization-shape.is-senior span{font-size:clamp(3.7rem,9vw,5.6rem)}
+.nf-visual-choice:focus-visible{outline:2px solid #2858A1;outline-offset:3px}
+.nf-visual-choice[aria-pressed="true"]{background:#EEF4FF}
+.nf-visual-choice__glyph{font-size:clamp(3.3rem,8vw,5rem);line-height:1}
+.nf-visual-choice.is-senior .nf-visual-choice__glyph{font-size:clamp(3.7rem,9vw,5.6rem)}
+.nf-visual-choice svg{max-width:100%;height:auto}
+.nf-visual-choice[data-feedback="correct"]{background:#E4F4EB}
+.nf-visual-choice[data-feedback="incorrect"]{background:#FAE9E8}
 .nf-familiarization-choices{
   width:min(100%,680px);
   display:grid;
@@ -4435,11 +4438,13 @@ const EX_ADULTO = {
           </NFTrainingStimulusCard>
 
           <div style={{display:"grid",gridTemplateColumns:`repeat(${Math.min(optionCount,3)},1fr)`,gap:M?16:12,maxWidth:620,margin:"0 auto"}}>
-            {item.opts.map(opt=><button key={opt} disabled={locked.current} onClick={()=>pick(opt)} style={{
-              minHeight:M?96:82,borderRadius:15,border:`3px solid ${!sel?COLORS.border:opt===item.target?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,
-              background:!sel?"#fff":opt===item.target?COLORS.success+"0D":sel===opt?COLORS.error+"0D":"#fff",
-              cursor:locked.current?"default":"pointer"
-            }}>{opt}</button>)}
+            {item.opts.map((opt, index) => (
+              <button key={opt} className="nf-visual-choice" disabled={locked.current}
+                onClick={()=>pick(opt)} aria-label={`Opción ${index + 1}`}
+                data-feedback={sel ? (opt === item.target ? "correct" : sel === opt ? "incorrect" : undefined) : undefined}>
+                <NFStimulusShape id={opt} size={M?72:60}/>
+              </button>
+            ))}
           </div>
         </div>;
       }
@@ -4642,11 +4647,13 @@ const EX_ADULTO = {
             </div>
           </NFTrainingStimulusCard>
           <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,maxWidth:560,margin:"0 auto"}}>
-            {p.opts.map(opt=><button key={opt} disabled={locked.current} onClick={()=>pick(opt)} style={{
-              minHeight:M?82:72,borderRadius:13,
-              border:`2px solid ${!sel?COLORS.border:opt===p.ans?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,
-              background:!sel?"#fff":opt===p.ans?COLORS.success+"0D":sel===opt?COLORS.error+"0D":"#fff",cursor:"pointer"
-            }}>{opt}</button>)}
+            {p.opts.map((opt, index) => (
+              <button key={opt} className="nf-visual-choice" disabled={locked.current}
+                onClick={()=>pick(opt)} aria-label={`Opción ${index + 1}`}
+                data-feedback={sel ? (opt === p.ans ? "correct" : sel === opt ? "incorrect" : undefined) : undefined}>
+                <NFStimulusShape id={opt} size={M?72:60}/>
+              </button>
+            ))}
           </div>
         </div>;
       }
@@ -5120,7 +5127,11 @@ const EX_ADULTO = {
         const make=()=>{const start=Math.floor(Math.random()*3),seq=[0,1,2].map(i=>shapes[(start+i)%3]),ans=shapes[start],opts=shuffle(shapes);return{seq,ans,opts}};
         const [items]=useState(()=>Array.from({length:count},make)),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"razonamiento no verbal / matrices lógicas",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa la secuencia de figuras y elige cuál continúa la regla." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div style={{display:"flex",gap:16,alignItems:"center"}}>{item.seq.map((x,i)=><div key={i} style={{width:M?88:72,height:M?88:72,border:`2px solid ${COLORS.border}`,borderRadius:12,display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?58:48}/></div>)}<div style={{width:M?88:72,height:M?88:72,border:`2px dashed ${COLORS.primary}`,borderRadius:12,display:"grid",placeItems:"center",fontWeight:900,fontSize:"1.5rem",color:COLORS.primary}}>?</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,maxWidth:500,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} aria-label="Opción de figura" style={{minHeight:M?92:78,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape id={v} size={M?56:46}/></button>)}</div></div>;
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa la secuencia de figuras y elige cuál continúa la regla." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div style={{display:"flex",gap:16,alignItems:"center"}}>{item.seq.map((x,i)=><div key={i} style={{width:M?88:72,height:M?88:72,border:`2px solid ${COLORS.border}`,borderRadius:12,display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?58:48}/></div>)}<div style={{width:M?88:72,height:M?88:72,border:`2px dashed ${COLORS.primary}`,borderRadius:12,display:"grid",placeItems:"center",fontWeight:900,fontSize:"1.5rem",color:COLORS.primary}}>?</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,maxWidth:500,margin:"0 auto"}}>{item.opts.map((v,index)=><button key={v} className="nf-visual-choice" onClick={()=>pick(v)} disabled={locked.current}
+          aria-label={`Opción ${index + 1}`}
+          data-feedback={sel ? (v === item.ans ? "correct" : sel === v ? "incorrect" : undefined) : undefined}>
+          <NFStimulusShape id={v} size={M?72:60}/>
+        </button>)}</div></div>;
       }
     },
   ],
@@ -13164,13 +13175,10 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                     setSelected(opt.id);
                     if (opt.id === "circle") setTimeout(next, 300);
                   }}
-                  style={{
-                    padding:mayor?"14px 5px":"10px 5px",
-                    borderRadius:14,border:`2px solid ${selected===opt.id?COLORS.primary:COLORS.border}`,
-                    background:selected===opt.id?COLORS.primary+"10":"#fff",cursor:"pointer"
-                  }}
+                  aria-pressed={selected===opt.id}
+                  className={`nf-visual-choice${mayor ? " is-senior" : ""}`}
                 >
-                  <div style={{ fontSize:mayor?"2.3rem":"1.9rem",lineHeight:1 }}>{opt.shape}</div>
+                  <span className="nf-visual-choice__glyph" aria-hidden="true">{opt.shape}</span>
                   <div style={{ marginTop:7,fontSize:mayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",fontWeight:700 }}>{opt.label}</div>
                 </button>
               ))}
@@ -13228,8 +13236,8 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                     }}
                     aria-label={opt.label}
                     aria-pressed={listenChoice===opt.id}
-                    className={`nf-familiarization-shape${mayor ? " is-senior" : ""}`}>
-                    <span aria-hidden="true" style={{color:opt.tone}}>{opt.shape}</span>
+                    className={`nf-visual-choice${mayor ? " is-senior" : ""}`}>
+                    <span className="nf-visual-choice__glyph" aria-hidden="true" style={{color:opt.tone}}>{opt.shape}</span>
                   </button>)}
                 </div>
               )}
