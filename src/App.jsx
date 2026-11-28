@@ -594,6 +594,31 @@ body{background:
   display:grid;
   place-items:center;
 }
+.nf-familiarization-audio{
+  display:flex;
+  justify-content:flex-start;
+  margin-top:14px;
+}
+.nf-familiarization-audio-choices{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(8px,3vw,32px);
+}
+.nf-familiarization-shape{
+  display:grid;
+  place-items:center;
+  min-width:0;
+  min-height:clamp(74px,15dvh,120px);
+  padding:4px;
+  border:0;
+  background:transparent;
+  border-radius:12px;
+  cursor:pointer;
+}
+.nf-familiarization-shape:focus-visible{outline:2px solid #2858A1;outline-offset:3px}
+.nf-familiarization-shape[aria-pressed="true"]{background:#EEF4FF}
+.nf-familiarization-shape span{font-size:clamp(3.3rem,8vw,5rem);line-height:1}
+.nf-familiarization-shape.is-senior span{font-size:clamp(3.7rem,9vw,5.6rem)}
 .nf-familiarization-choices{
   width:min(100%,680px);
   display:grid;
@@ -13103,6 +13128,14 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 
         <ProgressBar value={Math.round(((step + 1) / steps.length) * 100)} color={COLORS.primary} />
 
+        {current.id === "listen" && (
+          <div className="nf-familiarization-audio">
+            <BtnPrimary onClick={()=>{setListenChoice(null);playInstruction();}} >
+                <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:8}}><NFIcon name="volume" size={18}/>Escuchar instrucción</span>
+              </BtnPrimary>
+          </div>
+        )}
+
         <div className="nf-familiarization-stimulus">
           {current.id === "touch" && (
             <button
@@ -13179,30 +13212,24 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
           )}
 
           {current.id === "listen" && (
-            <div style={{ width:"100%",maxWidth:560,textAlign:"center" }}>
-              <BtnPrimary onClick={()=>{setListenChoice(null);playInstruction();}} style={{ width:"100%",padding:mayor?16:13,marginBottom:18 }}>
-                <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:8}}><NFIcon name="volume" size={18}/>Escuchar instrucción</span>
-              </BtnPrimary>
+            <div style={{ width:"100%",maxWidth:680,textAlign:"center" }}>
+
 
               {heard && speechAvailable && (
-                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
+                <div className="nf-familiarization-audio-choices">
                   {[
-                    {id:"blueCircle",shape:"●",label:"",tone:"#2F80ED"},
-                    {id:"redTriangle",shape:"▲",label:"",tone:"#E05252"},
-                    {id:"greenSquare",shape:"■",label:"",tone:"#2E9B7B"},
+                    {id:"blueCircle",shape:"●",label:"Círculo azul",tone:"#2F80ED"},
+                    {id:"redTriangle",shape:"▲",label:"Triángulo rojo",tone:"#E05252"},
+                    {id:"greenSquare",shape:"■",label:"Cuadrado verde",tone:"#2E9B7B"},
                   ].map(opt=><button key={opt.id} onClick={()=>{
                       addAttempt("listen");
                       setListenChoice(opt.id);
                       if(opt.id==="redTriangle")setTimeout(next,300);
                     }}
-                    aria-label={opt.id}
-                    style={{
-                      minHeight:mayor?118:100,borderRadius:16,
-                      border:`2px solid ${listenChoice===opt.id?COLORS.primary:COLORS.border}`,
-                      background:"#fff",cursor:"pointer",
-                      display:"grid",placeItems:"center"
-                    }}>
-                    <span style={{fontSize:mayor?"3.6rem":"3rem",lineHeight:1,color:opt.tone}}>{opt.shape}</span>
+                    aria-label={opt.label}
+                    aria-pressed={listenChoice===opt.id}
+                    className={`nf-familiarization-shape${mayor ? " is-senior" : ""}`}>
+                    <span aria-hidden="true" style={{color:opt.tone}}>{opt.shape}</span>
                   </button>)}
                 </div>
               )}
