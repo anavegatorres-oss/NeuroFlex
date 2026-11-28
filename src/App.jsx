@@ -13326,7 +13326,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                 {["ROJO","AZUL","VERDE"].map(x => (
                   <button key={x} className="nf-visual-choice" aria-pressed={response===x}
                     onClick={() => { addAttempt("respondConfirm"); setResponse(x); }}
-                    style={{fontSize:"clamp(1.1rem,2.5vw,1.35rem)",fontWeight:750,color:COLORS.primary}}>{x}</button>
+                    style={{fontSize:"clamp(1.25rem,3.5vw,1.8rem)",fontWeight:750,color:COLORS.primary}}>{x}</button>
                 ))}
               </div>
               <BtnPrimary
