@@ -2350,11 +2350,11 @@ function ClinicalMetricCard({ icon = "default", label, value, detail, accent = C
   );
 }
 
-function ClinicalCaseDashboard({ paciente, onGo, onStartSession, onEvaluate }) {
+function ClinicalCaseDashboard({ paciente, onGo, onStartSession }) {
   const s = getClinicalDashboardSummary(paciente);
 
-  const nextStep = !paciente?.eval
-    ? { icon: "brain", text: "Realizar evaluación", action: onEvaluate }
+  const nextStep = !getActiveEvaluation(paciente)
+    ? null
     : !paciente?.interventionPlan
       ? { icon: "plan", text: "Definir plan de intervención", action: () => onGo?.("intervencion") }
       : s.activeAreas.length === 0
@@ -2530,7 +2530,7 @@ function ClinicalCaseDashboard({ paciente, onGo, onStartSession, onEvaluate }) {
           )}
         </Card>
 
-        <Card style={{ background: COLORS.primary + "05", border: `1.5px solid ${COLORS.primary}18` }}>
+        {nextStep && <Card style={{ background: COLORS.primary + "05", border: `1.5px solid ${COLORS.primary}18` }}>
           <h3 style={{ margin: "0 0 8px", fontSize: ".9rem" }}><span style={{display:"inline-flex",alignItems:"center",gap:8}}><NFLineIcon name="next" size={18}/>Próximo paso</span></h3>
           <p style={{ color: COLORS.textMuted, fontSize: ".75rem", lineHeight: 1.5, margin: "0 0 14px" }}>
             NeuroFlex propone el siguiente paso según el estado del caso. El profesional conserva la decisión final.
@@ -2538,7 +2538,7 @@ function ClinicalCaseDashboard({ paciente, onGo, onStartSession, onEvaluate }) {
           <BtnPrimary onClick={nextStep.action} style={{ width: "100%" }}>
             <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:8}}><NFLineIcon name={nextStep.icon} size={17}/>{nextStep.text}</span>
           </BtnPrimary>
-        </Card>
+        </Card>}
       </div>
     </div>
   );
@@ -14361,19 +14361,19 @@ const PROFILE_TAB_INFO = {
   reportes:{icon:"report",help:"Reportes de sesión y evolución."},
 };
 
-function ClinicalStatusBanner({paciente,onGo,onEvaluate,onSession}) {
+function ClinicalStatusBanner({paciente,onGo,onSession}) {
   const hasEval=!!getActiveEvaluation(paciente);
   const hasPlan=!!paciente?.interventionPlan;
   const active=(paciente?.interventionPlan?.areas||[]).filter(a=>a.estado==="objetivo"||a.estado==="seguimiento");
   const sessions=paciente?.sesiones?.length||0;
-  let icon="brain",title="Evaluación pendiente",detail="Realiza la evaluación para construir el perfil cognitivo.",action="Evaluar",fn=onEvaluate;
+  let icon="brain",title="Evaluación pendiente",detail="Realiza la evaluación para construir el perfil cognitivo.",action,fn;
   if(hasEval&&!hasPlan){icon="plan";title="Evaluación completada";detail="El siguiente paso es definir los objetivos del plan de intervención.";action="Crear plan";fn=()=>onGo?.("intervencion");}
   else if(hasEval&&hasPlan&&active.length===0){icon="settings";title="Plan sin objetivos activos";detail="Revisa el plan antes de utilizar el modo automático.";action="Revisar plan";fn=()=>onGo?.("intervencion");}
   else if(hasEval&&active.length>0&&sessions===0){icon="next";title="Listo para intervenir";detail=`${active.length} área(s) activa(s). Puedes preparar la primera sesión.`;action="Configurar sesión";fn=onSession;}
   else if(sessions>0){icon="followup";title="Seguimiento en curso";detail=`${sessions} sesión(es) registrada(s). Revisa la evolución o continúa la intervención.`;action="Ver progreso";fn=()=>onGo?.("progreso");}
   return <div className="nf-clinical-status">
     <div className="nf-clinical-status__content"><span className="nf-clinical-status__icon"><NFLineIcon name={icon} size={20}/></span><div><div className="nf-clinical-status__title">{title}</div><div className="nf-clinical-status__detail">{detail}</div></div></div>
-    <BtnSecondary onClick={fn} style={{fontSize:".76rem",whiteSpace:"nowrap"}}>{action}</BtnSecondary>
+    {action && <BtnSecondary onClick={fn} style={{fontSize:".76rem",whiteSpace:"nowrap"}}>{action}</BtnSecondary>}
   </div>;
 }
 
@@ -16279,7 +16279,7 @@ function PerfilPaciente({ paciente: pacienteInit, onVolver, profesionalUid, onIn
         ))}
       </div>
 
-      <ClinicalStatusBanner paciente={paciente} onGo={setTab} onEvaluate={() => setShowEval(true)} onSession={onIniciarSesion} />
+      <ClinicalStatusBanner paciente={paciente} onGo={setTab} onSession={onIniciarSesion} />
 
       {/* Tab content */}
       {portalView}
@@ -16288,7 +16288,6 @@ function PerfilPaciente({ paciente: pacienteInit, onVolver, profesionalUid, onIn
           paciente={paciente}
           onGo={setTab}
           onStartSession={onIniciarSesion}
-          onEvaluate={() => setShowEval(true)}
         />
       )}
 
