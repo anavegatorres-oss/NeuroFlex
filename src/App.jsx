@@ -485,6 +485,10 @@ body{background:
   padding-inline:clamp(12px,2vw,24px);
 }
 .nf-session-workspace__body{
+  --nf-activity-meta:.9rem;
+  --nf-activity-text:1rem;
+  --nf-activity-muted:#465B77;
+  color:#233851;
   min-width:0;
   overflow:auto;
   overscroll-behavior:contain;
@@ -547,6 +551,16 @@ body{background:
 }
 .nf-route-picker__footer{display:flex;justify-content:flex-end;margin-top:16px}
 .nf-route-picker .nf-workspace-notice{padding:12px 14px;border-radius:10px;margin-bottom:14px;font-size:.98rem}
+.nf-session-workspace__body :is(button,input,select,textarea){font-family:inherit}
+.nf-session-workspace__body button:not([style*="font-size"]){font-size:var(--nf-activity-text)}
+.nf-session-workspace__body :is(h2,h3){text-wrap:balance}
+.nf-session-workspace__body :is(.nf-eval-eyebrow,.nf-exercise-instruction__label,.nf-v2-domain-pill){
+  font-size:var(--nf-activity-meta);
+}
+.nf-session-workspace__body :is(.nf-eval-task-head h2,.nf-workspace-familiarization h2){
+  font-size:clamp(1.35rem,2.15vw,1.65rem)!important;
+  line-height:1.25;
+}
 .nf-session-workspace .nf-workspace-notice{
   background:#EFF5FC;
   border:1px solid #CBDCEF;
@@ -575,12 +589,51 @@ body{background:
 }
 .nf-session-workspace .nf-eval-task-head{padding-bottom:4px!important;margin-bottom:6px!important}
 .nf-session-workspace .nf-eval-task-card{padding-block:clamp(10px,1.6dvh,24px)!important}
+.nf-session-workspace .nf-v2-session-card{padding:clamp(10px,2vw,20px)!important}
+.nf-session-workspace .nf-v2-session-domain{margin-bottom:8px;padding-bottom:6px}
+.nf-session-workspace .nf-v2-session-instruction{margin-bottom:8px;padding:8px 12px!important}
+.nf-session-workspace .nf-training-stimulus{min-height:min(var(--nf-stimulus-min-height),36dvh,240px)!important;margin:10px 0 12px!important;padding:12px!important}
+@media(min-width:1000px){
+  .nf-session-workspace .nf-v2-session-card{
+    display:grid;
+    grid-template-columns:minmax(220px,27%) minmax(0,1fr);
+    grid-template-rows:auto auto 1fr;
+    align-items:start;
+    column-gap:20px;
+  }
+  .nf-session-workspace .nf-v2-session-card > .nf-protected-stimulus-zone{
+    grid-column:2;
+    grid-row:1 / 4;
+    border-top:0;
+    border-left:1px solid #E0E8F2;
+    min-width:0;
+    padding:0 0 0 16px!important;
+  }
+}
+.nf-animal-grid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(var(--nf-animal-columns),minmax(0,1fr));
+  gap:8px;
+}
+.nf-animal-grid button{height:clamp(58px,11dvh,88px);min-width:0;padding:2px}
+.nf-animal-grid button > :is(img,svg){max-width:100%;max-height:100%;object-fit:contain}
+.nf-rotation-options{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  max-width:680px;
+  margin-inline:auto;
+}
+.nf-rotation-options button{padding:8px;min-width:0;display:grid;place-items:center}
+.nf-rotation-options svg{max-width:100%;height:auto}
+@media(max-width:560px){.nf-rotation-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .nf-cancellation-grid{
   --nf-grid-rows:6;
   --nf-grid-columns:8;
   display:grid;
   grid-template-columns:repeat(var(--nf-grid-columns),minmax(0,1fr));
-  grid-auto-rows:clamp(44px,calc((100dvh - 400px) / var(--nf-grid-rows)),76px);
+  grid-auto-rows:clamp(44px,calc((100dvh - 420px) / var(--nf-grid-rows)),76px);
   gap:3px;
 }
 .nf-cancellation-grid.is-senior{--nf-grid-rows:8;--nf-grid-columns:6}
@@ -1025,7 +1078,7 @@ const Card = ({ children, style = {}, className = "" }) => (
 const Badge = ({ label, color = COLORS.info }) => (
   <span style={{
     background: color + "18", color, borderRadius: 20,
-    padding: "3px 10px", fontSize: ".72rem", fontWeight: 700,
+    padding: "3px 10px", fontSize: "var(--nf-activity-meta, .72rem)", fontWeight: 700,
     whiteSpace: "nowrap"
   }}>{label}</span>
 );
@@ -1468,7 +1521,7 @@ function NFAudioReadButton({ text, label="Escuchar", mayor=false, style={} }) {
         border:`1px solid ${COLORS.border}`,background:"#fff",color:COLORS.primary,
         display:"inline-flex",alignItems:"center",justifyContent:"center",gap:7,
         padding:mayor?"9px 13px":"8px 11px",fontWeight:700,fontFamily:"inherit",
-        cursor:"pointer",fontSize:mayor?".86rem":".74rem",...style
+        cursor:"pointer",fontSize:mayor?"var(--nf-activity-text, .86rem)":"var(--nf-activity-meta, .74rem)",...style
       }}
     >
       <NFIcon name="volume" size={mayor?20:18}/>
@@ -2999,8 +3052,9 @@ function chooseAdaptiveExercise(paciente, domId, exs, usedIds = []) {
 
 
 function NFTrainingStimulusCard({children,modoMayor=false,minHeight=170}){
-  return <div style={{
-    minHeight:modoMayor?Math.max(minHeight,200):minHeight,
+  return <div className="nf-training-stimulus" style={{
+    "--nf-stimulus-min-height":`${modoMayor ? Math.max(minHeight, 200) : minHeight}px`,
+    minHeight:"var(--nf-stimulus-min-height)",
     display:"flex",alignItems:"center",justifyContent:"center",
     padding:modoMayor?"28px 24px":"24px 20px",
     margin:"18px 0 22px",
@@ -3021,7 +3075,7 @@ function NFSequenceResponsePad({value=[],onChange,symbols=[],maxLength,modoMayor
       fontWeight:900,fontSize:modoMayor?"1.55rem":"1.3rem",
       letterSpacing:5,marginBottom:16
     }}>
-      {value.length?value.join("  "):<span style={{fontSize:modoMayor?".95rem":".78rem",fontWeight:650,letterSpacing:0,color:COLORS.textMuted}}>Tu respuesta aparecerá aquí</span>}
+      {value.length?value.join("  "):<span style={{fontSize:modoMayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .78rem)",fontWeight:650,letterSpacing:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Tu respuesta aparecerá aquí</span>}
     </div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(64px,1fr))",gap:9,marginBottom:14}}>
       {symbols.map(x=><button key={x} type="button" onClick={()=>add(x)}
@@ -3076,7 +3130,7 @@ const EX_ADULTO = {
         },[phase,seq]);
 
         if(phase==="show")return <div style={{padding:"8px 0"}}>
-          <p style={{textAlign:"center",color:COLORS.textMuted,fontSize:M?".95rem":".8rem",marginBottom:8}}>Memoriza la secuencia · un número a la vez</p>
+          <p style={{textAlign:"center",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",marginBottom:8}}>Memoriza la secuencia · un número a la vez</p>
           <NFTrainingStimulusCard modoMayor={M}>
             <div style={{fontSize:M?"4.6rem":"3.8rem",fontWeight:900,color:COLORS.primary,lineHeight:1}}>{seq[visibleIdx]}</div>
           </NFTrainingStimulusCard>
@@ -3090,7 +3144,7 @@ const EX_ADULTO = {
         return <div style={{padding:"8px 0"}}>
           <div style={{textAlign:"center",marginBottom:18}}>
             <h3 style={{margin:"0 0 5px"}}>Reconstruye la secuencia</h3>
-            <p style={{margin:0,color:COLORS.textMuted,fontSize:M?".9rem":".76rem"}}>Toca los números en el mismo orden en que aparecieron.</p>
+            <p style={{margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .76rem)"}}>Toca los números en el mismo orden en que aparecieron.</p>
           </div>
           <NFSequenceResponsePad value={answer} onChange={setAnswer} symbols={["1","2","3","4","5","6","7","8","9"]} maxLength={len} modoMayor={M} onConfirm={confirm}/>
         </div>;
@@ -3123,7 +3177,7 @@ const EX_ADULTO = {
         },[phase,seq]);
 
         if(phase==="show")return <div style={{padding:"8px 0"}}>
-          <p style={{textAlign:"center",color:COLORS.textMuted,fontSize:M?".95rem":".8rem"}}>Memoriza primero. La inversión se hace después.</p>
+          <p style={{textAlign:"center",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)"}}>Memoriza primero. La inversión se hace después.</p>
           <NFTrainingStimulusCard modoMayor={M}>
             <div style={{fontSize:M?"4.6rem":"3.8rem",fontWeight:900,color:COLORS.primary,lineHeight:1}}>{seq[visibleIdx]}</div>
           </NFTrainingStimulusCard>
@@ -3138,7 +3192,7 @@ const EX_ADULTO = {
         return <div style={{padding:"8px 0"}}>
           <div style={{textAlign:"center",marginBottom:18}}>
             <h3 style={{margin:"0 0 5px"}}>Ahora, al revés</h3>
-            <p style={{margin:0,color:COLORS.textMuted,fontSize:M?".9rem":".76rem"}}>Empieza por el último número que viste y continúa hacia atrás.</p>
+            <p style={{margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .76rem)"}}>Empieza por el último número que viste y continúa hacia atrás.</p>
           </div>
           <NFSequenceResponsePad value={answer} onChange={setAnswer} symbols={["1","2","3","4","5","6","7","8","9"]} maxLength={len} modoMayor={M} onConfirm={confirm}/>
         </div>;
@@ -3177,7 +3231,7 @@ const EX_ADULTO = {
         },[phase,item]);
 
         if(phase==="show")return <div>
-          <p style={{textAlign:"center",color:COLORS.textMuted,fontSize:M?".95rem":".8rem"}}>Memoriza cada elemento. El ordenamiento viene después.</p>
+          <p style={{textAlign:"center",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)"}}>Memoriza cada elemento. El ordenamiento viene después.</p>
           <NFTrainingStimulusCard modoMayor={M}>
             <div style={{fontSize:M?"4.1rem":"3.4rem",fontWeight:900,color:COLORS.primary}}>{item.seq[visibleIdx]}</div>
           </NFTrainingStimulusCard>
@@ -3192,7 +3246,7 @@ const EX_ADULTO = {
         return <div>
           <div style={{textAlign:"center",marginBottom:18}}>
             <h3 style={{margin:"0 0 5px"}}>Ordena lo que recuerdas</h3>
-            <p style={{margin:0,color:COLORS.textMuted,fontSize:M?".9rem":".76rem"}}>Primero números de menor a mayor. Después letras de A a Z.</p>
+            <p style={{margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .76rem)"}}>Primero números de menor a mayor. Después letras de A a Z.</p>
           </div>
           <NFSequenceResponsePad value={answer} onChange={setAnswer} symbols={symbols} maxLength={item.correct.length} modoMayor={M} onConfirm={confirm}/>
         </div>;
@@ -3231,7 +3285,7 @@ const EX_ADULTO = {
           const op=ops[cur];
           return <div style={{padding:"4px 0"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-              <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>CALCULA Y RECUERDA</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>CALCULA Y RECUERDA</div>
               <Badge label={`${cur+1}/${ops.length}`} color={COLORS.info}/>
             </div>
             <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
@@ -3245,7 +3299,7 @@ const EX_ADULTO = {
                 fontFamily:"inherit",fontSize:M?"1.35rem":"1.15rem",fontWeight:900,cursor:"pointer"
               }}>{n}</button>)}
             </div>
-            <p style={{textAlign:"center",fontSize:M?".9rem":".76rem",color:COLORS.textMuted,marginTop:12}}>Guarda mentalmente cada resultado en el orden en que aparece.</p>
+            <p style={{textAlign:"center",fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .76rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:12}}>Guarda mentalmente cada resultado en el orden en que aparece.</p>
           </div>;
         }
 
@@ -3266,19 +3320,19 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0"}}>
           <div style={{textAlign:"center",marginBottom:12}}>
-            <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>RECUERDO DE RESULTADOS</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>RECUERDO DE RESULTADOS</div>
             <h3 style={{margin:"6px 0 4px"}}>Reconstruye la secuencia</h3>
-            <p style={{margin:0,color:COLORS.textMuted,fontSize:M?".9rem":".76rem"}}>Toca los resultados en el mismo orden. Puedes repetir un número si apareció más de una vez.</p>
+            <p style={{margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .76rem)"}}>Toca los resultados en el mismo orden. Puedes repetir un número si apareció más de una vez.</p>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={155}>
             <div style={{width:"100%",maxWidth:620}}>
               <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"center",minHeight:50,marginBottom:14}}>
                 {recall.length===0
-                  ? <span style={{color:COLORS.textMuted,fontSize:".8rem"}}>Tu secuencia aparecerá aquí</span>
+                  ? <span style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-text, .8rem)"}}>Tu secuencia aparecerá aquí</span>
                   : recall.map((n,i)=><span key={i} style={{minWidth:46,padding:"9px 12px",borderRadius:10,background:COLORS.primary+"10",border:`1px solid ${COLORS.primary}25`,fontWeight:900}}>{n}</span>)}
               </div>
               <div style={{display:"grid",gridTemplateColumns:M?"repeat(5,1fr)":"repeat(5,1fr)",gap:8}}>
-                {answerPool.map(n=><button key={n} disabled={recall.length>=ops.length} onClick={()=>setRecall(r=>r.length<ops.length?[...r,n]:r)} style={{minHeight:M?58:50,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>{n}</button>)}
+                {answerPool.map(n=><button key={n} disabled={recall.length>=ops.length} onClick={()=>setRecall(r=>r.length<ops.length?[...r,n]:r)} style={{minHeight:M?58:50,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>{n}</button>)}
               </div>
             </div>
           </NFTrainingStimulusCard>
@@ -3328,8 +3382,8 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}>
-            <span style={{fontSize:".72rem",color:COLORS.textMuted}}>Estímulo {cur+1} de {LEN}</span>
-            <span style={{fontSize:".7rem",color:COLORS.textMuted}}>{cur===0?"Solo observa":"Compara con el anterior"}</span>
+            <span style={{fontSize:"var(--nf-activity-meta, .72rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Estímulo {cur+1} de {LEN}</span>
+            <span style={{fontSize:"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>{cur===0?"Solo observa":"Compara con el anterior"}</span>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={230}>
             <NFStimulusToken id={seq[cur]} size={M?138:118}/>
@@ -3339,8 +3393,8 @@ const EX_ADULTO = {
             : <div style={{maxWidth:560,margin:"0 auto"}}>
                 {feedback&&<div style={{textAlign:"center",fontWeight:800,color:feedback==="ok"?COLORS.success:COLORS.error,marginBottom:10}}>{feedback==="ok"?"Correcto":"Revisa la comparación"}</div>}
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-                  <button disabled={!!feedback} onClick={()=>responder(true)} style={{minHeight:M?72:62,padding:14,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"10",fontWeight:800,fontSize:M?"1.05rem":".9rem",color:COLORS.success,cursor:"pointer"}}>Sí, es igual</button>
-                  <button disabled={!!feedback} onClick={()=>responder(false)} style={{minHeight:M?72:62,padding:14,borderRadius:13,border:`2px solid ${COLORS.error}`,background:COLORS.error+"10",fontWeight:800,fontSize:M?"1.05rem":".9rem",color:COLORS.error,cursor:"pointer"}}>No, es diferente</button>
+                  <button disabled={!!feedback} onClick={()=>responder(true)} style={{minHeight:M?72:62,padding:14,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"10",fontWeight:800,fontSize:M?"1.05rem":"var(--nf-activity-text, .9rem)",color:COLORS.success,cursor:"pointer"}}>Sí, es igual</button>
+                  <button disabled={!!feedback} onClick={()=>responder(false)} style={{minHeight:M?72:62,padding:14,borderRadius:13,border:`2px solid ${COLORS.error}`,background:COLORS.error+"10",fontWeight:800,fontSize:M?"1.05rem":"var(--nf-activity-text, .9rem)",color:COLORS.error,cursor:"pointer"}}>No, es diferente</button>
                 </div>
               </div>}
         </div>;
@@ -3393,29 +3447,29 @@ const EX_ADULTO = {
         };
 
         if(phase==="study")return <div style={{padding:"4px 0",textAlign:"center"}}>
-          <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIZA</div>
-          <p style={{color:COLORS.textMuted,fontSize:M?".95rem":".8rem",margin:"4px 0 12px"}}>Estas palabras desaparecerán · {tl}s</p>
+          <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>MEMORIZA</div>
+          <p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",margin:"4px 0 12px"}}>Estas palabras desaparecerán · {tl}s</p>
           <NFTrainingStimulusCard modoMayor={M} minHeight={250}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(110px,1fr))",gap:12,width:"100%",maxWidth:650}}>
-              {WORDS.map(w=><div key={w} style={{padding:M?"14px 16px":"11px 14px",borderRadius:12,border:`2px solid ${COLORS.primary}25`,background:COLORS.primary+"08",fontSize:M?"1.05rem":".88rem",fontWeight:800}}>{w}</div>)}
+              {WORDS.map(w=><div key={w} style={{padding:M?"14px 16px":"11px 14px",borderRadius:12,border:`2px solid ${COLORS.primary}25`,background:COLORS.primary+"08",fontSize:M?"1.05rem":"var(--nf-activity-text, .88rem)",fontWeight:800}}>{w}</div>)}
             </div>
           </NFTrainingStimulusCard>
         </div>;
 
         if(phase==="distract")return <div style={{padding:"25px 0",textAlign:"center"}}>
           <NFTrainingStimulusCard modoMayor={M} minHeight={210}>
-            <div><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent}}>TAREA INTERMEDIA</div><h3>Cuenta hacia atrás desde 20</h3><p style={{color:COLORS.textMuted}}>Hazlo en voz alta · {distTl}s</p><div style={{fontSize:M?"3.8rem":"3rem",fontWeight:900,color:COLORS.primary}}>{distTl}</div></div>
+            <div><div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.accent}}>TAREA INTERMEDIA</div><h3>Cuenta hacia atrás desde 20</h3><p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Hazlo en voz alta · {distTl}s</p><div style={{fontSize:M?"3.8rem":"3rem",fontWeight:900,color:COLORS.primary}}>{distTl}</div></div>
           </NFTrainingStimulusCard>
         </div>;
 
         return <div style={{padding:"4px 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:14}}>
-            <div style={{textAlign:"left"}}><h3 style={{margin:"0 0 5px"}}>¿Cuáles viste?</h3><p style={{margin:0,color:COLORS.textMuted,fontSize:M?".92rem":".78rem"}}>Selecciona todas las palabras que recuerdes. También hay palabras nuevas.</p></div>
+            <div style={{textAlign:"left"}}><h3 style={{margin:"0 0 5px"}}>¿Cuáles viste?</h3><p style={{margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"var(--nf-activity-text, .92rem)":"var(--nf-activity-text, .78rem)"}}>Selecciona todas las palabras que recuerdes. También hay palabras nuevas.</p></div>
             <NFAudioReadButton text={`Selecciona todas las palabras que recuerdes haber visto. Opciones: ${recognition.join(", ")}.`} label="Escuchar opciones" mayor={modoMayor}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={280}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(125px,1fr))",gap:11,width:"100%"}}>
-              {recognition.map(w=><button key={w} onClick={()=>toggle(w)} style={{minHeight:M?62:54,padding:10,borderRadius:11,border:`2px solid ${selected.has(w)?COLORS.primary:COLORS.border}`,background:selected.has(w)?COLORS.primary+"10":"#fff",fontFamily:"inherit",fontSize:M?".98rem":".84rem",fontWeight:800,cursor:"pointer"}}>{w}</button>)}
+              {recognition.map(w=><button key={w} onClick={()=>toggle(w)} style={{minHeight:M?62:54,padding:10,borderRadius:11,border:`2px solid ${selected.has(w)?COLORS.primary:COLORS.border}`,background:selected.has(w)?COLORS.primary+"10":"#fff",fontFamily:"inherit",fontSize:M?"var(--nf-activity-text, .98rem)":"var(--nf-activity-text, .84rem)",fontWeight:800,cursor:"pointer"}}>{w}</button>)}
             </div>
           </NFTrainingStimulusCard>
           <div style={{maxWidth:520,margin:"0 auto"}}><BtnPrimary onClick={finish} style={{width:"100%"}}>Confirmar selección</BtnPrimary></div>
@@ -3469,7 +3523,7 @@ const EX_ADULTO = {
         if (phase === "read") return (
           <div>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:12}}>
-              <p style={{ color: COLORS.textMuted, margin:0, fontSize: ".85rem" }}>Lee o escucha con atención — luego habrá preguntas</p>
+              <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", margin:0, fontSize: "var(--nf-activity-text, .85rem)" }}>Lee o escucha con atención — luego habrá preguntas</p>
               <NFAudioReadButton text={story.texto} label="Escuchar historia" mayor={M}/>
             </div>
             <div style={{ background: COLORS.bg, borderRadius: 12, padding: 16, marginBottom: 20, border: `1px solid ${COLORS.border}`, lineHeight: 1.8 }}>
@@ -3482,14 +3536,14 @@ const EX_ADULTO = {
         return (
           <div style={{ textAlign: "center" }}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:12}}>
-              <p style={{ color: COLORS.textMuted, margin:0 }}>Pregunta {cur + 1}/{story.preguntas.length}</p>
+              <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", margin:0 }}>Pregunta {cur + 1}/{story.preguntas.length}</p>
               <NFAudioReadButton text={`${q.q} Opciones: ${q.opts.join(", ")}.`} label="Escuchar pregunta" mayor={M}/>
             </div>
             <p style={{ fontWeight: 700, marginBottom: 16 }}>{q.q}</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 380, margin: "0 auto" }}>
               {q.opts.map((opt, i) => (
                 <button key={i} onClick={() => pick(opt)} style={{
-                  padding: "12px 16px", borderRadius: 12, border: "2px solid", fontWeight: 600, fontSize: ".88rem", cursor: sel ? "default" : "pointer", textAlign: "left",
+                  padding: "12px 16px", borderRadius: 12, border: "2px solid", fontWeight: 600, fontSize: "var(--nf-activity-text, .88rem)", cursor: sel ? "default" : "pointer", textAlign: "left",
                   borderColor: !sel ? COLORS.border : opt.toLowerCase().includes(q.a) ? COLORS.success : sel === opt ? COLORS.error : COLORS.border,
                   background: !sel ? COLORS.white : opt.toLowerCase().includes(q.a) ? COLORS.success + "15" : sel === opt ? COLORS.error + "15" : COLORS.white,
                   color: COLORS.textPrimary,
@@ -3559,8 +3613,8 @@ const EX_ADULTO = {
         return <div style={{padding:"4px 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",marginBottom:12}}>
             <div>
-              <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>OBJETIVO: NÚMERO 3</div>
-              <div style={{fontSize:M?".95rem":".8rem",color:COLORS.textMuted,marginTop:2}}>Mantén el foco y evita tocar distractores.</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>OBJETIVO: NÚMERO 3</div>
+              <div style={{fontSize:M?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:2}}>Mantén el foco y evita tocar distractores.</div>
             </div>
             <Badge label={`Panel ${panel+1}/${panels.length}`} color={COLORS.info}/>
           </div>
@@ -3630,12 +3684,12 @@ const EX_ADULTO = {
         return <div style={{padding:"4px 0"}}>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
             <div style={{padding:10,borderRadius:10,background:COLORS.primary+"07",border:`1px solid ${COLORS.primary}20`,textAlign:"center"}}>
-              <div style={{fontSize:".64rem",fontWeight:800,color:COLORS.primary}}>IZQUIERDA</div>
-              <div style={{fontSize:M?".9rem":".76rem",marginTop:3}}>Objetivo: número PAR</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .64rem)",fontWeight:800,color:COLORS.primary}}>IZQUIERDA</div>
+              <div style={{fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .76rem)",marginTop:3}}>Objetivo: número PAR</div>
             </div>
             <div style={{padding:10,borderRadius:10,background:COLORS.accent+"07",border:`1px solid ${COLORS.accent}20`,textAlign:"center"}}>
-              <div style={{fontSize:".64rem",fontWeight:800,color:COLORS.accent}}>DERECHA</div>
-              <div style={{fontSize:M?".9rem":".76rem",marginTop:3}}>Objetivo: CÍRCULO ●</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .64rem)",fontWeight:800,color:COLORS.accent}}>DERECHA</div>
+              <div style={{fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .76rem)",marginTop:3}}>Objetivo: CÍRCULO ●</div>
             </div>
           </div>
 
@@ -3652,7 +3706,7 @@ const EX_ADULTO = {
             <button disabled={locked} onClick={()=>pick("both")} style={{minHeight:M?68:60,padding:13,borderRadius:12,border:`2px solid ${COLORS.success}`,background:"#fff",fontWeight:800,fontFamily:"inherit",cursor:"pointer"}}>Ambos</button>
             <button disabled={locked} onClick={()=>pick("none")} style={{minHeight:M?68:60,padding:13,borderRadius:12,border:`2px solid ${COLORS.border}`,background:COLORS.bg,fontWeight:800,fontFamily:"inherit",cursor:"pointer"}}>Ninguno</button>
           </div>
-          <div style={{textAlign:"center",marginTop:10,fontSize:".68rem",color:COLORS.textMuted}}>Ronda {idx+1} de {trials.length}</div>
+          <div style={{textAlign:"center",marginTop:10,fontSize:"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Ronda {idx+1} de {trials.length}</div>
         </div>;
       }
     },
@@ -3695,17 +3749,16 @@ const EX_ADULTO = {
         return <div style={{padding:"4px 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",marginBottom:12}}>
             <div>
-              <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>BÚSQUEDA SELECTIVA</div>
-              <div style={{fontSize:M?".95rem":".8rem",color:COLORS.textMuted,marginTop:2}}>Toca solo animales. Puedes desmarcar antes de confirmar.</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>BÚSQUEDA SELECTIVA</div>
+              <div style={{fontSize:M?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:2}}>Toca solo animales. Puedes desmarcar antes de confirmar.</div>
             </div>
             <NFLineIcon name="attention" size={M?28:24}/>
           </div>
 
           <NFTrainingStimulusCard modoMayor={M} minHeight={280}>
-            <div style={{width:"100%",display:"grid",gridTemplateColumns:`repeat(${cols},1fr)`,gap:M?15:11}}>
+            <div className="nf-animal-grid" style={{"--nf-animal-columns":cols}}>
               {grid.map(cell=><button key={cell.id} onClick={()=>tap(cell.id)} aria-label="estímulo visual"
                 style={{
-                  minHeight:M?92:78,aspectRatio:"1",
                   borderRadius:15,
                   border:`2px solid ${selected.has(cell.id)?COLORS.primary:COLORS.border}`,
                   background:selected.has(cell.id)?COLORS.primary+"0D":"#fff",
@@ -3757,9 +3810,9 @@ const EX_ADULTO = {
         if(phase==="ready")return <div style={{padding:"12px 0",textAlign:"center"}}>
           <NFTrainingStimulusCard modoMayor={M} minHeight={230}>
             <div>
-              <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>FLUIDEZ ORAL · SIN ESCRIBIR</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>FLUIDEZ ORAL · SIN ESCRIBIR</div>
               <h2 style={{margin:"10px 0 8px",fontSize:M?"2rem":"1.65rem"}}>{cat.toUpperCase()}</h2>
-              <p style={{margin:0,color:COLORS.textMuted,fontSize:M?"1rem":".85rem"}}>Di palabras de esta categoría en voz alta durante 60 segundos.</p>
+              <p style={{margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:M?"1rem":"var(--nf-activity-text, .85rem)"}}>Di palabras de esta categoría en voz alta durante 60 segundos.</p>
             </div>
           </NFTrainingStimulusCard>
           <div style={{maxWidth:480,margin:"0 auto"}}><BtnPrimary onClick={start} style={{width:"100%"}}>Comenzar</BtnPrimary></div>
@@ -3767,22 +3820,22 @@ const EX_ADULTO = {
 
         if(phase==="done")return <div style={{padding:"20px 0",textAlign:"center"}}>
           <h3>Actividad registrada</h3>
-          <p style={{color:COLORS.textMuted}}>Palabras válidas: <strong>{valid}</strong> · Repetidas/no válidas: <strong>{invalid}</strong></p>
+          <p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Palabras válidas: <strong>{valid}</strong> · Repetidas/no válidas: <strong>{invalid}</strong></p>
         </div>;
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,marginBottom:12}}>
-            <div style={{textAlign:"left"}}><div style={{fontSize:".66rem",fontWeight:800,color:COLORS.primary}}>CATEGORÍA</div><strong style={{fontSize:M?"1.1rem":".92rem"}}>{cat.toUpperCase()}</strong></div>
+            <div style={{textAlign:"left"}}><div style={{fontSize:"var(--nf-activity-meta, .66rem)",fontWeight:800,color:COLORS.primary}}>CATEGORÍA</div><strong style={{fontSize:M?"1.1rem":"var(--nf-activity-text, .92rem)"}}>{cat.toUpperCase()}</strong></div>
             <div style={{fontSize:M?"2rem":"1.6rem",fontWeight:950,color:tl<=15?COLORS.error:COLORS.textPrimary}}>{tl}s</div>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={240}>
             <div style={{width:"100%",maxWidth:560}}>
-              <div style={{fontSize:M?"1.15rem":".92rem",fontWeight:800,marginBottom:18}}>Escucha la palabra dicha y regístrala con un toque.</div>
+              <div style={{fontSize:M?"1.15rem":"var(--nf-activity-text, .92rem)",fontWeight:800,marginBottom:18}}>Escucha la palabra dicha y regístrala con un toque.</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-                <button onClick={()=>setValid(v=>v+1)} style={{minHeight:M?105:90,borderRadius:16,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:900,fontSize:M?"1.05rem":".88rem",cursor:"pointer"}}>
+                <button onClick={()=>setValid(v=>v+1)} style={{minHeight:M?105:90,borderRadius:16,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:900,fontSize:M?"1.05rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>
                   ✓ Palabra válida<br/><span style={{fontSize:"1.5rem"}}>{valid}</span>
                 </button>
-                <button onClick={()=>setInvalid(v=>v+1)} style={{minHeight:M?105:90,borderRadius:16,border:`2px solid ${COLORS.warning}`,background:COLORS.warning+"0D",fontFamily:"inherit",fontWeight:900,fontSize:M?"1.05rem":".88rem",cursor:"pointer"}}>
+                <button onClick={()=>setInvalid(v=>v+1)} style={{minHeight:M?105:90,borderRadius:16,border:`2px solid ${COLORS.warning}`,background:COLORS.warning+"0D",fontFamily:"inherit",fontWeight:900,fontSize:M?"1.05rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>
                   ↻ Repetida / no válida<br/><span style={{fontSize:"1.5rem"}}>{invalid}</span>
                 </button>
               </div>
@@ -3842,8 +3895,8 @@ const EX_ADULTO = {
         return <div style={{padding:"4px 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",marginBottom:12}}>
             <div>
-              <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>REGLA: NÚMERO → LETRA → NÚMERO → LETRA</div>
-              <div style={{fontSize:M?".95rem":".8rem",color:COLORS.textMuted,marginTop:3}}>Empieza en 1. La pantalla no señalará el siguiente elemento.</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>REGLA: NÚMERO → LETRA → NÚMERO → LETRA</div>
+              <div style={{fontSize:M?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>Empieza en 1. La pantalla no señalará el siguiente elemento.</div>
             </div>
             <Badge label={`${next}/${sequence.length}`} color={COLORS.info}/>
           </div>
@@ -3864,7 +3917,7 @@ const EX_ADULTO = {
               })}
             </div>
           </NFTrainingStimulusCard>
-          <div style={{minHeight:24,textAlign:"center",fontWeight:800,fontSize:".78rem",color:flash==="error"?COLORS.error:COLORS.success}}>
+          <div style={{minHeight:24,textAlign:"center",fontWeight:800,fontSize:"var(--nf-activity-text, .78rem)",color:flash==="error"?COLORS.error:COLORS.success}}>
             {flash==="error"?"Ese elemento no corresponde ahora":flash==="ok"?"Continúa alternando":""}
           </div>
         </div>;
@@ -3944,8 +3997,8 @@ const EX_ADULTO = {
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",marginBottom:12}}>
             <div style={{textAlign:"left"}}>
-              <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>RESPUESTA RÁPIDA</div>
-              <div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>No te adelantes. Espera la señal verde.</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>RESPUESTA RÁPIDA</div>
+              <div style={{fontSize:M?"var(--nf-activity-text, .92rem)":"var(--nf-activity-text, .77rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>No te adelantes. Espera la señal verde.</div>
             </div>
             <Badge label={`${round+1}/${ROUNDS}`} color={COLORS.info}/>
           </div>
@@ -3965,10 +4018,10 @@ const EX_ADULTO = {
             </button>
           </NFTrainingStimulusCard>
 
-          <div style={{minHeight:27,fontWeight:800,fontSize:M?".9rem":".78rem",color:phase==="early"?COLORS.error:COLORS.success}}>
+          <div style={{minHeight:27,fontWeight:800,fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .78rem)",color:phase==="early"?COLORS.error:COLORS.success}}>
             {feedback}
           </div>
-          <div style={{display:"flex",justifyContent:"center",gap:18,fontSize:".7rem",color:COLORS.textMuted,marginTop:4}}>
+          <div style={{display:"flex",justifyContent:"center",gap:18,fontSize:"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:4}}>
             <span>Anticipaciones: <strong>{anticipations}</strong></span>
             {avg!=null&&<span>Promedio: <strong>{avg} ms</strong></span>}
           </div>
@@ -4021,8 +4074,8 @@ const EX_ADULTO = {
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
             <div style={{textAlign:"left"}}>
-              <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>LEE Y SELECCIONA</div>
-              <div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>Toca la muestra que corresponde a la palabra.</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>LEE Y SELECCIONA</div>
+              <div style={{fontSize:M?"var(--nf-activity-text, .92rem)":"var(--nf-activity-text, .77rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>Toca la muestra que corresponde a la palabra.</div>
             </div>
             <Badge label={`${cur+1}/${ROUNDS}`} color={COLORS.info}/>
           </div>
@@ -4043,7 +4096,7 @@ const EX_ADULTO = {
                 boxShadow:feedback&&opt.name===item.target.name?`0 0 0 4px ${COLORS.success}18`:"none"
               }} />)}
           </div>
-          <div style={{minHeight:24,marginTop:10,fontSize:".76rem",fontWeight:800,color:feedback==="error"?COLORS.error:COLORS.success}}>
+          <div style={{minHeight:24,marginTop:10,fontSize:"var(--nf-activity-text, .76rem)",fontWeight:800,color:feedback==="error"?COLORS.error:COLORS.success}}>
             {feedback==="ok"?"Correcto":feedback==="error"?`La respuesta era ${item.target.name}`:""}
           </div>
         </div>;
@@ -4104,7 +4157,7 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <div style={{textAlign:"left"}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>DENOMINACIÓN ORAL</div><div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>Di el nombre antes de pedir ayuda.</div></div>
+            <div style={{textAlign:"left"}}><div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>DENOMINACIÓN ORAL</div><div style={{fontSize:M?"var(--nf-activity-text, .92rem)":"var(--nf-activity-text, .77rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>Di el nombre antes de pedir ayuda.</div></div>
             <Badge label={`${cur+1}/${ITEMS.length}`} color={COLORS.info}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={280}>
@@ -4117,11 +4170,11 @@ const EX_ADULTO = {
           </div>}
 
           {mode==="help"&&<div>
-            <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.textMuted,marginBottom:10}}>Selecciona cómo se llama:</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:10}}>Selecciona cómo se llama:</div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12,maxWidth:560,margin:"0 auto"}}>
-              {options.map(opt=><button key={opt} disabled={locked} onClick={()=>choose(opt)} style={{minHeight:M?68:60,padding:12,borderRadius:12,border:`2px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".86rem",cursor:"pointer"}}>{opt}</button>)}
+              {options.map(opt=><button key={opt} disabled={locked} onClick={()=>choose(opt)} style={{minHeight:M?68:60,padding:12,borderRadius:12,border:`2px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .86rem)",cursor:"pointer"}}>{opt}</button>)}
             </div>
-            <button disabled={locked} onClick={()=>advance("missed")} style={{marginTop:12,border:"none",background:"transparent",fontFamily:"inherit",fontWeight:700,color:COLORS.textMuted,cursor:"pointer"}}>No lo reconozco</button>
+            <button disabled={locked} onClick={()=>advance("missed")} style={{marginTop:12,border:"none",background:"transparent",fontFamily:"inherit",fontWeight:700,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",cursor:"pointer"}}>No lo reconozco</button>
           </div>}
         </div>;
       }
@@ -4170,7 +4223,7 @@ const EX_ADULTO = {
             <p style={{margin:0,fontWeight:800,fontSize:M?"1.25rem":"1.05rem",lineHeight:1.65,maxWidth:680}}>{item.enunciado}</p>
           </NFTrainingStimulusCard>
           <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12,maxWidth:600,margin:"0 auto"}}>
-            {item.opts.map(opt=><button key={opt} onClick={()=>pick(opt)} disabled={!!sel} style={{minHeight:M?70:62,padding:12,borderRadius:12,border:`2px solid ${!sel?COLORS.border:opt===item.ans?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,background:!sel?"#fff":opt===item.ans?COLORS.success+"10":sel===opt?COLORS.error+"10":"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".86rem",cursor:sel?"default":"pointer"}}>{opt}</button>)}
+            {item.opts.map(opt=><button key={opt} onClick={()=>pick(opt)} disabled={!!sel} style={{minHeight:M?70:62,padding:12,borderRadius:12,border:`2px solid ${!sel?COLORS.border:opt===item.ans?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,background:!sel?"#fff":opt===item.ans?COLORS.success+"10":sel===opt?COLORS.error+"10":"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .86rem)",cursor:sel?"default":"pointer"}}>{opt}</button>)}
           </div>
         </div>;
       }
@@ -4222,7 +4275,7 @@ const EX_ADULTO = {
             <p style={{margin:0,fontWeight:800,fontSize:M?"1.28rem":"1.08rem",lineHeight:1.65,maxWidth:680}}>{item.oracion}</p>
           </NFTrainingStimulusCard>
           <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12,maxWidth:600,margin:"0 auto"}}>
-            {item.opts.map(opt=><button key={opt} onClick={()=>pick(opt)} disabled={!!sel} style={{minHeight:M?70:62,padding:12,borderRadius:12,border:`2px solid ${!sel?COLORS.border:opt===item.ans?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,background:!sel?"#fff":opt===item.ans?COLORS.success+"10":sel===opt?COLORS.error+"10":"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".86rem",cursor:sel?"default":"pointer"}}>{opt}</button>)}
+            {item.opts.map(opt=><button key={opt} onClick={()=>pick(opt)} disabled={!!sel} style={{minHeight:M?70:62,padding:12,borderRadius:12,border:`2px solid ${!sel?COLORS.border:opt===item.ans?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,background:!sel?"#fff":opt===item.ans?COLORS.success+"10":sel===opt?COLORS.error+"10":"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .86rem)",cursor:sel?"default":"pointer"}}>{opt}</button>)}
           </div>
         </div>;
       }
@@ -4268,13 +4321,13 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <div style={{textAlign:"left"}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>BUSCA LA FIGURA EXACTA</div><div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>Fíjate también si está rellena o vacía.</div></div>
+            <div style={{textAlign:"left"}}><div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>BUSCA LA FIGURA EXACTA</div><div style={{fontSize:M?"var(--nf-activity-text, .92rem)":"var(--nf-activity-text, .77rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>Fíjate también si está rellena o vacía.</div></div>
             <Badge label={`${cur+1}/${ROUNDS}`} color={COLORS.info}/>
           </div>
 
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
             <div>
-              <div style={{fontSize:".65rem",fontWeight:800,color:COLORS.textMuted,marginBottom:10}}>MODELO</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .65rem)",fontWeight:800,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:10}}>MODELO</div>
               <NFStimulusShape id={item.target} size={M?104:86}/>
             </div>
           </NFTrainingStimulusCard>
@@ -4351,20 +4404,20 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <div style={{textAlign:"left"}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>ROTACIÓN MENTAL</div><div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>La orientación puede cambiar; compara la forma.</div></div>
+            <div style={{textAlign:"left"}}><div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>ROTACIÓN MENTAL</div><div style={{fontSize:M?"var(--nf-activity-text, .92rem)":"var(--nf-activity-text, .77rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>La orientación puede cambiar; compara la forma.</div></div>
             <Badge label={`${cur+1}/${PARES.length}`} color={COLORS.info}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={260}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:M?42:28,flexWrap:"wrap"}}>
               {shapeBox(par.a,par.ra)}
-              <span style={{fontSize:M?"1.3rem":"1rem",fontWeight:800,color:COLORS.textMuted}}>VS</span>
+              <span style={{fontSize:M?"1.3rem":"1rem",fontWeight:800,color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>VS</span>
               {shapeBox(par.b,par.rb)}
             </div>
           </NFTrainingStimulusCard>
           {feedback&&<div style={{minHeight:25,fontWeight:800,color:feedback==="ok"?COLORS.success:COLORS.error,marginBottom:8}}>{feedback==="ok"?"Correcto":par.same?"Era la misma figura rotada":"Las figuras eran diferentes"}</div>}
           {!feedback&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,maxWidth:560,margin:"0 auto"}}>
-            <button onClick={()=>responder(true)} style={{minHeight:M?74:66,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>Misma figura</button>
-            <button onClick={()=>responder(false)} style={{minHeight:M?74:66,borderRadius:13,border:`2px solid ${COLORS.error}`,background:COLORS.error+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>Diferente</button>
+            <button onClick={()=>responder(true)} style={{minHeight:M?74:66,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>Misma figura</button>
+            <button onClick={()=>responder(false)} style={{minHeight:M?74:66,borderRadius:13,border:`2px solid ${COLORS.error}`,background:COLORS.error+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>Diferente</button>
           </div>}
         </div>;
       }
@@ -4414,7 +4467,7 @@ const EX_ADULTO = {
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
-              <span style={{fontSize:".68rem",fontWeight:800,color:COLORS.textMuted}}>BUSCA</span>
+              <span style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>BUSCA</span>
               <NFStimulusShape id={d.target} size={M?52:44}/>
             </div>
             <Badge label={`${cur+1}/${ROUNDS}`} color={COLORS.info}/>
@@ -4477,7 +4530,7 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>COMPLETA EL PATRÓN</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>COMPLETA EL PATRÓN</div>
             <Badge label={`${cur+1}/${PATRONES.length}`} color={COLORS.info}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={230}>
@@ -4554,7 +4607,7 @@ const EX_ADULTO = {
               minHeight:M?72:64,padding:12,borderRadius:12,
               border:`2px solid ${!sel?COLORS.border:opt.toLowerCase()===item.answer.toLowerCase()?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,
               background:!sel?"#fff":opt.toLowerCase()===item.answer.toLowerCase()?COLORS.success+"0D":sel===opt?COLORS.error+"0D":"#fff",
-              fontFamily:"inherit",fontSize:M?"1.05rem":".9rem",fontWeight:800,cursor:"pointer",textTransform:"capitalize"
+              fontFamily:"inherit",fontSize:M?"1.05rem":"var(--nf-activity-text, .9rem)",fontWeight:800,cursor:"pointer",textTransform:"capitalize"
             }}>{opt}</button>)}
           </div>
         </div>;
@@ -4601,13 +4654,13 @@ const EX_ADULTO = {
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
             <div>
-              <div style={{fontSize:".66rem",fontWeight:800,color:COLORS.primary,marginBottom:8}}>RESPONDE EN VOZ ALTA</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .66rem)",fontWeight:800,color:COLORS.primary,marginBottom:8}}>RESPONDE EN VOZ ALTA</div>
               <p style={{margin:0,fontWeight:800,fontSize:M?"1.35rem":"1.12rem",lineHeight:1.55}}>{q}</p>
             </div>
           </NFTrainingStimulusCard>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,maxWidth:600,margin:"0 auto"}}>
-            <button disabled={locked} onClick={()=>record(true)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>Respuesta adecuada</button>
-            <button disabled={locked} onClick={()=>record(false)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.warning}`,background:COLORS.warning+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>Requiere revisión</button>
+            <button disabled={locked} onClick={()=>record(true)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>Respuesta adecuada</button>
+            <button disabled={locked} onClick={()=>record(false)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.warning}`,background:COLORS.warning+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>Requiere revisión</button>
           </div>
         </div>;
       }
@@ -4653,13 +4706,13 @@ const EX_ADULTO = {
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
             <div>
-              <div style={{fontSize:".66rem",fontWeight:800,color:COLORS.primary,marginBottom:8}}>RESPONDE EN VOZ ALTA</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .66rem)",fontWeight:800,color:COLORS.primary,marginBottom:8}}>RESPONDE EN VOZ ALTA</div>
               <p style={{margin:0,fontWeight:800,fontSize:M?"1.35rem":"1.12rem",lineHeight:1.55}}>{q}</p>
             </div>
           </NFTrainingStimulusCard>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,maxWidth:600,margin:"0 auto"}}>
-            <button disabled={locked} onClick={()=>record(true)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>Respuesta adecuada</button>
-            <button disabled={locked} onClick={()=>record(false)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.warning}`,background:COLORS.warning+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>Requiere revisión</button>
+            <button disabled={locked} onClick={()=>record(true)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>Respuesta adecuada</button>
+            <button disabled={locked} onClick={()=>record(false)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.warning}`,background:COLORS.warning+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>Requiere revisión</button>
           </div>
         </div>;
       }
@@ -4705,13 +4758,13 @@ const EX_ADULTO = {
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
             <div>
-              <div style={{fontSize:".66rem",fontWeight:800,color:COLORS.accent,marginBottom:8}}>SITUACIÓN ACTUAL · RESPONDE EN VOZ ALTA</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .66rem)",fontWeight:800,color:COLORS.accent,marginBottom:8}}>SITUACIÓN ACTUAL · RESPONDE EN VOZ ALTA</div>
               <p style={{margin:0,fontWeight:800,fontSize:M?"1.35rem":"1.12rem",lineHeight:1.55}}>{q}</p>
             </div>
           </NFTrainingStimulusCard>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,maxWidth:600,margin:"0 auto"}}>
-            <button disabled={locked} onClick={()=>record(true)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>Respuesta coherente</button>
-            <button disabled={locked} onClick={()=>record(false)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.warning}`,background:COLORS.warning+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>Requiere revisión</button>
+            <button disabled={locked} onClick={()=>record(true)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.success}`,background:COLORS.success+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>Respuesta coherente</button>
+            <button disabled={locked} onClick={()=>record(false)} style={{minHeight:M?76:68,borderRadius:13,border:`2px solid ${COLORS.warning}`,background:COLORS.warning+"0D",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>Requiere revisión</button>
           </div>
         </div>;
       }
@@ -4767,7 +4820,7 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Descubre la regla</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>Descubre la regla</div>
             <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",justifyContent:"flex-end"}}>
               <NFAudioReadButton text={`Serie: ${item.seq.join(", ")}. ¿Qué número sigue? Opciones: ${item.stableOpts.join(", ")}.`} label="Escuchar pregunta" mayor={modoMayor}/>
               <Badge label={`${cur+1}/${SERIES.length}`} color={COLORS.info}/>
@@ -4844,11 +4897,11 @@ const EX_ADULTO = {
                 minHeight:M?82:72,padding:14,borderRadius:14,
                 border:`2px solid ${!sel?COLORS.border:item===g.ans?COLORS.success:sel===item?COLORS.error:COLORS.border}`,
                 background:!sel?"#fff":item===g.ans?COLORS.success+"0D":sel===item?COLORS.error+"0D":"#fff",
-                fontFamily:"inherit",fontSize:M?"1.08rem":".93rem",fontWeight:800,cursor:"pointer"
+                fontFamily:"inherit",fontSize:M?"1.08rem":"var(--nf-activity-text, .93rem)",fontWeight:800,cursor:"pointer"
               }}>{item}</button>)}
             </div>
           </NFTrainingStimulusCard>
-          <div style={{minHeight:28,fontSize:M?".9rem":".78rem",color:COLORS.textMuted,fontWeight:700}}>{sel?g.razon:""}</div>
+          <div style={{minHeight:28,fontSize:M?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .78rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontWeight:700}}>{sel?g.razon:""}</div>
         </div>;
       }
     },
@@ -4907,7 +4960,7 @@ const EX_ADULTO = {
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,maxWidth:560,margin:"0 auto"}}>
             {[{v:true,l:"Verdadero"},{v:false,l:"Falso"}].map(o=><button key={String(o.v)} disabled={locked.current} onClick={()=>pick(o.v)} style={{
               minHeight:M?78:68,borderRadius:14,border:`2px solid ${o.v?COLORS.success:COLORS.error}`,
-              background:o.v?COLORS.success+"0D":COLORS.error+"0D",fontFamily:"inherit",fontWeight:900,fontSize:M?"1.05rem":".9rem",cursor:"pointer"
+              background:o.v?COLORS.success+"0D":COLORS.error+"0D",fontFamily:"inherit",fontWeight:900,fontSize:M?"1.05rem":"var(--nf-activity-text, .9rem)",cursor:"pointer"
             }}>{o.l}</button>)}
           </div>
           <div style={{minHeight:26,marginTop:9,fontWeight:800,color:sel===null?COLORS.textMuted:sel===item.ans?COLORS.success:COLORS.error}}>
@@ -4952,7 +5005,7 @@ const EX_ADULTO = {
         ];
         const [items]=useState(()=>shuffle(pool).slice(0,Math.min(pool.length,[0,3,4,5,6,6][L])).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"razonamiento relacional / ordenamiento lógico",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},430)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text={`${item.p} ${item.q} Opciones: ${item.opts.join(", ")}.`} label="Escuchar pistas" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div><p style={{fontSize:M?"1.15rem":".98rem",fontWeight:750,lineHeight:1.65,margin:"0 0 12px"}}>{item.p}</p><strong style={{fontSize:M?"1.2rem":"1.02rem"}}>{item.q}</strong></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:650,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} style={{minHeight:68,padding:11,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800}}>{v}</button>)}</div></div>;
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text={`${item.p} ${item.q} Opciones: ${item.opts.join(", ")}.`} label="Escuchar pistas" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div><p style={{fontSize:M?"1.15rem":"var(--nf-activity-text, .98rem)",fontWeight:750,lineHeight:1.65,margin:"0 0 12px"}}>{item.p}</p><strong style={{fontSize:M?"1.2rem":"1.02rem"}}>{item.q}</strong></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:650,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} style={{minHeight:68,padding:11,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800}}>{v}</button>)}</div></div>;
       }
     },
     {
@@ -4961,11 +5014,11 @@ const EX_ADULTO = {
       instruccion: "Observa cómo cambian las figuras y descubre la regla. Toca la opción que completa la secuencia.",
       Component: ({ onDone, modoMayor, difficultyLevel = 3 }) => {
         const M=!!modoMayor,L=clampAdaptiveLevel(difficultyLevel),count=[0,4,5,6,7,8][L];
-        const shapes=["circle","square","triangle"];
+        const shapes=["circle_o","square_o","triangle_o"];
         const make=()=>{const start=Math.floor(Math.random()*3),seq=[0,1,2].map(i=>shapes[(start+i)%3]),ans=shapes[start],opts=shuffle(shapes);return{seq,ans,opts}};
         const [items]=useState(()=>Array.from({length:count},make)),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{clinicalProcess:"razonamiento no verbal / matrices lógicas",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},420)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa la secuencia de figuras y elige cuál continúa la regla." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div style={{display:"flex",gap:16,alignItems:"center"}}>{item.seq.map((x,i)=><div key={i} style={{width:M?88:72,height:M?88:72,border:`2px solid ${COLORS.border}`,borderRadius:12,display:"grid",placeItems:"center"}}><NFStimulusShape shape={x} size={M?58:48}/></div>)}<div style={{width:M?88:72,height:M?88:72,border:`2px dashed ${COLORS.primary}`,borderRadius:12,display:"grid",placeItems:"center",fontWeight:900,fontSize:"1.5rem",color:COLORS.primary}}>?</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,maxWidth:500,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} aria-label="Opción de figura" style={{minHeight:M?92:78,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape shape={v} size={M?56:46}/></button>)}</div></div>;
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><NFAudioReadButton text="Observa la secuencia de figuras y elige cuál continúa la regla." label="Escuchar instrucción" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><div style={{display:"flex",gap:16,alignItems:"center"}}>{item.seq.map((x,i)=><div key={i} style={{width:M?88:72,height:M?88:72,border:`2px solid ${COLORS.border}`,borderRadius:12,display:"grid",placeItems:"center"}}><NFStimulusShape id={x} size={M?58:48}/></div>)}<div style={{width:M?88:72,height:M?88:72,border:`2px dashed ${COLORS.primary}`,borderRadius:12,display:"grid",placeItems:"center",fontWeight:900,fontSize:"1.5rem",color:COLORS.primary}}>?</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,maxWidth:500,margin:"0 auto"}}>{item.opts.map(v=><button key={v} onClick={()=>pick(v)} disabled={locked.current} aria-label="Opción de figura" style={{minHeight:M?92:78,borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",display:"grid",placeItems:"center"}}><NFStimulusShape id={v} size={M?56:46}/></button>)}</div></div>;
       }
     },
   ],
@@ -5023,7 +5076,7 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Cálculo mental · sin escribir</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>Cálculo mental · sin escribir</div>
             <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",justifyContent:"flex-end"}}>
               <NFAudioReadButton text={`${item.expr.replace("−"," menos ").replace("×"," por ").replace("÷"," dividido entre ")}. Opciones: ${item.opts.join(", ")}.`} label="Escuchar pregunta" mayor={modoMayor}/>
               <Badge label={`${cur+1}/${ops.length}`} color={COLORS.info}/>
@@ -5096,7 +5149,7 @@ const EX_ADULTO = {
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Encuentra el número</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>Encuentra el número</div>
             <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",justifyContent:"flex-end"}}>
               <NFAudioReadButton text={`${item.expr.replaceAll("?","número faltante").replace("−"," menos ").replace("×"," por ").replace("÷"," dividido entre ")}. Opciones: ${item.opts.join(", ")}.`} label="Escuchar pregunta" mayor={modoMayor}/>
               <Badge label={`${cur+1}/${ITEMS.length}`} color={COLORS.info}/>
@@ -5146,7 +5199,7 @@ const EX_ADULTO = {
         return <div style={{padding:"4px 0",textAlign:"center"}}>
           <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",marginBottom:10}}><NFAudioReadButton text={`${item.q} Opciones: ${item.opts.join(", ")}.`} label="Escuchar problema" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}><p style={{maxWidth:700,margin:0,fontSize:M?"1.2rem":"1rem",fontWeight:800,lineHeight:1.65}}>{item.q}</p></NFTrainingStimulusCard>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12,maxWidth:600,margin:"0 auto"}}>{item.opts.map(v=><button key={String(v)} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?76:66,borderRadius:13,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:850,fontSize:M?"1.05rem":".92rem"}}>{typeof v==="number"&&v>=1000?`$${v.toLocaleString("es-CO")}`:v}</button>)}</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12,maxWidth:600,margin:"0 auto"}}>{item.opts.map(v=><button key={String(v)} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?76:66,borderRadius:13,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:850,fontSize:M?"1.05rem":"var(--nf-activity-text, .92rem)"}}>{typeof v==="number"&&v>=1000?`$${v.toLocaleString("es-CO")}`:v}</button>)}</div>
         </div>;
       }
     },
@@ -5263,10 +5316,10 @@ const EX_ADULTO = {
             borderRadius:22,background:q.regla==="color"?COLORS.primary+"10":COLORS.warning+"12",
             border:`2px solid ${q.regla==="color"?COLORS.primary:COLORS.warning}`,marginBottom:6
           }}>
-            <span style={{fontSize:".62rem",fontWeight:800,color:COLORS.textMuted}}>RESPONDE POR</span>
-            <strong style={{fontSize:M?"1.08rem":".9rem",color:q.regla==="color"?COLORS.primary:COLORS.warning}}>{q.regla.toUpperCase()}</strong>
+            <span style={{fontSize:"var(--nf-activity-meta, .62rem)",fontWeight:800,color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>RESPONDE POR</span>
+            <strong style={{fontSize:M?"1.08rem":"var(--nf-activity-text, .9rem)",color:q.regla==="color"?COLORS.primary:COLORS.warning}}>{q.regla.toUpperCase()}</strong>
           </div>
-          {isSwitch&&<div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent,marginTop:5}}>La regla cambió</div>}
+          {isSwitch&&<div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.accent,marginTop:5}}>La regla cambió</div>}
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
             <NFColoredRuleStimulus shape={q.item.shape} color={q.item.hex} size={M?142:122}/>
           </NFTrainingStimulusCard>
@@ -5276,10 +5329,10 @@ const EX_ADULTO = {
           {!feedback&&<div style={{display:"grid",gridTemplateColumns:`repeat(${opts.length},1fr)`,gap:12,maxWidth:580,margin:"0 auto"}}>
             {opts.map(opt=><button key={opt} onClick={()=>pick(opt)} style={{
               minHeight:M?68:60,padding:13,borderRadius:12,border:`2px solid ${COLORS.border}`,
-              background:"#fff",fontWeight:800,fontSize:M?"1.05rem":".9rem",fontFamily:"inherit",cursor:"pointer"
+              background:"#fff",fontWeight:800,fontSize:M?"1.05rem":"var(--nf-activity-text, .9rem)",fontFamily:"inherit",cursor:"pointer"
             }}>{opt}</button>)}
           </div>}
-          <div style={{fontSize:".68rem",color:COLORS.textMuted,marginTop:12}}>Intento {cur+1} de {RONDAS}</div>
+          <div style={{fontSize:"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:12}}>Intento {cur+1} de {RONDAS}</div>
         </div>;
       }
     },
@@ -5319,7 +5372,7 @@ const EX_ADULTO = {
         };
 
         return <div style={{padding:"4px 0",textAlign:"center"}}>
-          <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary,marginBottom:4}}>REGLA: RESPONDE LO CONTRARIO</div>
+          <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary,marginBottom:4}}>REGLA: RESPONDE LO CONTRARIO</div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
             <div>
               <div style={{fontSize:M?"5.2rem":"4.3rem",lineHeight:1,marginBottom:10}}>{item.icon}</div>
@@ -5332,10 +5385,10 @@ const EX_ADULTO = {
           {!feedback&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,maxWidth:520,margin:"0 auto"}}>
             {item.group.map(opt=><button key={opt} onClick={()=>pick(opt)} style={{
               minHeight:M?72:64,padding:14,borderRadius:12,border:`2px solid ${COLORS.border}`,background:"#fff",
-              fontFamily:"inherit",fontSize:M?"1.05rem":".9rem",fontWeight:800,cursor:"pointer"
+              fontFamily:"inherit",fontSize:M?"1.05rem":"var(--nf-activity-text, .9rem)",fontWeight:800,cursor:"pointer"
             }}>{opt}</button>)}
           </div>}
-          <div style={{fontSize:".68rem",color:COLORS.textMuted,marginTop:12}}>Intento {cur+1} de {trials.length}</div>
+          <div style={{fontSize:"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:12}}>Intento {cur+1} de {trials.length}</div>
         </div>;
       }
     },
@@ -5395,9 +5448,9 @@ const EX_ADULTO = {
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={250}>
             <div style={{maxWidth:720,textAlign:"left"}}>
-              <div style={{fontSize:".66rem",fontWeight:800,color:COLORS.primary,marginBottom:8}}>SITUACIÓN</div>
-              <p style={{margin:"0 0 14px",fontSize:M?"1.08rem":".93rem",lineHeight:1.8}}>{item.contexto}</p>
-              <p style={{margin:0,fontWeight:800,fontSize:M?"1.12rem":".98rem",lineHeight:1.6}}>{item.pregunta}</p>
+              <div style={{fontSize:"var(--nf-activity-meta, .66rem)",fontWeight:800,color:COLORS.primary,marginBottom:8}}>SITUACIÓN</div>
+              <p style={{margin:"0 0 14px",fontSize:M?"1.08rem":"var(--nf-activity-text, .93rem)",lineHeight:1.8}}>{item.contexto}</p>
+              <p style={{margin:0,fontWeight:800,fontSize:M?"1.12rem":"var(--nf-activity-text, .98rem)",lineHeight:1.6}}>{item.pregunta}</p>
             </div>
           </NFTrainingStimulusCard>
           <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12,maxWidth:720,margin:"0 auto"}}>
@@ -5405,7 +5458,7 @@ const EX_ADULTO = {
               minHeight:M?86:74,padding:14,borderRadius:13,textAlign:"left",
               border:`2px solid ${!sel?COLORS.border:opt===item.ans?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,
               background:!sel?"#fff":opt===item.ans?COLORS.success+"0D":sel===opt?COLORS.error+"0D":"#fff",
-              fontFamily:"inherit",fontSize:M?".98rem":".86rem",fontWeight:800,cursor:"pointer",lineHeight:1.45
+              fontFamily:"inherit",fontSize:M?"var(--nf-activity-text, .98rem)":"var(--nf-activity-text, .86rem)",fontWeight:800,cursor:"pointer",lineHeight:1.45
             }}>{opt}</button>)}
           </div>
         </div>;
@@ -5495,11 +5548,11 @@ const EX_ADULTO = {
 
         if(phase==="read")return <div style={{padding:"4px 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-            <div><div style={{fontSize:".66rem",fontWeight:800,color:COLORS.primary}}>LECTURA A TU RITMO</div><strong style={{fontSize:M?"1.05rem":".9rem"}}>{texto.titulo}</strong></div>
+            <div><div style={{fontSize:"var(--nf-activity-meta, .66rem)",fontWeight:800,color:COLORS.primary}}>LECTURA A TU RITMO</div><strong style={{fontSize:M?"1.05rem":"var(--nf-activity-text, .9rem)"}}>{texto.titulo}</strong></div>
             <NFAudioReadButton text={texto.texto} label="Escuchar texto" mayor={modoMayor}/>
           </div>
           <NFTrainingStimulusCard modoMayor={M} minHeight={330}>
-            <p style={{margin:0,maxWidth:760,textAlign:"left",fontSize:M?"1.08rem":".94rem",lineHeight:1.95}}>{texto.texto}</p>
+            <p style={{margin:0,maxWidth:760,textAlign:"left",fontSize:M?"1.08rem":"var(--nf-activity-text, .94rem)",lineHeight:1.95}}>{texto.texto}</p>
           </NFTrainingStimulusCard>
           <div style={{maxWidth:540,margin:"0 auto"}}><BtnPrimary onClick={finishRead} style={{width:"100%"}}>Ya estoy listo para responder</BtnPrimary></div>
         </div>;
@@ -5514,13 +5567,13 @@ const EX_ADULTO = {
           </div>
 
           {showText&&<div style={{marginBottom:12,textAlign:"left",padding:M?18:14,borderRadius:13,border:`1px solid ${COLORS.border}`,background:COLORS.bg}}>
-            <div style={{fontSize:".65rem",fontWeight:800,color:COLORS.primary,marginBottom:6}}>{texto.titulo}</div>
-            <p style={{margin:0,fontSize:M?".98rem":".84rem",lineHeight:1.75}}>{texto.texto}</p>
+            <div style={{fontSize:"var(--nf-activity-meta, .65rem)",fontWeight:800,color:COLORS.primary,marginBottom:6}}>{texto.titulo}</div>
+            <p style={{margin:0,fontSize:M?"var(--nf-activity-text, .98rem)":"var(--nf-activity-text, .84rem)",lineHeight:1.75}}>{texto.texto}</p>
           </div>}
 
           <NFTrainingStimulusCard modoMayor={M} minHeight={185}>
             <div>
-              <div style={{fontSize:".64rem",fontWeight:800,color:q.type==="literal"?COLORS.info:COLORS.accent,marginBottom:8}}>{q.type==="literal"?"COMPRENSIÓN LITERAL":"COMPRENSIÓN INFERENCIAL"}</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .64rem)",fontWeight:800,color:q.type==="literal"?COLORS.info:COLORS.accent,marginBottom:8}}>{q.type==="literal"?"COMPRENSIÓN LITERAL":"COMPRENSIÓN INFERENCIAL"}</div>
               <p style={{margin:0,fontWeight:800,fontSize:M?"1.18rem":"1rem",lineHeight:1.65,maxWidth:720}}>{q.p}</p>
             </div>
           </NFTrainingStimulusCard>
@@ -5530,7 +5583,7 @@ const EX_ADULTO = {
               minHeight:M?84:72,padding:14,borderRadius:13,textAlign:"left",
               border:`2px solid ${!sel?COLORS.border:opt===q.ans?COLORS.success:sel===opt?COLORS.error:COLORS.border}`,
               background:!sel?"#fff":opt===q.ans?COLORS.success+"0D":sel===opt?COLORS.error+"0D":"#fff",
-              fontFamily:"inherit",fontSize:M?".98rem":".86rem",fontWeight:800,cursor:"pointer",lineHeight:1.45
+              fontFamily:"inherit",fontSize:M?"var(--nf-activity-text, .98rem)":"var(--nf-activity-text, .86rem)",fontWeight:800,cursor:"pointer",lineHeight:1.45
             }}>{opt}</button>)}
           </div>
         </div>;
@@ -5556,7 +5609,7 @@ const EX_ADULTO = {
         const [cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);
         const t0=useRef(Date.now()),locked=useRef(false),records=useRef([]); const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);records.current.push({ok});setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,mainIdea:true,audioSupportAvailable:true,clinicalProcess:"comprensión global / identificación de idea principal",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},450)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.texto} label="Escuchar texto" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={245}><p style={{margin:0,maxWidth:740,textAlign:"left",fontSize:M?"1.12rem":".96rem",lineHeight:1.85}}>{item.texto}</p></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"flex-end",margin:"-2px auto 10px",maxWidth:720}}><NFAudioReadButton text="¿Cuál es la idea principal del texto?" label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?88:74,padding:13,textAlign:"left",borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:780,lineHeight:1.45}}>{v}</button>)}</div></div>;
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.texto} label="Escuchar texto" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={245}><p style={{margin:0,maxWidth:740,textAlign:"left",fontSize:M?"1.12rem":"var(--nf-activity-text, .96rem)",lineHeight:1.85}}>{item.texto}</p></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"flex-end",margin:"-2px auto 10px",maxWidth:720}}><NFAudioReadButton text="¿Cuál es la idea principal del texto?" label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?88:74,padding:13,textAlign:"left",borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:780,lineHeight:1.45}}>{v}</button>)}</div></div>;
       }
     },
     {
@@ -5577,7 +5630,7 @@ const EX_ADULTO = {
         const [choices]=useState(()=>shuffle(target)),[picked,setPicked]=useState([]);const t0=useRef(Date.now()),locked=useRef(false);
         const choose=v=>{if(locked.current||picked.includes(v))return;const next=[...picked,v];setPicked(next);if(next.length===target.length){locked.current=true;const correct=next.reduce((n,x,i)=>n+(x===target[i]?1:0),0);setTimeout(()=>onDone({correct,total:target.length,errors:target.length-correct,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,eventSequencing:true,audioSupportAvailable:true,clinicalProcess:"comprensión temporal / secuenciación de acontecimientos",noTyping:true}}),500)}};
         const undo=()=>{if(!locked.current)setPicked(p=>p.slice(0,-1))};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={`Acontecimientos: ${target.join(" ")}`} label="Escuchar acontecimientos" mayor={M}/><Badge label={`${picked.length}/${target.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={170}><div style={{width:"100%"}}><div style={{fontSize:".7rem",fontWeight:800,color:COLORS.primary,marginBottom:10}}>TU ORDEN</div><div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"center"}}>{picked.length?picked.map((v,i)=><span key={v} style={{padding:"9px 11px",borderRadius:10,background:COLORS.primary+"0D",border:`1px solid ${COLORS.primary}33`,fontWeight:750}}>{i+1}. {v}</span>):<span style={{color:COLORS.textMuted}}>Toca primero el acontecimiento que ocurrió antes.</span>}</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{choices.map(v=><button key={v} disabled={picked.includes(v)||locked.current} onClick={()=>choose(v)} style={{minHeight:M?82:70,padding:12,borderRadius:12,border:`2px solid ${picked.includes(v)?COLORS.primary+"55":COLORS.border}`,background:picked.includes(v)?COLORS.primary+"08":"#fff",fontFamily:"inherit",fontWeight:760,lineHeight:1.45,opacity:picked.includes(v)?.55:1}}>{v}</button>)}</div><div style={{marginTop:10}}><BtnSecondary onClick={undo} disabled={!picked.length||locked.current}>Deshacer último</BtnSecondary></div></div>;
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={`Acontecimientos: ${target.join(" ")}`} label="Escuchar acontecimientos" mayor={M}/><Badge label={`${picked.length}/${target.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={170}><div style={{width:"100%"}}><div style={{fontSize:"var(--nf-activity-meta, .7rem)",fontWeight:800,color:COLORS.primary,marginBottom:10}}>TU ORDEN</div><div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"center"}}>{picked.length?picked.map((v,i)=><span key={v} style={{padding:"9px 11px",borderRadius:10,background:COLORS.primary+"0D",border:`1px solid ${COLORS.primary}33`,fontWeight:750}}>{i+1}. {v}</span>):<span style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Toca primero el acontecimiento que ocurrió antes.</span>}</div></div></NFTrainingStimulusCard><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{choices.map(v=><button key={v} disabled={picked.includes(v)||locked.current} onClick={()=>choose(v)} style={{minHeight:M?82:70,padding:12,borderRadius:12,border:`2px solid ${picked.includes(v)?COLORS.primary+"55":COLORS.border}`,background:picked.includes(v)?COLORS.primary+"08":"#fff",fontFamily:"inherit",fontWeight:760,lineHeight:1.45,opacity:picked.includes(v)?.55:1}}>{v}</button>)}</div><div style={{marginTop:10}}><BtnSecondary onClick={undo} disabled={!picked.length||locked.current}>Deshacer último</BtnSecondary></div></div>;
       }
     },
     {
@@ -5596,7 +5649,7 @@ const EX_ADULTO = {
         const [items]=useState(()=>shuffle(pool).slice(0,count).map(x=>({...x,facts:shuffle(x.facts)}))),[cur,setCur]=useState(0),[selected,setSelected]=useState([]),[score,setScore]=useState(0);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const toggle=v=>{if(locked.current)return;setSelected(a=>a.includes(v)?a.filter(x=>x!==v):[...a,v])};
         const confirm=()=>{if(locked.current||!selected.length)return;locked.current=true;const exact=selected.length===item.ans.length&&item.ans.every(x=>selected.includes(x));const ns=score+(exact?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,relevanceSelection:true,audioSupportAvailable:true,clinicalProcess:"selección de información relevante / comprensión funcional",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSelected([]);locked.current=false}},500)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.contexto} label="Escuchar situación" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><p style={{margin:0,maxWidth:740,textAlign:"left",fontSize:M?"1.1rem":".94rem",lineHeight:1.8}}>{item.contexto}</p></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:720,margin:"0 auto 10px",gap:8}}><strong style={{textAlign:"left"}}>{item.q}</strong><NFAudioReadButton text={item.q} label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.facts.map(v=><button key={v} disabled={locked.current} onClick={()=>toggle(v)} style={{minHeight:66,padding:11,borderRadius:12,border:`2px solid ${selected.includes(v)?COLORS.primary:COLORS.border}`,background:selected.includes(v)?COLORS.primary+"0D":"#fff",fontFamily:"inherit",fontWeight:760}}>{v}</button>)}</div><div style={{maxWidth:420,margin:"12px auto 0"}}><BtnPrimary onClick={confirm} disabled={!selected.length||locked.current} style={{width:"100%"}}>Confirmar selección</BtnPrimary></div></div>;
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.contexto} label="Escuchar situación" mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={220}><p style={{margin:0,maxWidth:740,textAlign:"left",fontSize:M?"1.1rem":"var(--nf-activity-text, .94rem)",lineHeight:1.8}}>{item.contexto}</p></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:720,margin:"0 auto 10px",gap:8}}><strong style={{textAlign:"left"}}>{item.q}</strong><NFAudioReadButton text={item.q} label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.facts.map(v=><button key={v} disabled={locked.current} onClick={()=>toggle(v)} style={{minHeight:66,padding:11,borderRadius:12,border:`2px solid ${selected.includes(v)?COLORS.primary:COLORS.border}`,background:selected.includes(v)?COLORS.primary+"0D":"#fff",fontFamily:"inherit",fontWeight:760}}>{v}</button>)}</div><div style={{maxWidth:420,margin:"12px auto 0"}}><BtnPrimary onClick={confirm} disabled={!selected.length||locked.current} style={{width:"100%"}}>Confirmar selección</BtnPrimary></div></div>;
       }
     },
     {
@@ -5616,7 +5669,7 @@ const EX_ADULTO = {
         const count=Math.min(pool.length,[0,3,4,5,6,6][L]);
         const [items]=useState(()=>shuffle(pool).slice(0,count).map(x=>({...x,opts:shuffle(x.opts)}))),[cur,setCur]=useState(0),[score,setScore]=useState(0),[sel,setSel]=useState(null);const t0=useRef(Date.now()),locked=useRef(false);const item=items[cur];
         const pick=v=>{if(locked.current)return;locked.current=true;setSel(v);const ok=v===item.ans,ns=score+(ok?1:0);setTimeout(()=>{if(cur+1>=items.length)onDone({correct:ns,total:items.length,errors:items.length-ns,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{readingComprehension:true,functionalReading:true,audioSupportAvailable:true,clinicalProcess:"comprensión lectora funcional / aplicación de información",noTyping:true}});else{setScore(ns);setCur(c=>c+1);setSel(null);locked.current=false}},450)};
-        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.text} label={`Escuchar ${item.kind}`} mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={245}><div style={{maxWidth:720,textAlign:"left",width:"100%"}}><div style={{fontSize:".68rem",fontWeight:850,color:COLORS.primary,marginBottom:9}}>{item.title.toUpperCase()}</div><p style={{margin:0,fontSize:M?"1.12rem":".96rem",lineHeight:1.85}}>{item.text}</p></div></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:720,margin:"0 auto 10px",gap:8}}><strong style={{textAlign:"left"}}>{item.q}</strong><NFAudioReadButton text={item.q} label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?82:70,padding:12,textAlign:"left",borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:760,lineHeight:1.45}}>{v}</button>)}</div></div>;
+        return <div style={{textAlign:"center"}}><div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:10}}><NFAudioReadButton text={item.text} label={`Escuchar ${item.kind}`} mayor={M}/><Badge label={`${cur+1}/${items.length}`} color={COLORS.info}/></div><NFTrainingStimulusCard modoMayor={M} minHeight={245}><div style={{maxWidth:720,textAlign:"left",width:"100%"}}><div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:850,color:COLORS.primary,marginBottom:9}}>{item.title.toUpperCase()}</div><p style={{margin:0,fontSize:M?"1.12rem":"var(--nf-activity-text, .96rem)",lineHeight:1.85}}>{item.text}</p></div></NFTrainingStimulusCard><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:720,margin:"0 auto 10px",gap:8}}><strong style={{textAlign:"left"}}>{item.q}</strong><NFAudioReadButton text={item.q} label="Escuchar pregunta" mayor={M}/></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:720,margin:"0 auto"}}>{item.opts.map(v=><button key={v} disabled={locked.current} onClick={()=>pick(v)} style={{minHeight:M?82:70,padding:12,textAlign:"left",borderRadius:12,border:`2px solid ${sel===null?COLORS.border:v===item.ans?COLORS.success:sel===v?COLORS.error:COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:760,lineHeight:1.45}}>{v}</button>)}</div></div>;
       }
     },
   ],
@@ -5892,14 +5945,14 @@ function NF63InhibitionStop({onDone,modoMayor,difficultyLevel=3}){
   return <div style={{padding:"4px 0",textAlign:"center"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}>
       <div style={{textAlign:"left"}}>
-        <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>CONTROL DE RESPUESTA</div>
-        <div style={{fontSize:M?".92rem":".77rem",color:COLORS.textMuted,marginTop:3}}>Toca únicamente cuando aparezca TOCA. Si aparece DETENTE, espera.</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>CONTROL DE RESPUESTA</div>
+        <div style={{fontSize:M?"var(--nf-activity-text, .92rem)":"var(--nf-activity-text, .77rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>Toca únicamente cuando aparezca TOCA. Si aparece DETENTE, espera.</div>
       </div>
       <Badge label={`${idx+1}/${items.length}`} color={COLORS.info}/>
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={250}>
       {phase==="ready"
-        ? <div style={{fontSize:M?"1.25rem":"1rem",fontWeight:800,color:COLORS.textMuted}}>Prepárate…</div>
+        ? <div style={{fontSize:M?"1.25rem":"1rem",fontWeight:800,color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Prepárate…</div>
         : <button onClick={tap} disabled={phase!=="stimulus"} style={{
             width:M?210:185,height:M?150:130,borderRadius:18,
             border:`3px solid ${item.stop?COLORS.error:COLORS.success}`,
@@ -5909,7 +5962,7 @@ function NF63InhibitionStop({onDone,modoMayor,difficultyLevel=3}){
             cursor:phase==="stimulus"?"pointer":"default"
           }}>{phase==="ok"?"✓":phase==="error"?"×":item.label}</button>}
     </NFTrainingStimulusCard>
-    <div style={{minHeight:24,fontSize:".76rem",fontWeight:800,color:phase==="ok"?COLORS.success:phase==="error"?COLORS.error:COLORS.textMuted}}>
+    <div style={{minHeight:24,fontSize:"var(--nf-activity-text, .76rem)",fontWeight:800,color:phase==="ok"?COLORS.success:phase==="error"?COLORS.error:COLORS.textMuted}}>
       {phase==="ok"?"Correcto":phase==="error"?(item.stop?"Debías detenerte":"Debías tocar"):""}
     </div>
   </div>;
@@ -5972,9 +6025,9 @@ function NF63ProspectiveEvent({onDone,modoMayor}){
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={190}>
       <div style={{maxWidth:620}}>
-        <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent,marginBottom:8}}>Pendiente para más adelante</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.accent,marginBottom:8}}>Pendiente para más adelante</div>
         <h3 style={{margin:"0 0 10px",fontSize:M?"1.45rem":"1.2rem"}}>Recuerda esta intención</h3>
-        <p style={{lineHeight:1.7,fontSize:M?"1.02rem":".88rem",margin:0}}>
+        <p style={{lineHeight:1.7,fontSize:M?"1.02rem":"var(--nf-activity-text, .88rem)",margin:0}}>
           Mientras resuelves otras actividades, cuando aparezca la palabra <strong style={{color:COLORS.primary}}>TRANSPORTE</strong>, toca <strong>“Recordé el pendiente”</strong>. No lo pulses antes ni después.
         </p>
       </div>
@@ -5984,8 +6037,8 @@ function NF63ProspectiveEvent({onDone,modoMayor}){
 
   return <div style={{padding:"4px 0"}}>
     <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center"}}>
-      <span style={{fontSize:".72rem",color:COLORS.textMuted}}>Actividad {idx+1} de {items.length}</span>
-      <span style={{fontSize:".68rem",fontWeight:800,color:item.target?COLORS.accent:COLORS.textMuted}}>{item.cue}</span>
+      <span style={{fontSize:"var(--nf-activity-meta, .72rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Actividad {idx+1} de {items.length}</span>
+      <span style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:item.target?COLORS.accent:COLORS.textMuted}}>{item.cue}</span>
     </div>
     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
       <NFAudioReadButton text={`${item.p} Opciones: ${item.opts.join(", ")}.`} label="Escuchar pregunta" mayor={modoMayor}/>
@@ -5995,12 +6048,12 @@ function NF63ProspectiveEvent({onDone,modoMayor}){
         <div style={{fontSize:M?"1.25rem":"1.05rem",fontWeight:800,lineHeight:1.55,marginBottom:20}}>{item.p}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
           {item.opts.map((o,i)=><button key={o} disabled={locked} onClick={()=>choose(i)}
-            style={{minHeight:M?68:60,padding:14,borderRadius:12,border:`2px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontSize:M?"1rem":".88rem",fontWeight:800,cursor:locked?"default":"pointer"}}>{o}</button>)}
+            style={{minHeight:M?68:60,padding:14,borderRadius:12,border:`2px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",fontWeight:800,cursor:locked?"default":"pointer"}}>{o}</button>)}
         </div>
       </div>
     </NFTrainingStimulusCard>
     <div style={{maxWidth:520,margin:"0 auto",paddingTop:4,borderTop:`1px solid ${COLORS.border}`}}>
-      <p style={{fontSize:".68rem",color:COLORS.textMuted,textAlign:"center",margin:"10px 0 8px"}}>Si aparece la señal acordada, recuerda también tu pendiente.</p>
+      <p style={{fontSize:"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",textAlign:"center",margin:"10px 0 8px"}}>Si aparece la señal acordada, recuerda también tu pendiente.</p>
       <BtnSecondary onClick={remember} disabled={item.target&&prospectiveHit} style={{width:"100%",padding:M?15:12}}>
         {item.target&&prospectiveHit?"Pendiente registrado":"Recordé el pendiente"}
       </BtnSecondary>
@@ -6025,8 +6078,8 @@ function NF63VisualMemory({onDone,modoMayor}){
     onDone({correct:hits,total:target.length,errors:falseAlarms+omissions,seconds:Math.round((Date.now()-t0.current)/1000),specificMetrics:{recognitionHits:hits,falseAlarms,omissions,visualRecognition:true,clinicalProcess:"memoria visual de reconocimiento",errorProfile:{omissions,commissions:falseAlarms}}});
   };
   if(phase==="study")return <div style={{textAlign:"center",padding:"4px 0"}}>
-    <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Memoria visual</div>
-    <p style={{fontSize:M?".95rem":".8rem",color:COLORS.textMuted}}>Observa las figuras · {seconds}s</p>
+    <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>Memoria visual</div>
+    <p style={{fontSize:M?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Observa las figuras · {seconds}s</p>
     <NFTrainingStimulusCard modoMayor={M} minHeight={250}>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:M?18:14,maxWidth:460,width:"100%"}}>
         {target.map((x,i)=><div key={i} style={{minHeight:M?92:78,display:"grid",placeItems:"center",border:`2px solid ${COLORS.border}`,borderRadius:14,background:"#fff"}}>{x}</div>)}
@@ -6035,7 +6088,7 @@ function NF63VisualMemory({onDone,modoMayor}){
   </div>;
   return <div style={{textAlign:"center",padding:"4px 0"}}>
     <h3 style={{margin:"0 0 5px"}}>Selecciona las figuras que viste</h3>
-    <p style={{fontSize:M?".92rem":".78rem",color:COLORS.textMuted,marginTop:0}}>Puedes seleccionar varias. Algunas son distractores.</p>
+    <p style={{fontSize:M?"var(--nf-activity-text, .92rem)":"var(--nf-activity-text, .78rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:0}}>Puedes seleccionar varias. Algunas son distractores.</p>
     <NFTrainingStimulusCard modoMayor={M} minHeight={280}>
       <div style={{display:"grid",gridTemplateColumns:M?"repeat(3,1fr)":"repeat(5,1fr)",gap:M?15:11,width:"100%",maxWidth:650}}>
         {pool.map(x=><button key={x} onClick={()=>toggle(x)} style={{minHeight:M?88:74,border:`2px solid ${selected.has(x)?COLORS.primary:COLORS.border}`,borderRadius:13,background:selected.has(x)?COLORS.primary+"0D":"#fff",cursor:"pointer"}}><NFStimulusShape id={x} size={M?54:46}/></button>)}
@@ -6091,12 +6144,12 @@ function NF63AuditoryPatterns({onDone,modoMayor}){
   };
   return <div style={{padding:"4px 0",textAlign:"center"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-      <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Discriminación auditiva</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>Discriminación auditiva</div>
       <Badge label={`${idx+1}/${items.length}`} color={COLORS.info}/>
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={240}>
       <div style={{width:"100%",maxWidth:560}}>
-        <p style={{fontSize:M?"1.02rem":".86rem",color:COLORS.textMuted,margin:"0 0 18px"}}>Escucha ambas secuencias antes de responder.</p>
+        <p style={{fontSize:M?"1.02rem":"var(--nf-activity-text, .86rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",margin:"0 0 18px"}}>Escucha ambas secuencias antes de responder.</p>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
           <BtnSecondary onClick={()=>play(item.a,"A")} style={{minHeight:M?72:64}}>{playedA?"✓ Escuchar A otra vez":"Escuchar A"}</BtnSecondary>
           <BtnSecondary onClick={()=>play(item.b,"B")} style={{minHeight:M?72:64}}>{playedB?"✓ Escuchar B otra vez":"Escuchar B"}</BtnSecondary>
@@ -6131,7 +6184,7 @@ function NF63PraxiaActions({onDone,modoMayor}){
   };
   return <div style={{padding:"4px 0",textAlign:"center"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-      <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent}}>Ejecución observada</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.accent}}>Ejecución observada</div>
       <Badge label={`${idx+1}/${items.length}`} color={COLORS.info}/>
     </div>
     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
@@ -6139,11 +6192,11 @@ function NF63PraxiaActions({onDone,modoMayor}){
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={240}>
       <div style={{maxWidth:700}}>
-        <div style={{fontSize:".66rem",fontWeight:800,color:COLORS.primary,marginBottom:10}}>Realiza la acción</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .66rem)",fontWeight:800,color:COLORS.primary,marginBottom:10}}>Realiza la acción</div>
         <p style={{margin:0,fontWeight:800,fontSize:M?"1.3rem":"1.08rem",lineHeight:1.6}}>{items[idx]}</p>
       </div>
     </NFTrainingStimulusCard>
-    <p style={{fontSize:M?".88rem":".75rem",color:COLORS.textMuted,maxWidth:650,margin:"0 auto 12px"}}>El profesional valora la ejecución considerando comprensión, movilidad, dolor y limitaciones sensoriales.</p>
+    <p style={{fontSize:M?"var(--nf-activity-text, .88rem)":"var(--nf-activity-meta, .75rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",maxWidth:650,margin:"0 auto 12px"}}>El profesional valora la ejecución considerando comprensión, movilidad, dolor y limitaciones sensoriales.</p>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:620,margin:"0 auto"}}>
       <BtnSecondary disabled={locked.current} onClick={()=>rate(false)}>Requiere apoyo/revisión</BtnSecondary>
       <BtnPrimary disabled={locked.current} onClick={()=>rate(true)}>Ejecución adecuada</BtnPrimary>
@@ -6178,14 +6231,14 @@ function NF63SocialInference({onDone,modoMayor}){
       <NFAudioReadButton text={`${it.p} Opciones: ${it.o.join(", ")}.`} label="Escuchar situación" mayor={modoMayor}/>
     </div>
     <NFTrainingStimulusCard modoMayor={M} minHeight={220}>
-      <p style={{margin:0,maxWidth:720,fontWeight:800,fontSize:M?"1.12rem":".96rem",lineHeight:1.75,textAlign:"left"}}>{it.p}</p>
+      <p style={{margin:0,maxWidth:720,fontWeight:800,fontSize:M?"1.12rem":"var(--nf-activity-text, .96rem)",lineHeight:1.75,textAlign:"left"}}>{it.p}</p>
     </NFTrainingStimulusCard>
     <div style={{display:"grid",gap:11,maxWidth:720,margin:"0 auto"}}>
       {it.o.map((o,j)=><button key={o} disabled={locked.current} onClick={()=>pick(j)} style={{
         minHeight:M?74:64,padding:14,borderRadius:12,textAlign:"left",
         border:`2px solid ${sel===null?COLORS.border:j===it.a?COLORS.success:sel===j?COLORS.error:COLORS.border}`,
         background:sel===null?"#fff":j===it.a?COLORS.success+"0D":sel===j?COLORS.error+"0D":"#fff",
-        fontFamily:"inherit",fontWeight:800,fontSize:M?".98rem":".86rem",cursor:"pointer",lineHeight:1.45
+        fontFamily:"inherit",fontWeight:800,fontSize:M?"var(--nf-activity-text, .98rem)":"var(--nf-activity-text, .86rem)",cursor:"pointer",lineHeight:1.45
       }}>{o}</button>)}
     </div>
   </div>;
@@ -6217,7 +6270,7 @@ function NF63MetacognitiveReview({onDone,modoMayor}){
   };
   return <div style={{padding:"4px 0",textAlign:"center"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
-      <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Monitorea tu seguridad</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>Monitorea tu seguridad</div>
       <Badge label={`${i+1}/${items.length}`} color={COLORS.info}/>
     </div>
     {phase==="answer"?<>
@@ -6228,7 +6281,7 @@ function NF63MetacognitiveReview({onDone,modoMayor}){
         <p style={{margin:0,fontWeight:800,fontSize:M?"1.2rem":"1rem",lineHeight:1.65}}>{it.p}</p>
       </NFTrainingStimulusCard>
       <div style={{display:"grid",gap:10,maxWidth:560,margin:"0 auto"}}>
-        {it.o.map((o,j)=><button key={o} onClick={()=>{setChoice(j);setPhase("confidence")}} style={{minHeight:M?68:60,padding:12,border:`2px solid ${COLORS.border}`,borderRadius:11,background:"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":".88rem",cursor:"pointer"}}>{o}</button>)}
+        {it.o.map((o,j)=><button key={o} onClick={()=>{setChoice(j);setPhase("confidence")}} style={{minHeight:M?68:60,padding:12,border:`2px solid ${COLORS.border}`,borderRadius:11,background:"#fff",fontFamily:"inherit",fontWeight:800,fontSize:M?"1rem":"var(--nf-activity-text, .88rem)",cursor:"pointer"}}>{o}</button>)}
       </div>
     </>:<>
       <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
@@ -6236,8 +6289,8 @@ function NF63MetacognitiveReview({onDone,modoMayor}){
       </div>
       <NFTrainingStimulusCard modoMayor={M} minHeight={165}>
         <div>
-          <div style={{fontSize:".66rem",fontWeight:800,color:COLORS.primary,marginBottom:8}}>Antes de ver si acertaste</div>
-          <p style={{margin:0,fontWeight:800,fontSize:M?"1.15rem":".98rem"}}>¿Qué tan seguro estás de tu respuesta?</p>
+          <div style={{fontSize:"var(--nf-activity-meta, .66rem)",fontWeight:800,color:COLORS.primary,marginBottom:8}}>Antes de ver si acertaste</div>
+          <p style={{margin:0,fontWeight:800,fontSize:M?"1.15rem":"var(--nf-activity-text, .98rem)"}}>¿Qué tan seguro estás de tu respuesta?</p>
         </div>
       </NFTrainingStimulusCard>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:620,margin:"0 auto"}}>
@@ -6464,8 +6517,8 @@ function EvaluationHistoryManager({ paciente, onUpdate, onRepeat }) {
     <Card className="nf-v2-evaluation-history" style={{ marginTop: 18 }}>
       <div style={{ display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",flexWrap:"wrap",marginBottom:14 }}>
         <div style={{ flex:1,minWidth:240 }}>
-          <h3 style={{ margin:"0 0 4px",fontSize:".95rem",display:"flex",alignItems:"center",gap:8 }}><NFLineIcon name="history" size={18}/>Historial de evaluaciones</h3>
-          <p style={{ margin:0,color:COLORS.textMuted,fontSize:".73rem",lineHeight:1.5 }}>
+          <h3 style={{ margin:"0 0 4px",fontSize:"var(--nf-activity-text, .95rem)",display:"flex",alignItems:"center",gap:8 }}><NFLineIcon name="history" size={18}/>Historial de evaluaciones</h3>
+          <p style={{ margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-meta, .73rem)",lineHeight:1.5 }}>
             Las evaluaciones anteriores se conservan. Solo la evaluación marcada como línea base vigente alimenta el perfil cognitivo, el plan y la comparación de evolución.
           </p>
         </div>
@@ -6475,7 +6528,7 @@ function EvaluationHistoryManager({ paciente, onUpdate, onRepeat }) {
       </div>
 
       {!history.length ? (
-        <p style={{ color:COLORS.textMuted,fontSize:".76rem",margin:0 }}>Aún no hay evaluaciones registradas.</p>
+        <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-text, .76rem)",margin:0 }}>Aún no hay evaluaciones registradas.</p>
       ) : (
         <div style={{ display:"flex",flexDirection:"column",gap:9 }}>
           {[...history].reverse().map((record,index) => {
@@ -6489,14 +6542,14 @@ function EvaluationHistoryManager({ paciente, onUpdate, onRepeat }) {
               }}>
                 <div style={{ display:"flex",justifyContent:"space-between",gap:10,alignItems:"flex-start",flexWrap:"wrap" }}>
                   <div>
-                    <div style={{ fontWeight:800,fontSize:".8rem" }}>
+                    <div style={{ fontWeight:800,fontSize:"var(--nf-activity-text, .8rem)" }}>
                       {record.assessmentMode === "selective_reassessment" ? "Reevaluación selectiva" : record.assessmentMode === "screening" ? "Tamizaje cognitivo" : record.assessmentMode === "personalized" ? "Evaluación personalizada" : `Evaluación ${history.length - index}`}
                       {isActive && <span style={{ marginLeft:7,color:COLORS.success }}>· Línea base vigente</span>}
                       {record.assessmentMode === "selective_reassessment" && <span style={{ marginLeft:7,color:COLORS.accent }}>· Seguimiento</span>}
                       {record.assessmentMode === "screening" && <span style={{ marginLeft:7,color:COLORS.info }}>· Exploratorio</span>}
                       {invalid && <span style={{ marginLeft:7,color:COLORS.error }}>· No válida</span>}
                     </div>
-                    <div style={{ color:COLORS.textMuted,fontSize:".69rem",marginTop:3 }}>
+                    <div style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-meta, .69rem)",marginTop:3 }}>
                       {record.date ? new Date(record.date).toLocaleDateString("es") : "Fecha no registrada"}
                       {" · "}
                       {record.assessmentMode === "selective_reassessment"
@@ -6510,7 +6563,7 @@ function EvaluationHistoryManager({ paciente, onUpdate, onRepeat }) {
                                 : (typeof record.globalPct === "number" ? `${record.globalPct}% indicador global` : "Valoración profesional"))}
                     </div>
                     {invalid && record.validityReason && (
-                      <div style={{ color:COLORS.error,fontSize:".68rem",marginTop:4 }}>
+                      <div style={{ color:COLORS.error,fontSize:"var(--nf-activity-meta, .68rem)",marginTop:4 }}>
                         Motivo: {record.validityReason}
                       </div>
                     )}
@@ -6519,18 +6572,18 @@ function EvaluationHistoryManager({ paciente, onUpdate, onRepeat }) {
                   <div style={{ display:"flex",gap:7,flexWrap:"wrap" }}>
                     {!invalid && !isActive && record.assessmentMode !== "selective_reassessment" && record.assessmentMode !== "screening" && (
                       <button type="button" disabled={busyId===record.evaluationId} onClick={() => useAsBaseline(record)}
-                        style={{ padding:"6px 9px",borderRadius:8,border:`1px solid ${COLORS.primary}`,background:COLORS.white,color:COLORS.primary,fontSize:".68rem",fontWeight:700,cursor:"pointer" }}>
+                        style={{ padding:"6px 9px",borderRadius:8,border:`1px solid ${COLORS.primary}`,background:COLORS.white,color:COLORS.primary,fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:700,cursor:"pointer" }}>
                         Usar como línea base
                       </button>
                     )}
                     {!invalid ? (
                       <button type="button" disabled={busyId===record.evaluationId} onClick={() => markInvalid(record)}
-                        style={{ padding:"6px 9px",borderRadius:8,border:`1px solid ${COLORS.error}55`,background:COLORS.white,color:COLORS.error,fontSize:".68rem",fontWeight:700,cursor:"pointer" }}>
+                        style={{ padding:"6px 9px",borderRadius:8,border:`1px solid ${COLORS.error}55`,background:COLORS.white,color:COLORS.error,fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:700,cursor:"pointer" }}>
                         Marcar no válida
                       </button>
                     ) : (
                       <button type="button" disabled={busyId===record.evaluationId} onClick={() => markValid(record)}
-                        style={{ padding:"6px 9px",borderRadius:8,border:`1px solid ${COLORS.success}55`,background:COLORS.white,color:COLORS.success,fontSize:".68rem",fontWeight:700,cursor:"pointer" }}>
+                        style={{ padding:"6px 9px",borderRadius:8,border:`1px solid ${COLORS.success}55`,background:COLORS.white,color:COLORS.success,fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:700,cursor:"pointer" }}>
                         Restaurar validez
                       </button>
                     )}
@@ -6707,24 +6760,24 @@ function F61EvaluationPreparation({ taskId, paciente, onReady }) {
         <div className="nf-task-ready-mark"><NFIcon name="volume" size={25}/></div>
         <div className="nf-eval-eyebrow">Antes de comenzar</div>
         <h3 style={{margin:"6px 0 12px",fontSize:mayor?"1.35rem":"1.12rem"}}>Escucha la instrucción</h3>
-        <div style={{padding:mayor?20:16,borderRadius:12,background:COLORS.bg,lineHeight:1.7,fontSize:mayor?"1.05rem":".88rem",textAlign:"left"}}>{cfg.instruction}</div>
+        <div style={{padding:mayor?20:16,borderRadius:12,background:COLORS.bg,lineHeight:1.7,fontSize:mayor?"1.05rem":"var(--nf-activity-text, .88rem)",textAlign:"left"}}>{cfg.instruction}</div>
         <button type="button" onClick={()=>speakInstruction(cfg.instruction)} style={{margin:"12px 0 18px",border:`1px solid ${COLORS.border}`,background:"#fff",color:COLORS.primary,borderRadius:10,padding:"9px 13px",fontWeight:700,display:"inline-flex",alignItems:"center",gap:7}}><NFIcon name="volume" size={17}/>Escuchar de nuevo</button>
-        <div style={{padding:mayor?18:14,borderRadius:12,border:`1px solid ${COLORS.border}`,textAlign:"left",marginBottom:18}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.textMuted,marginBottom:5}}>EJEMPLO</div><div style={{lineHeight:1.65,fontSize:mayor?"1rem":".83rem"}}>{cfg.example}</div></div>
+        <div style={{padding:mayor?18:14,borderRadius:12,border:`1px solid ${COLORS.border}`,textAlign:"left",marginBottom:18}}><div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:5}}>EJEMPLO</div><div style={{lineHeight:1.65,fontSize:mayor?"1rem":"var(--nf-activity-text, .83rem)"}}>{cfg.example}</div></div>
         <BtnPrimary onClick={()=>{try{window.speechSynthesis?.cancel()}catch(e){};setStage("practice")}} style={{width:"100%"}}>Hacer práctica</BtnPrimary>
       </div>}
 
       {stage==="practice"&&<div>
-        <div style={{textAlign:"center",marginBottom:16}}><div className="nf-task-ready-mark"><NFLineIcon name="plan" size={25}/></div><h3 style={{margin:"4px 0"}}>Práctica guiada</h3><p style={{margin:0,color:COLORS.textMuted,fontSize:".76rem"}}>Esta práctica no afecta el resultado de la evaluación.</p></div>
-        <p style={{fontWeight:700,lineHeight:1.6,fontSize:mayor?"1.05rem":".9rem"}}>{practice.prompt}</p>
+        <div style={{textAlign:"center",marginBottom:16}}><div className="nf-task-ready-mark"><NFLineIcon name="plan" size={25}/></div><h3 style={{margin:"4px 0"}}>Práctica guiada</h3><p style={{margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-text, .76rem)"}}>Esta práctica no afecta el resultado de la evaluación.</p></div>
+        <p style={{fontWeight:700,lineHeight:1.6,fontSize:mayor?"1.05rem":"var(--nf-activity-text, .9rem)"}}>{practice.prompt}</p>
         <div style={{display:"grid",gap:9}}>{practice.options.map(opt=><button key={opt} disabled={selected!==null} onClick={()=>setSelected(opt)} style={{padding:mayor?16:13,borderRadius:11,border:`2px solid ${selected===null?COLORS.border:opt===practice.answer?COLORS.success:selected===opt?COLORS.warning:COLORS.border}`,background:selected!==null&&opt===practice.answer?COLORS.success+"10":"#fff",fontWeight:700,textAlign:"left"}}>{opt}</button>)}</div>
-        {selected!==null&&<div style={{marginTop:14,padding:13,borderRadius:10,background:(correct?COLORS.success:COLORS.warning)+"10",lineHeight:1.55,fontSize:mayor?".98rem":".8rem"}}>{correct?practice.correct:practice.wrong}</div>}
+        {selected!==null&&<div style={{marginTop:14,padding:13,borderRadius:10,background:(correct?COLORS.success:COLORS.warning)+"10",lineHeight:1.55,fontSize:mayor?"var(--nf-activity-text, .98rem)":"var(--nf-activity-text, .8rem)"}}>{correct?practice.correct:practice.wrong}</div>}
         {selected!==null&&<BtnPrimary onClick={()=>setStage("ready")} style={{width:"100%",marginTop:16}}>Continuar</BtnPrimary>}
       </div>}
 
       {stage==="ready"&&<div style={{textAlign:"center"}}>
         <div className="nf-task-ready-mark"><NFIcon name="check" size={25}/></div>
         <h3 style={{margin:"4px 0 8px",fontSize:mayor?"1.35rem":"1.12rem"}}>¿Entendiste qué debes hacer?</h3>
-        <p style={{color:COLORS.textMuted,lineHeight:1.6,fontSize:mayor?".98rem":".8rem"}}>La actividad que comienza después de esta pantalla sí forma parte de la evaluación.</p>
+        <p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.6,fontSize:mayor?"var(--nf-activity-text, .98rem)":"var(--nf-activity-text, .8rem)"}}>La actividad que comienza después de esta pantalla sí forma parte de la evaluación.</p>
         <label style={{display:"flex",justifyContent:"center",alignItems:"center",gap:9,margin:"18px 0",fontWeight:700}}><input type="checkbox" checked={understood} onChange={e=>setUnderstood(e.target.checked)}/> Sí, entendí la tarea</label>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}><BtnSecondary onClick={()=>{setSelected(null);setUnderstood(false);setStage("instruction")}}>Revisar de nuevo</BtnSecondary><BtnPrimary disabled={!understood} onClick={onReady}>Comenzar evaluación</BtnPrimary></div>
       </div>}
@@ -6765,8 +6818,8 @@ function NFE01Orientation({ paciente, onDone }) {
       <select value={weekday} onChange={e=>setWeekday(e.target.value)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}><option value=''>Día de la semana…</option>{weekdays.map(x=><option key={x}>{x}</option>)}</select>
     </div>
     <div style={{marginTop:20,paddingTop:16,borderTop:`1px solid ${COLORS.border}`}}>
-      <p style={{fontWeight:700,fontSize:'.98rem',marginBottom:10}}>Registro del profesional</p>
-      {[['personal','Reconoce adecuadamente su identidad / información personal básica'],['spatial','Reconoce adecuadamente el lugar o entorno actual'],['contextual','Comprende adecuadamente la situación actual de evaluación']].map(([k,label])=><div key={k} style={{display:'flex',justifyContent:'space-between',gap:10,alignItems:'center',padding:'9px 0'}}><span style={{fontSize:'.94rem'}}>{label}</span><div style={{display:'flex',gap:6}}><button onClick={()=>setPro(p=>({...p,[k]:true}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===true?COLORS.success:COLORS.border}`,background:pro[k]===true?COLORS.success+'12':'#fff'}}>Sí</button><button onClick={()=>setPro(p=>({...p,[k]:false}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===false?COLORS.warning:COLORS.border}`,background:pro[k]===false?COLORS.warning+'12':'#fff'}}>No</button></div></div>)}
+      <p style={{fontWeight:700,fontSize:'var(--nf-activity-text, .98rem)',marginBottom:10}}>Registro del profesional</p>
+      {[['personal','Reconoce adecuadamente su identidad / información personal básica'],['spatial','Reconoce adecuadamente el lugar o entorno actual'],['contextual','Comprende adecuadamente la situación actual de evaluación']].map(([k,label])=><div key={k} style={{display:'flex',justifyContent:'space-between',gap:10,alignItems:'center',padding:'9px 0'}}><span style={{fontSize:'var(--nf-activity-text, .94rem)'}}>{label}</span><div style={{display:'flex',gap:6}}><button onClick={()=>setPro(p=>({...p,[k]:true}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===true?COLORS.success:COLORS.border}`,background:pro[k]===true?COLORS.success+'12':'#fff'}}>Sí</button><button onClick={()=>setPro(p=>({...p,[k]:false}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===false?COLORS.warning:COLORS.border}`,background:pro[k]===false?COLORS.warning+'12':'#fff'}}>No</button></div></div>)}
     </div>
     <BtnPrimary disabled={!month||!year||!weekday} onClick={complete} style={{width:'100%',marginTop:18}}>Continuar</BtnPrimary>
   </AssessmentTaskShell>;
@@ -6794,19 +6847,19 @@ function NFE02Cancellation({ paciente, onDone }) {
   return <AssessmentTaskShell taskId='NF-E02' paciente={paciente}>
     <div style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:12,alignItems:"center",padding:"6px 10px",border:`1px solid ${COLORS.border}`,borderRadius:14,background:COLORS.bg,marginBottom:8}}>
       <div style={{textAlign:"center"}}>
-        <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,marginBottom:5}}>Figura objetivo</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary,marginBottom:5}}>Figura objetivo</div>
         <div style={{fontSize:mayor?"2.15rem":"1.9rem",fontWeight:900,lineHeight:1}}>◆</div>
       </div>
       <div>
-        <div style={{fontSize:mayor?"1.08rem":".96rem",fontWeight:800}}>Busca únicamente los rombos rellenos.</div>
-        <div style={{fontSize:mayor?".9rem":".8rem",color:"#405574",marginTop:3}}>Toca todos los ◆ que encuentres. No selecciones figuras vacías ni otras formas.</div>
+        <div style={{fontSize:mayor?"1.08rem":"var(--nf-activity-text, .96rem)",fontWeight:800}}>Busca únicamente los rombos rellenos.</div>
+        <div style={{fontSize:mayor?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .8rem)",color:"#405574",marginTop:3}}>Toca todos los ◆ que encuentres. No selecciones figuras vacías ni otras formas.</div>
       </div>
     </div>
     <div className={`nf-cancellation-grid${mayor ? ' is-senior' : ''}`}>
       {items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} aria-label={`Figura ${it.symbol}`} style={{borderRadius:10,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:mayor?'1.75rem':'1.45rem',fontWeight:800}}>{it.symbol}</button>)}
     </div>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:6,gap:10}}>
-      <span style={{fontSize:mayor?'.88rem':'.78rem',color:COLORS.textMuted}}>Seleccionados: {selected.length}</span>
+      <span style={{fontSize:mayor?'var(--nf-activity-text, .88rem)':'var(--nf-activity-text, .78rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Seleccionados: {selected.length}</span>
       <BtnPrimary onClick={finish}>Finalizar búsqueda</BtnPrimary>
     </div>
   </AssessmentTaskShell>;
@@ -6834,8 +6887,8 @@ function TimedSignalTaskCore({ taskId, paciente, mode, onDone }) {
   };
   return <AssessmentTaskShell taskId={taskId} paciente={paciente} note={isCpt?'Pulsa RESPONDER solo cuando aparezca el círculo ●. No respondas a las otras figuras.':'Pulsa RESPONDER ante ●. Cuando aparezca ✕, debes inhibir la respuesta y esperar.'}>
     {!running&&!done&&<div style={{textAlign:'center',padding:'30px 0'}}><div style={{fontSize:'3rem',marginBottom:10}}>{isCpt?'● ■ ▲ ◆':'●  ✕'}</div><BtnPrimary onClick={start}>Comenzar tarea</BtnPrimary></div>}
-    {running&&<div style={{textAlign:'center'}}><div style={{fontSize:'.74rem',color:COLORS.textMuted,marginBottom:8}}>Ensayo {Math.min(idx+1,trials.length)} de {trials.length}</div><ProgressBar value={Math.max(0,((idx+1)/trials.length)*100)}/><div style={{height:190,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'5rem',fontWeight:900}}>{idx<trials.length?trials[idx]?.symbol:''}</div><BtnPrimary onClick={respond} style={{width:'100%',padding:18,fontSize:'1rem'}}>RESPONDER</BtnPrimary></div>}
-    {done&&<div style={{textAlign:'center',padding:'25px 0'}}><div style={{fontSize:'2.2rem',marginBottom:8}}>✓</div><p style={{color:COLORS.textMuted,marginBottom:18}}>Tarea completada. Las métricas se calcularán separando omisiones, comisiones y tiempos de respuesta.</p><BtnPrimary onClick={finish}>Continuar</BtnPrimary></div>}
+    {running&&<div style={{textAlign:'center'}}><div style={{fontSize:'var(--nf-activity-meta, .74rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:8}}>Ensayo {Math.min(idx+1,trials.length)} de {trials.length}</div><ProgressBar value={Math.max(0,((idx+1)/trials.length)*100)}/><div style={{height:190,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'5rem',fontWeight:900}}>{idx<trials.length?trials[idx]?.symbol:''}</div><BtnPrimary onClick={respond} style={{width:'100%',padding:18,fontSize:'1rem'}}>RESPONDER</BtnPrimary></div>}
+    {done&&<div style={{textAlign:'center',padding:'25px 0'}}><div style={{fontSize:'2.2rem',marginBottom:8}}>✓</div><p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:18}}>Tarea completada. Las métricas se calcularán separando omisiones, comisiones y tiempos de respuesta.</p><BtnPrimary onClick={finish}>Continuar</BtnPrimary></div>}
   </AssessmentTaskShell>;
 }
 
@@ -6879,10 +6932,10 @@ function NFE05InterferenceCore({ paciente, onDone }) {
     setTimeout(()=>{ if(idx+1>=trials.length){setIdx(trials.length)} else {setIdx(i=>i+1);started.current=Date.now();setPicked(null)} },220);
   };
   const finish=()=>{const rs=records.current, base=rs.filter(r=>r.phase==='baseline'), inter=rs.filter(r=>r.phase==='interference'), brt=base.filter(r=>r.correct).map(r=>r.rt), irt=inter.filter(r=>r.correct).map(r=>r.rt); const correct=rs.filter(r=>r.correct).length; onDone(nfTaskResult('NF-E05',{precision:pctSafe(correct,rs.length),correct,total:rs.length,errors:rs.length-correct,meanResponseMs:meanNum(irt),medianResponseMs:medianNum(irt),responseVariabilityMs:sdNum(irt),interferenceCost:(meanNum(irt)!=null&&meanNum(brt)!=null)?Math.round(meanNum(irt)-meanNum(brt)):null,blockPerformance:[pctSafe(base.filter(r=>r.correct).length,base.length),pctSafe(inter.filter(r=>r.correct).length,inter.length)],taskVersionAdministered:'NF-E05-1.0'}));};
-  if(idx>=trials.length) return <AssessmentTaskShell taskId='NF-E05' paciente={paciente}><div style={{textAlign:'center',padding:30}}><p style={{color:COLORS.textMuted}}>Condición simple e interferente completadas.</p><BtnPrimary onClick={finish}>Continuar</BtnPrimary></div></AssessmentTaskShell>;
+  if(idx>=trials.length) return <AssessmentTaskShell taskId='NF-E05' paciente={paciente}><div style={{textAlign:'center',padding:30}}><p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Condición simple e interferente completadas.</p><BtnPrimary onClick={finish}>Continuar</BtnPrimary></div></AssessmentTaskShell>;
   const tr=trials[idx];
   return <AssessmentTaskShell taskId='NF-E05' paciente={paciente} note={tr.phase==='baseline'?'Primero identifica el COLOR visual del estímulo.':'Ahora sigue respondiendo por el COLOR visual e ignora el significado de la palabra.'}>
-    <div style={{textAlign:'center'}}><div style={{fontSize:'.72rem',color:COLORS.textMuted}}>Ensayo {idx+1}/{trials.length} · {tr.phase==='baseline'?'condición simple':'condición interferente'}</div><div style={{height:150,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'2.4rem',fontWeight:900,color:css[tr.ink]}}>{tr.word}</div><div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:9}}>{labels.map(l=><button key={l} onClick={()=>choose(l)} style={{padding:14,borderRadius:10,border:`2px solid ${picked===l?COLORS.primary:COLORS.border}`,background:'#fff',fontWeight:800}}>{l}</button>)}</div></div>
+    <div style={{textAlign:'center'}}><div style={{fontSize:'var(--nf-activity-meta, .72rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Ensayo {idx+1}/{trials.length} · {tr.phase==='baseline'?'condición simple':'condición interferente'}</div><div style={{height:150,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'2.4rem',fontWeight:900,color:css[tr.ink]}}>{tr.word}</div><div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:9}}>{labels.map(l=><button key={l} onClick={()=>choose(l)} style={{padding:14,borderRadius:10,border:`2px solid ${picked===l?COLORS.primary:COLORS.border}`,background:'#fff',fontWeight:800}}>{l}</button>)}</div></div>
   </AssessmentTaskShell>;
 }
 
@@ -6891,9 +6944,9 @@ function NFE06SwitchingCore({ paciente, onDone }) {
   const [idx,setIdx]=useState(0); const records=useRef([]); const started=useRef(Date.now());
   const pick=(resp)=>{const tr=trials[idx]; const rt=Date.now()-started.current; const correct=resp===tr.current; records.current.push({...tr,resp,correct,rt,perseveration:!correct&&tr.switch&&resp===tr.other}); if(idx+1>=trials.length)setIdx(trials.length);else{setIdx(i=>i+1);started.current=Date.now();}};
   const finish=()=>{const rs=records.current, sw=rs.filter(r=>r.switch&&r.correct).map(r=>r.rt), rep=rs.filter(r=>!r.switch&&r.correct).map(r=>r.rt), correct=rs.filter(r=>r.correct).length;onDone(nfTaskResult('NF-E06',{precision:pctSafe(correct,rs.length),correct,total:rs.length,errors:rs.length-correct,perseverations:rs.filter(r=>r.perseveration).length,meanResponseMs:meanNum(rs.filter(r=>r.correct).map(r=>r.rt)),medianResponseMs:medianNum(rs.filter(r=>r.correct).map(r=>r.rt)),responseVariabilityMs:sdNum(rs.filter(r=>r.correct).map(r=>r.rt)),switchCost:(meanNum(sw)!=null&&meanNum(rep)!=null)?Math.round(meanNum(sw)-meanNum(rep)):null,blockPerformance:[pctSafe(rs.slice(0,6).filter(r=>r.correct).length,6),pctSafe(rs.slice(6,12).filter(r=>r.correct).length,6),pctSafe(rs.slice(12,18).filter(r=>r.correct).length,6),pctSafe(rs.slice(18,24).filter(r=>r.correct).length,6)],taskVersionAdministered:'NF-E06-1.0'}));};
-  if(idx>=trials.length)return <AssessmentTaskShell taskId='NF-E06' paciente={paciente}><div style={{textAlign:'center',padding:30}}><p style={{color:COLORS.textMuted}}>Cambios de regla completados.</p><BtnPrimary onClick={finish}>Ver resumen del bloque</BtnPrimary></div></AssessmentTaskShell>;
+  if(idx>=trials.length)return <AssessmentTaskShell taskId='NF-E06' paciente={paciente}><div style={{textAlign:'center',padding:30}}><p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Cambios de regla completados.</p><BtnPrimary onClick={finish}>Ver resumen del bloque</BtnPrimary></div></AssessmentTaskShell>;
   const tr=trials[idx]; return <AssessmentTaskShell taskId='NF-E06' paciente={paciente} note="Si la regla es NÚMERO: 1–4 = izquierda y 5–9 = derecha. Si la regla es FORMA: círculo = izquierda y triángulo = derecha.">
-    <div style={{textAlign:'center'}}><Badge label={`REGLA: ${tr.rule.toUpperCase()}`} color={tr.switch?COLORS.warning:COLORS.primary}/><div style={{height:150,display:'flex',alignItems:'center',justifyContent:'center',gap:24}}><span style={{fontSize:'3rem',fontWeight:900}}>{tr.n}</span><span style={{fontSize:'3rem'}}>{tr.shape==='círculo'?'●':'▲'}</span></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}><BtnSecondary onClick={()=>pick('IZQUIERDA')} style={{padding:16}}>← IZQUIERDA</BtnSecondary><BtnSecondary onClick={()=>pick('DERECHA')} style={{padding:16}}>DERECHA →</BtnSecondary></div><div style={{fontSize:'.72rem',color:COLORS.textMuted,marginTop:12}}>Ensayo {idx+1}/{trials.length}{tr.switch?' · cambio de regla':''}</div></div>
+    <div style={{textAlign:'center'}}><Badge label={`REGLA: ${tr.rule.toUpperCase()}`} color={tr.switch?COLORS.warning:COLORS.primary}/><div style={{height:150,display:'flex',alignItems:'center',justifyContent:'center',gap:24}}><span style={{fontSize:'3rem',fontWeight:900}}>{tr.n}</span><span style={{fontSize:'3rem'}}>{tr.shape==='círculo'?'●':'▲'}</span></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}><BtnSecondary onClick={()=>pick('IZQUIERDA')} style={{padding:16}}>← IZQUIERDA</BtnSecondary><BtnSecondary onClick={()=>pick('DERECHA')} style={{padding:16}}>DERECHA →</BtnSecondary></div><div style={{fontSize:'var(--nf-activity-meta, .72rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:12}}>Ensayo {idx+1}/{trials.length}{tr.switch?' · cambio de regla':''}</div></div>
   </AssessmentTaskShell>;
 }
 
@@ -6909,10 +6962,10 @@ function EvaluationV2Phase34Block({ paciente, onExit }) {
     'NF-E06':NFE06Switching,
   };
   if(idx>=ids.length){
-    return <div style={{maxWidth:820,margin:'0 auto'}}><Card><div style={{fontSize:'.7rem',fontWeight:800,color:COLORS.primary,letterSpacing:'.06em'}}>EVALUACIÓN COGNITIVA</div><h2 style={{margin:'6px 0'}}>Primer bloque completado</h2><p style={{color:COLORS.textMuted,lineHeight:1.6,fontSize:'.82rem'}}>Estos resultados sirven para verificar el nuevo motor. Este bloque todavía no sustituye la evaluación clínica completa ni se guarda como línea base NF‑EVAL‑2.0.</p><div style={{marginTop:16}}>{results.map(r=><div key={r.taskId} style={{padding:'12px 0',borderBottom:`1px solid ${COLORS.border}`,display:'grid',gridTemplateColumns:'100px 1fr',gap:10}}><strong>{getAssessmentTaskDefinition(r.taskId)?.name || "Tarea completada"}</strong><div style={{fontSize:'.78rem',color:COLORS.textSecond}}>Precisión: {r.metrics?.precision ?? '—'}% · Errores: {r.metrics?.errors ?? '—'} · TR medio: {r.metrics?.meanResponseMs?Math.round(r.metrics.meanResponseMs)+' ms':'—'}{r.metrics?.interferenceCost!=null?` · Costo interferencia: ${r.metrics.interferenceCost} ms`:''}{r.metrics?.switchCost!=null?` · Costo cambio: ${r.metrics.switchCost} ms`:''}</div></div>)}</div><BtnPrimary onClick={onExit} style={{width:'100%',marginTop:20}}>Volver a evaluación</BtnPrimary></Card></div>;
+    return <div style={{maxWidth:820,margin:'0 auto'}}><Card><div style={{fontSize:'var(--nf-activity-meta, .7rem)',fontWeight:800,color:COLORS.primary,letterSpacing:'.06em'}}>EVALUACIÓN COGNITIVA</div><h2 style={{margin:'6px 0'}}>Primer bloque completado</h2><p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.6,fontSize:'var(--nf-activity-text, .82rem)'}}>Estos resultados sirven para verificar el nuevo motor. Este bloque todavía no sustituye la evaluación clínica completa ni se guarda como línea base NF‑EVAL‑2.0.</p><div style={{marginTop:16}}>{results.map(r=><div key={r.taskId} style={{padding:'12px 0',borderBottom:`1px solid ${COLORS.border}`,display:'grid',gridTemplateColumns:'100px 1fr',gap:10}}><strong>{getAssessmentTaskDefinition(r.taskId)?.name || "Tarea completada"}</strong><div style={{fontSize:'var(--nf-activity-text, .78rem)',color:COLORS.textSecond}}>Precisión: {r.metrics?.precision ?? '—'}% · Errores: {r.metrics?.errors ?? '—'} · TR medio: {r.metrics?.meanResponseMs?Math.round(r.metrics.meanResponseMs)+' ms':'—'}{r.metrics?.interferenceCost!=null?` · Costo interferencia: ${r.metrics.interferenceCost} ms`:''}{r.metrics?.switchCost!=null?` · Costo cambio: ${r.metrics.switchCost} ms`:''}</div></div>)}</div><BtnPrimary onClick={onExit} style={{width:'100%',marginTop:20}}>Volver a evaluación</BtnPrimary></Card></div>;
   }
   const id=ids[idx], Comp=components[id];
-  return <div><div style={{maxWidth:760,margin:'0 auto 12px'}}><div style={{display:'flex',justifyContent:'space-between',fontSize:'.72rem',color:COLORS.textMuted,marginBottom:6}}><span>Bloque Fase 34</span><span>{idx+1}/{ids.length}</span></div><ProgressBar value={(idx/ids.length)*100}/></div><Comp paciente={paciente} onDone={(r)=>{setResults(x=>[...x,r]);setIdx(i=>i+1)}}/></div>;
+  return <div><div style={{maxWidth:760,margin:'0 auto 12px'}}><div style={{display:'flex',justifyContent:'space-between',fontSize:'var(--nf-activity-meta, .72rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:6}}><span>Bloque Fase 34</span><span>{idx+1}/{ids.length}</span></div><ProgressBar value={(idx/ids.length)*100}/></div><Comp paciente={paciente} onDone={(r)=>{setResults(x=>[...x,r]);setIdx(i=>i+1)}}/></div>;
 }
 
 
@@ -7051,7 +7104,7 @@ function NFE07ActiveSpanCore({ paciente, onDone }) {
     <div style={{textAlign:"center"}}>
       <Badge label={tr.condition==="directo"?"ORDEN DIRECTO":tr.condition==="inverso"?"ORDEN INVERSO":"REORDENAMIENTO"} color={COLORS.primary}/>
       <p style={{fontWeight:700,margin:"16px 0 8px"}}>{instruction}</p>
-      <p style={{fontSize:".75rem",color:COLORS.textMuted}}>Ensayo {idx+1}/{trials.length}</p>
+      <p style={{fontSize:"var(--nf-activity-meta, .75rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Ensayo {idx+1}/{trials.length}</p>
 
       {phase==="ready" && <BtnPrimary onClick={present} style={{padding:mayor?16:13,minWidth:210}}>
         {speechAvailable ? <span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFIcon name="volume" size={17}/>Escuchar secuencia</span> : "Mostrar secuencia"}
@@ -7062,7 +7115,7 @@ function NFE07ActiveSpanCore({ paciente, onDone }) {
           {speechAvailable
             ? <div className="nf-audio-presenting"><NFIcon name="volume" size={24}/></div>
             : <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>{tr.seq.map((n,i)=><span key={i} style={{fontSize:"1.8rem",fontWeight:800,padding:"8px 12px",border:`1px solid ${COLORS.border}`,borderRadius:10}}>{n}</span>)}</div>}
-          <p style={{fontSize:".76rem",color:COLORS.textMuted}}>Atiende a la secuencia…</p>
+          <p style={{fontSize:"var(--nf-activity-text, .76rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Atiende a la secuencia…</p>
         </div>
       )}
 
@@ -7142,14 +7195,14 @@ function NFE08SpatialSpanCore({ paciente, onDone }) {
   return <AssessmentTaskShell taskId="NF-E08" paciente={paciente} note="Tarea visuoespacial original inspirada conceptualmente en paradigmas de span espacial tipo Corsi.">
     <div style={{textAlign:"center"}}>
       <p style={{fontWeight:700}}>Observa el recorrido y después repítelo tocando las casillas en el mismo orden.</p>
-      <p style={{fontSize:".74rem",color:COLORS.textMuted}}>Secuencia {idx+1}/{trials.length} · longitud {trials[idx].length}</p>
+      <p style={{fontSize:"var(--nf-activity-meta, .74rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Secuencia {idx+1}/{trials.length} · longitud {trials[idx].length}</p>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:360,margin:"18px auto"}}>
         {Array.from({length:9},(_,cell)=><button key={cell} onClick={()=>clickCell(cell)} disabled={phase!=="respond"}
           style={{aspectRatio:"1",borderRadius:14,border:`2px solid ${active===cell?COLORS.primary:response.includes(cell)&&phase==="respond"?COLORS.info:COLORS.border}`,background:active===cell?COLORS.primary+"30":"#fff",fontSize:"1rem",cursor:phase==="respond"?"pointer":"default"}}>{phase==="respond"&&response.includes(cell)?"•":""}</button>)}
       </div>
       {phase==="ready" && <BtnPrimary onClick={showSequence}>Mostrar recorrido</BtnPrimary>}
-      {phase==="show" && <p style={{fontSize:".76rem",color:COLORS.textMuted}}>Memoriza…</p>}
-      {phase==="respond" && <p style={{fontSize:".76rem",color:COLORS.textMuted}}>Tu turno · {response.length}/{trials[idx].length}</p>}
+      {phase==="show" && <p style={{fontSize:"var(--nf-activity-text, .76rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Memoriza…</p>}
+      {phase==="respond" && <p style={{fontSize:"var(--nf-activity-text, .76rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Tu turno · {response.length}/{trials[idx].length}</p>}
     </div>
   </AssessmentTaskShell>;
 }
@@ -7189,7 +7242,7 @@ function NFE09LearningPhase({ paciente, onEncoded }) {
     if(calcIdx+1>=calculations.length){setPhase("immediate");setInput("")}
     else setCalcIdx(i=>i+1);
   };
-  const wordCard=(w,i)=><span key={`${w}-${i}`} style={{padding:mayor?"12px 15px":"10px 13px",borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontWeight:700,fontSize:mayor?"1.02rem":".9rem"}}>{w}</span>;
+  const wordCard=(w,i)=><span key={`${w}-${i}`} style={{padding:mayor?"12px 15px":"10px 13px",borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff",fontWeight:700,fontSize:mayor?"1.02rem":"var(--nf-activity-text, .9rem)"}}>{w}</span>;
 
   return <AssessmentTaskShell taskId="NF-E09" paciente={paciente}>
     {phase==="study"&&<div style={{textAlign:"center"}}>
@@ -7211,7 +7264,7 @@ function NFE09LearningPhase({ paciente, onEncoded }) {
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:11}}>
           {calculations[calcIdx].o.map(n=><button key={n} onClick={()=>chooseCalc(n)} style={{minHeight:mayor?72:64,borderRadius:11,border:`1.5px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:800,fontSize:mayor?"1.15rem":"1rem"}}>{n}</button>)}
         </div>
-        <div style={{fontSize:".75rem",color:COLORS.textMuted,marginTop:12}}>Operación {calcIdx+1}/{calculations.length}</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .75rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:12}}>Operación {calcIdx+1}/{calculations.length}</div>
       </div>
     </div>}
     {phase==="immediate"&&<div>
@@ -7460,7 +7513,7 @@ function NFE11ProspectiveEncode({ paciente, onEncoded }) {
       <p style={{fontWeight:700,lineHeight:1.6,maxWidth:540,margin:"0 auto"}}>
         Más adelante aparecerá esta <strong>tarjeta con un punto</strong>. Cuando la veas, recuerda <strong>tocar la tarjeta</strong>.
       </p>
-      <label style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,margin:"22px 0 14px",fontSize:mayor?".95rem":".82rem"}}>
+      <label style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,margin:"22px 0 14px",fontSize:mayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .82rem)"}}>
         <input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
         Comprendí lo que debo recordar
       </label>
@@ -7549,15 +7602,15 @@ function EvaluationV2Phase35Block({ paciente, onExit }) {
 
   return <div style={{maxWidth:860,margin:"0 auto"}}>
     <Card>
-      <div style={{fontSize:".7rem",fontWeight:800,color:COLORS.primary,letterSpacing:".06em"}}>FASE 35 · BLOQUE DE MEMORIA</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .7rem)",fontWeight:800,color:COLORS.primary,letterSpacing:".06em"}}>FASE 35 · BLOQUE DE MEMORIA</div>
       <h2 style={{margin:"6px 0"}}>Segundo bloque completado</h2>
-      <p style={{color:COLORS.textMuted,lineHeight:1.6,fontSize:".82rem"}}>
+      <p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.6,fontSize:"var(--nf-activity-text, .82rem)"}}>
         Este bloque separa memoria de trabajo, span visuoespacial, aprendizaje verbal, memoria visual y memoria prospectiva. Sigue siendo un bloque de prueba y todavía no se guarda como línea base NF‑EVAL‑2.0.
       </p>
       <div style={{marginTop:16}}>
         {results.map(r=><div key={r.taskId} style={{padding:"12px 0",borderBottom:`1px solid ${COLORS.border}`,display:"grid",gridTemplateColumns:"90px 1fr",gap:10}}>
           <strong>{getAssessmentTaskDefinition(r.taskId)?.name || "Tarea completada"}</strong>
-          <div style={{fontSize:".78rem",color:COLORS.textSecond}}>
+          <div style={{fontSize:"var(--nf-activity-text, .78rem)",color:COLORS.textSecond}}>
             Precisión: {r.metrics?.precision ?? "—"}%
             {r.metrics?.levelReached!=null?` · Nivel máximo: ${r.metrics.levelReached}`:""}
             {r.metrics?.retentionRate!=null?` · Retención: ${r.metrics.retentionRate}%`:""}
@@ -7687,7 +7740,7 @@ function NFE12Naming({ paciente, onDone }) {
       }}>
         <NFNamingObject kind={items[idx].kind} size={mayor?180:150}/>
       </div>
-      <p style={{fontSize:".73rem",color:COLORS.textMuted}}>Elemento {idx+1}/{items.length}</p>
+      <p style={{fontSize:"var(--nf-activity-meta, .73rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Elemento {idx+1}/{items.length}</p>
       <input
         autoFocus
         value={input}
@@ -7734,7 +7787,7 @@ function NFE13SemanticRelations({ paciente, onDone }) {
   };
   return <AssessmentTaskShell taskId="NF-E13" paciente={paciente} note="Versión 2.0: relaciones semánticas y analogías originales NeuroFlex con posición de respuesta correcta distribuida; no reproduce reactivos WAIS.">
     <div>
-      <p style={{fontSize:".74rem",color:COLORS.textMuted}}>Ítem {idx+1}/{items.length}</p>
+      <p style={{fontSize:"var(--nf-activity-meta, .74rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Ítem {idx+1}/{items.length}</p>
       <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
         <NFAudioReadButton text={`${items[idx].q} Opciones: ${items[idx].opts.join(", ")}.`} label="Escuchar pregunta" mayor={esModoMayor(paciente)}/>
       </div>
@@ -7823,8 +7876,8 @@ function NFE14Fluency({ paciente, onDone }) {
         <strong style={{fontSize:mayor?"1.25rem":"1rem",color:secondsLeft<=10?COLORS.warning:COLORS.textPrimary}}>{secondsLeft} s</strong>
       </div>
       <p style={{fontWeight:700,lineHeight:1.6}}>Animales:</p>
-      <textarea autoFocus value={semantic} onChange={e=>setSemantic(e.target.value)} rows={mayor?7:6} style={{width:"100%",boxSizing:"border-box",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,fontFamily:"inherit",fontSize:mayor?"1rem":".88rem"}}/>
-      <p style={{fontSize:".7rem",color:COLORS.textMuted}}>La condición cambiará automáticamente cuando termine el tiempo.</p>
+      <textarea autoFocus value={semantic} onChange={e=>setSemantic(e.target.value)} rows={mayor?7:6} style={{width:"100%",boxSizing:"border-box",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,fontFamily:"inherit",fontSize:mayor?"1rem":"var(--nf-activity-text, .88rem)"}}/>
+      <p style={{fontSize:"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>La condición cambiará automáticamente cuando termine el tiempo.</p>
     </div>}
 
     {phase==="phonemic_ready"&&<div style={{textAlign:"center"}}>
@@ -7839,8 +7892,8 @@ function NFE14Fluency({ paciente, onDone }) {
         <strong style={{fontSize:mayor?"1.25rem":"1rem",color:secondsLeft<=10?COLORS.warning:COLORS.textPrimary}}>{secondsLeft} s</strong>
       </div>
       <p style={{fontWeight:700,lineHeight:1.6}}>Palabras con M:</p>
-      <textarea autoFocus value={phonemic} onChange={e=>setPhonemic(e.target.value)} rows={mayor?7:6} style={{width:"100%",boxSizing:"border-box",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,fontFamily:"inherit",fontSize:mayor?"1rem":".88rem"}}/>
-      <p style={{fontSize:".7rem",color:COLORS.textMuted}}>La tarea finalizará automáticamente al terminar el tiempo.</p>
+      <textarea autoFocus value={phonemic} onChange={e=>setPhonemic(e.target.value)} rows={mayor?7:6} style={{width:"100%",boxSizing:"border-box",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`,fontFamily:"inherit",fontSize:mayor?"1rem":"var(--nf-activity-text, .88rem)"}}/>
+      <p style={{fontSize:"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>La tarea finalizará automáticamente al terminar el tiempo.</p>
     </div>}
 
     {phase==="done"&&<div style={{textAlign:"center",padding:24}}><p style={{fontWeight:700}}>Tiempo completado. Preparando el registro…</p></div>}
@@ -7871,7 +7924,7 @@ function NFE15MatrixReasoning({ paciente, onDone }) {
     <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:mayor?13:11,maxWidth:mayor?560:500,margin:"22px auto 34px"}}>
       {items[idx].grid.map((x,i)=><div key={i} style={{minHeight:mayor?92:82,borderRadius:11,border:`1.5px solid ${COLORS.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:mayor?"1.85rem":"1.6rem",fontWeight:800,background:i===5?COLORS.bg:"#fff"}}>{x}</div>)}
     </div>
-    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Elige una respuesta</div>
+    <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Elige una respuesta</div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:mayor?12:10,maxWidth:mayor?620:560,margin:"0 auto"}}>
       {items[idx].opts.map((o,i)=><button key={i} disabled={locked.current} onClick={()=>pick(i)} style={{minHeight:mayor?78:68,padding:15,borderRadius:11,border:`1.5px solid ${COLORS.border}`,background:"#fff",fontSize:mayor?"1.55rem":"1.35rem",fontWeight:800}}>{o}</button>)}
     </div>
@@ -7905,7 +7958,7 @@ function NFE16Similarities({ paciente, onDone }) {
     setIdx(i=>i+1);t.current=Date.now();
   };
   return <AssessmentTaskShell taskId="NF-E16" paciente={paciente} note="Versión 2.0: conceptos originales con alternativas balanceadas por posición. No reproduce reactivos ni criterios WAIS.">
-    <p style={{fontSize:".74rem",color:COLORS.textMuted}}>Concepto {idx+1}/{items.length}</p>
+    <p style={{fontSize:"var(--nf-activity-meta, .74rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Concepto {idx+1}/{items.length}</p>
     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
       <NFAudioReadButton text={`${items[idx].q} Opciones: ${items[idx].opts.join(", ")}.`} label="Escuchar pregunta" mayor={esModoMayor(paciente)}/>
     </div>
@@ -7970,15 +8023,15 @@ function EvaluationV2Phase36Block({ paciente, onExit }) {
 
   return <div style={{maxWidth:860,margin:"0 auto"}}>
     <Card>
-      <div style={{fontSize:".7rem",fontWeight:800,color:COLORS.primary,letterSpacing:".06em"}}>FASE 36 · LENGUAJE Y RAZONAMIENTO</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .7rem)",fontWeight:800,color:COLORS.primary,letterSpacing:".06em"}}>FASE 36 · LENGUAJE Y RAZONAMIENTO</div>
       <h2 style={{margin:"6px 0"}}>Tercer bloque completado</h2>
-      <p style={{color:COLORS.textMuted,lineHeight:1.6,fontSize:".82rem"}}>
+      <p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.6,fontSize:"var(--nf-activity-text, .82rem)"}}>
         Este bloque separa denominación, relaciones semánticas, fluidez, razonamiento matricial, abstracción conceptual y razonamiento lógico. Sigue siendo un bloque de prueba y no se guarda todavía como línea base NF‑EVAL‑2.0.
       </p>
       <div style={{marginTop:16}}>
         {results.map(r=><div key={r.taskId} style={{padding:"12px 0",borderBottom:`1px solid ${COLORS.border}`,display:"grid",gridTemplateColumns:"90px 1fr",gap:10}}>
           <strong>{getAssessmentTaskDefinition(r.taskId)?.name || "Tarea completada"}</strong>
-          <div style={{fontSize:".78rem",color:COLORS.textSecond}}>
+          <div style={{fontSize:"var(--nf-activity-text, .78rem)",color:COLORS.textSecond}}>
             {typeof r.metrics?.precision==="number"?`Precisión: ${r.metrics.precision}%`:"Revisión profesional"}
             {r.metrics?.correct!=null?` · Respuestas registradas/correctas: ${r.metrics.correct}`:""}
             {r.metrics?.perseverations!=null?` · Repeticiones: ${r.metrics.perseverations}`:""}
@@ -8034,7 +8087,7 @@ function NFE18PlanningRouteCore({ paciente, onDone }) {
     <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,maxWidth:360,margin:"18px auto"}}>
       {Array.from({length:9},(_,i)=><button key={i} onClick={()=>move(i)} style={{aspectRatio:"1",borderRadius:12,border:`2px solid ${i===pos?COLORS.primary:COLORS.border}`,background:cfg.blocked.includes(i)?COLORS.bg:"#fff",fontSize:"1.7rem",fontWeight:800}}>{cfg.blocked.includes(i)?"×":i===pos?"●":i===cfg.goal?"★":""}</button>)}
     </div>
-    <p style={{fontSize:".75rem",color:COLORS.textMuted,textAlign:"center"}}>Problema {level+1}/{levels.length} · movimientos: {moves}</p>
+    <p style={{fontSize:"var(--nf-activity-meta, .75rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",textAlign:"center"}}>Problema {level+1}/{levels.length} · movimientos: {moves}</p>
   </AssessmentTaskShell>;
 }
 
@@ -8059,7 +8112,7 @@ function NFE19FunctionalSequence({ paciente, onDone }) {
   const remaining=items[idx].steps.filter(s=>!chosen.includes(s));
   return <AssessmentTaskShell taskId="NF-E19" paciente={paciente} note="Secuenciación cotidiana original; se interpreta con cautela porque una tarea digital no sustituye evaluación práxica presencial.">
     <p style={{fontWeight:700}}>{items[idx].title}</p>
-    <p style={{fontSize:".78rem",color:COLORS.textMuted}}>Toca los pasos en el orden correcto.</p>
+    <p style={{fontSize:"var(--nf-activity-text, .78rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Toca los pasos en el orden correcto.</p>
     <div style={{padding:12,borderRadius:10,background:COLORS.bg,minHeight:48,marginBottom:10}}>{chosen.length?chosen.map((x,i)=><span key={x} style={{display:"inline-block",margin:"3px",padding:"6px 8px",background:"#fff",borderRadius:8,border:`1px solid ${COLORS.border}`}}>{i+1}. {x}</span>):"Tu secuencia aparecerá aquí"}</div>
     <div style={{display:"grid",gap:8}}>{remaining.map(s=><button key={s} onClick={()=>choose(s)} style={{padding:11,borderRadius:9,border:`1px solid ${COLORS.border}`,background:"#fff",textAlign:"left"}}>{s}</button>)}</div>
     <div style={{display:"flex",gap:8,marginTop:12}}><BtnSecondary disabled={!chosen.length} onClick={undo}>Deshacer</BtnSecondary><BtnPrimary disabled={chosen.length!==items[idx].steps.length} onClick={submit} style={{flex:1}}>Confirmar orden</BtnPrimary></div>
@@ -8116,19 +8169,19 @@ function NFE20MentalRotation({ paciente, onDone }) {
   const arrow=item.direction==="derecha"?"↻":"↺";
   return <AssessmentTaskShell taskId="NF-E20" paciente={paciente}>
     <p style={{fontWeight:700}}>Imagina que la figura gira <strong>{item.degrees}° hacia la {item.direction}</strong>. ¿Cómo quedaría?</p>
-    <div style={{textAlign:"center",margin:"20px auto 34px"}}>
-      <div style={{fontSize:mayor?"1.05rem":".9rem",fontWeight:800,color:COLORS.primary,marginBottom:10}}>{arrow} Giro de {item.degrees}° hacia la {item.direction}</div>
-      <div style={{padding:mayor?24:18,borderRadius:14,background:COLORS.bg,maxWidth:190,margin:"0 auto",border:`1px solid ${COLORS.border}`}}>
+    <div style={{textAlign:"center",margin:"10px auto 12px"}}>
+      <div style={{fontSize:mayor?"1.05rem":"var(--nf-activity-text, .9rem)",fontWeight:800,color:COLORS.primary,marginBottom:10}}>{arrow} Giro de {item.degrees}° hacia la {item.direction}</div>
+      <div style={{padding:8,borderRadius:14,background:COLORS.bg,maxWidth:190,margin:"0 auto",border:`1px solid ${COLORS.border}`}}>
         <NFGridShape cells={baseCells} rotation={item.baseRot} size={mayor?150:132}/>
       </div>
     </div>
-    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Elige el resultado del giro</div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(140px,1fr))",gap:mayor?14:12,maxWidth:650,margin:"0 auto"}}>
-      {item.opts.map((o,i)=>{const cells=shapes[o.shape || item.shape];return <button key={i} disabled={locked.current} type="button" onClick={()=>pick(i)} style={{padding:mayor?17:14,borderRadius:12,border:`1.5px solid ${COLORS.border}`,background:"#fff",cursor:"pointer",minHeight:mayor?190:168}}>
+    <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Elige el resultado del giro</div>
+    <div className="nf-rotation-options">
+      {item.opts.map((o,i)=>{const cells=shapes[o.shape || item.shape];return <button key={i} disabled={locked.current} type="button" onClick={()=>pick(i)} style={{borderRadius:12,border:`1.5px solid ${COLORS.border}`,background:"#fff",cursor:"pointer"}}>
         <NFGridShape cells={cells} rotation={o.rotation || 0} mirrored={!!o.mirrored} size={mayor?136:118}/>
       </button>})}
     </div>
-    <p style={{fontSize:mayor?".78rem":".7rem",color:COLORS.textMuted,textAlign:"center",marginTop:12}}>Una figura reflejada como en un espejo no es el resultado correcto de una rotación.</p>
+    <p style={{fontSize:mayor?"var(--nf-activity-text, .78rem)":"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",textAlign:"center",marginTop:12}}>Una figura reflejada como en un espejo no es el resultado correcto de una rotación.</p>
   </AssessmentTaskShell>;
 }
 function NFE21ConstructionCore({ paciente, onDone }) {
@@ -8150,10 +8203,10 @@ function NFE21ConstructionCore({ paciente, onDone }) {
   return <AssessmentTaskShell taskId="NF-E21" paciente={paciente}>
     <p style={{fontWeight:700}}>Observa el modelo y elige la construcción idéntica.</p>
     <div style={{textAlign:"center",margin:"20px auto 34px"}}>
-      <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,marginBottom:10}}>Modelo</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary,marginBottom:10}}>Modelo</div>
       <div style={{padding:22,borderRadius:14,background:COLORS.bg,maxWidth:150,margin:"0 auto",border:`1px solid ${COLORS.border}`}}>{mini(patterns[idx].target,mayor?42:38)}</div>
     </div>
-    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Opciones</div>
+    <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary,textAlign:"center",marginBottom:10}}>Opciones</div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:mayor?14:12,maxWidth:720,margin:"0 auto"}}>
       {patterns[idx].options.map((o,i)=><button key={i} disabled={locked.current} onClick={()=>pick(i)} style={{minHeight:mayor?130:112,padding:18,borderRadius:12,border:`1.5px solid ${COLORS.border}`,background:"#fff"}}>{mini(o,mayor?36:32)}</button>)}
     </div>
@@ -8221,7 +8274,7 @@ function NFE23FigureGround({ paciente, onDone }) {
         <NFStimulusObject kind={kind} size={mayor?124:108} stroke="#344054" accent="#2A9D8F"/>
       </div>)}
     </div>
-    <div style={{fontSize:".72rem",color:COLORS.textMuted,textAlign:"center",marginBottom:9}}>¿Cuál de estos objetos está en la escena?</div>
+    <div style={{fontSize:"var(--nf-activity-meta, .72rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",textAlign:"center",marginBottom:9}}>¿Cuál de estos objetos está en la escena?</div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:9,maxWidth:600,margin:"0 auto"}}>
       {shuffle(scene.items).map(kind=><button key={kind} disabled={locked.current} onClick={()=>pick(kind)} style={{minHeight:mayor?100:86,borderRadius:11,border:`1.5px solid ${COLORS.border}`,background:"#fff",display:"flex",alignItems:"center",justifyContent:"center"}}><NFStimulusObject kind={kind} size={mayor?66:56}/></button>)}
     </div>
@@ -8276,7 +8329,7 @@ function NFE25SmartShopping({ paciente, onDone }) {
   return <AssessmentTaskShell taskId="NF-E25" paciente={paciente}>
     <div style={{display:"grid",gridTemplateColumns:mayor?"150px 1fr":"130px 1fr",gap:18,alignItems:"center",padding:16,borderRadius:14,border:`1px solid ${COLORS.border}`,background:"#fff",marginBottom:15}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"center"}}><NFStimulusObject kind={item.product} size={mayor?108:92}/></div>
-      <div><div style={{fontWeight:800,fontSize:mayor?"1.1rem":".94rem"}}>{item.name}</div><div style={{fontSize:mayor?"1.2rem":"1rem",fontWeight:900,color:COLORS.primary,marginTop:3}}>${item.price.toLocaleString("es-CO")}</div></div>
+      <div><div style={{fontWeight:800,fontSize:mayor?"1.1rem":"var(--nf-activity-text, .94rem)"}}>{item.name}</div><div style={{fontSize:mayor?"1.2rem":"1rem",fontWeight:900,color:COLORS.primary,marginTop:3}}>${item.price.toLocaleString("es-CO")}</div></div>
     </div>
     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}><NFAudioReadButton text={`${item.q} Opciones: ${opts.current[idx].map(x=>`$${x.toLocaleString("es-CO")}`).join(", ")}.`} label="Escuchar pregunta" mayor={mayor}/></div>
     <p style={{fontWeight:700,lineHeight:1.55}}>{item.q}</p>
@@ -8286,6 +8339,78 @@ function NFE25SmartShopping({ paciente, onDone }) {
   </AssessmentTaskShell>;
 }
 
+
+function NFE26FollowInstructionsCore({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
+  const shapes=["circle","square","triangle","diamond"];
+  const trials=[
+    {instruction:"Toca primero el círculo, después el cuadrado y al final el triángulo.",sequence:["circle","square","triangle"]},
+    {instruction:"Toca primero el rombo, luego el triángulo y termina con el círculo.",sequence:["diamond","triangle","circle"]},
+    {instruction:"Toca el cuadrado, después el círculo y termina con el rombo.",sequence:["square","circle","diamond"]},
+    {instruction:"Toca el triángulo, luego el rombo y al final el cuadrado.",sequence:["triangle","diamond","square"]},
+  ];
+  const [trialIndex,setTrialIndex]=useState(0),[selected,setSelected]=useState([]);
+  const records=useRef([]),started=useRef(Date.now());
+  const trial=trials[trialIndex];
+  const reset=()=>setSelected([]);
+  const confirm=()=>{
+    if(selected.length!==trial.sequence.length)return;
+    const positionErrors=selected.reduce((n,value,i)=>n+(value===trial.sequence[i]?0:1),0);
+    records.current.push({correct:positionErrors===0,positionErrors,rt:Date.now()-started.current});
+    if(trialIndex+1>=trials.length){
+      const rs=records.current,correct=rs.filter(x=>x.correct).length;
+      onDone(nfTaskResult("NF-E26",{precision:pctSafe(correct,rs.length),correct,total:rs.length,errors:rs.length-correct,sequenceErrors:rs.reduce((n,x)=>n+x.positionErrors,0),meanResponseMs:meanNum(rs.map(x=>x.rt)),taskVersionAdministered:"NF-E26-1.0"}));
+    }else{setTrialIndex(i=>i+1);setSelected([]);started.current=Date.now();}
+  };
+  return <AssessmentTaskShell taskId="NF-E26" paciente={paciente}>
+    <div style={{maxWidth:1000,margin:"0 auto",textAlign:"center"}}>
+      <div style={{fontSize:".9rem",fontWeight:700,color:COLORS.textMuted,marginBottom:8}}>Instrucción {trialIndex+1} de {trials.length}</div>
+      <div style={{padding:16,borderRadius:14,background:COLORS.bg,border:`1px solid ${COLORS.border}`,fontSize:mayor?"1.3rem":"1.15rem",fontWeight:750,lineHeight:1.5,marginBottom:16}}>{trial.instruction}</div>
+      <div aria-live="polite" style={{display:"flex",justifyContent:"center",alignItems:"center",gap:10,flexWrap:"wrap",minHeight:58,marginBottom:12}}>
+        {trial.sequence.map((_,i)=><span key={i} style={{minWidth:56,padding:"9px 12px",borderRadius:10,border:`1px solid ${COLORS.border}`,background:selected[i]?"#EEF4FF":"#fff",fontWeight:800,fontSize:"1rem"}}>{selected[i]?<NFStimulusObject kind={selected[i]} size={30}/>:`${i+1}.`}</span>)}
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,minmax(82px,1fr))",gap:12,maxWidth:760,margin:"0 auto"}}>
+        {shapes.map(kind=><button key={kind} type="button" disabled={selected.length>=trial.sequence.length} onClick={()=>setSelected(v=>[...v,kind])} aria-label={`Seleccionar ${kind}`} style={{minHeight:mayor?116:100,borderRadius:14,border:`1.5px solid ${COLORS.border}`,background:"#fff",display:"flex",alignItems:"center",justifyContent:"center"}}><NFStimulusObject kind={kind} size={mayor?72:64}/></button>)}
+      </div>
+      <div style={{display:"flex",justifyContent:"center",gap:10,marginTop:16,flexWrap:"wrap"}}>
+        <BtnSecondary onClick={reset} disabled={!selected.length}>Deshacer secuencia</BtnSecondary>
+        <BtnPrimary onClick={confirm} disabled={selected.length!==trial.sequence.length}>Confirmar secuencia</BtnPrimary>
+      </div>
+    </div>
+  </AssessmentTaskShell>;
+}
+
+function NFE27FunctionalProspectiveCore({ paciente, onDone }) {
+  const mayor=esModoMayor(paciente);
+  const trials=[{number:4,cue:false},{number:7,cue:false},{number:2,cue:true},{number:9,cue:false},{number:6,cue:false},{number:3,cue:false}];
+  const [index,setIndex]=useState(0),[parity,setParity]=useState(null),[cueDone,setCueDone]=useState(false);
+  const records=useRef([]),started=useRef(Date.now()),cueTime=useRef(null);
+  const current=trials[index];
+  const completeTrial=()=>{
+    if(!parity||(current.cue&&!cueDone))return;
+    records.current.push({parityCorrect:(current.number%2===0?"Par":"Impar")===parity,cue:current.cue,cueRemembered:current.cue?cueDone:null,cueLatencyMs:current.cue&&cueTime.current?cueTime.current-started.current:null});
+    if(index+1>=trials.length){
+      const rs=records.current,correct=rs.filter(x=>x.parityCorrect).length,remembered=rs.find(x=>x.cue)?.cueRemembered===true;
+      onDone(nfTaskResult("NF-E27",{precision:pctSafe(correct,rs.length),correct,total:rs.length,errors:rs.length-correct,spontaneousRecall:remembered,cuePresented:1,cueActions:remembered?1:0,meanResponseMs:meanNum(rs.map(x=>x.cueLatencyMs).filter(Number.isFinite)),taskVersionAdministered:"NF-E27-1.0"},{notes:"Una señal prospectiva se presentó durante una tarea de clasificación breve."}));
+    }else{setIndex(i=>i+1);setParity(null);setCueDone(false);cueTime.current=null;started.current=Date.now();}
+  };
+  return <AssessmentTaskShell taskId="NF-E27" paciente={paciente}>
+    <div style={{maxWidth:900,margin:"0 auto",textAlign:"center"}}>
+      <div style={{fontSize:".9rem",fontWeight:700,color:COLORS.textMuted,marginBottom:8}}>Actividad de atención · {index+1} de {trials.length}</div>
+      <div style={{padding:18,borderRadius:14,background:COLORS.bg,border:`1px solid ${COLORS.border}`,marginBottom:16}}>
+        <div style={{height:"min(24vh,150px)",display:"flex",alignItems:"center",justifyContent:"center",gap:24}}>
+          <div aria-hidden="true" style={{fontSize:"clamp(2.8rem,7vh,4.5rem)",fontWeight:900}}>{current.number}</div>
+          {current.cue&&<button type="button" aria-label="Tocar estrella" onClick={()=>{if(!cueDone){cueTime.current=Date.now();setCueDone(true)}}} style={{width:"min(26vw,150px)",height:"min(22vh,132px)",borderRadius:18,border:`2px solid ${cueDone?COLORS.success:COLORS.border}`,background:cueDone?COLORS.success+"10":"#fff",fontSize:"clamp(3rem,8vh,5rem)",cursor:"pointer"}}>★</button>}
+        </div>
+        <div style={{fontSize:"1.08rem",fontWeight:750,marginTop:8}}>¿El número es par o impar?</div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(120px,1fr))",gap:12}}>
+        {["Par","Impar"].map(value=><button key={value} type="button" onClick={()=>setParity(value)} style={{padding:16,borderRadius:12,border:`1.5px solid ${parity===value?COLORS.primary:COLORS.border}`,background:parity===value?COLORS.primary+"10":"#fff",fontWeight:800}}>{value}</button>)}
+      </div>
+      <BtnPrimary onClick={completeTrial} disabled={!parity||(current.cue&&!cueDone)} style={{width:"100%",marginTop:14}}>Continuar</BtnPrimary>
+    </div>
+  </AssessmentTaskShell>;
+}
 
 function NFE26FollowInstructions(props) {
   return <F61EvaluationGate taskId="NF-E26" paciente={props.paciente}><NFE26FollowInstructionsCore {...props}/></F61EvaluationGate>;
@@ -8304,11 +8429,11 @@ function EvaluationV2Phase38Block({ paciente, onExit }) {
   if(step===2)return <NFE26FollowInstructions paciente={paciente} onDone={push}/>;
   if(step===3)return <NFE27FunctionalProspective paciente={paciente} onDone={push}/>;
   return <div style={{maxWidth:860,margin:"0 auto"}}><Card>
-    <div style={{fontSize:".7rem",fontWeight:800,color:COLORS.primary,letterSpacing:".06em"}}>FASE 38 · COGNICIÓN FUNCIONAL</div>
+    <div style={{fontSize:"var(--nf-activity-meta, .7rem)",fontWeight:800,color:COLORS.primary,letterSpacing:".06em"}}>FASE 38 · COGNICIÓN FUNCIONAL</div>
     <h2 style={{margin:"6px 0"}}>Bloque completado</h2>
-    <p style={{color:COLORS.textMuted,lineHeight:1.6,fontSize:".82rem"}}>Este bloque observa desempeño en situaciones funcionales simuladas: organización temporal, compras, seguimiento de instrucciones y memoria prospectiva en doble demanda. No demuestra automáticamente funcionamiento equivalente en la vida diaria.</p>
-    {results.map(r=><div key={r.taskId} style={{padding:"11px 0",borderBottom:`1px solid ${COLORS.border}`,display:"grid",gridTemplateColumns:"85px 1fr",gap:10}}><strong>{getAssessmentTaskDefinition(r.taskId)?.name || "Tarea completada"}</strong><span style={{fontSize:".78rem",color:COLORS.textSecond}}>{typeof r.metrics?.precision==="number"?`Precisión: ${r.metrics.precision}%`:"Medida específica"}{r.metrics?.errors!=null?` · Errores: ${r.metrics.errors}`:""}{r.metrics?.sequenceErrors!=null?` · Errores de secuencia: ${r.metrics.sequenceErrors}`:""}{r.metrics?.spontaneousRecall!=null?` · Pendiente espontáneo: ${r.metrics.spontaneousRecall?"sí":"no"}`:""}</span></div>)}
-    <div style={{marginTop:16,padding:12,borderRadius:10,background:COLORS.bg,fontSize:".76rem",color:COLORS.textMuted,lineHeight:1.55}}>Los bloques de evaluación se mantienen separados para facilitar las pausas, almacenamiento y perfil multidimensional.</div>
+    <p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.6,fontSize:"var(--nf-activity-text, .82rem)"}}>Este bloque observa desempeño en situaciones funcionales simuladas: organización temporal, compras, seguimiento de instrucciones y memoria prospectiva en doble demanda. No demuestra automáticamente funcionamiento equivalente en la vida diaria.</p>
+    {results.map(r=><div key={r.taskId} style={{padding:"11px 0",borderBottom:`1px solid ${COLORS.border}`,display:"grid",gridTemplateColumns:"85px 1fr",gap:10}}><strong>{getAssessmentTaskDefinition(r.taskId)?.name || "Tarea completada"}</strong><span style={{fontSize:"var(--nf-activity-text, .78rem)",color:COLORS.textSecond}}>{typeof r.metrics?.precision==="number"?`Precisión: ${r.metrics.precision}%`:"Medida específica"}{r.metrics?.errors!=null?` · Errores: ${r.metrics.errors}`:""}{r.metrics?.sequenceErrors!=null?` · Errores de secuencia: ${r.metrics.sequenceErrors}`:""}{r.metrics?.spontaneousRecall!=null?` · Pendiente espontáneo: ${r.metrics.spontaneousRecall?"sí":"no"}`:""}</span></div>)}
+    <div style={{marginTop:16,padding:12,borderRadius:10,background:COLORS.bg,fontSize:"var(--nf-activity-text, .76rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.55}}>Los bloques de evaluación se mantienen separados para facilitar las pausas, almacenamiento y perfil multidimensional.</div>
     <BtnPrimary onClick={onExit} style={{width:"100%",marginTop:18}}>Volver a evaluación</BtnPrimary>
   </Card></div>;
 }
@@ -8459,9 +8584,9 @@ function AssessmentPauseScreen({ number, total, onContinue, onSaveForLater }) {
   });
   return <div style={{maxWidth:700,margin:"0 auto"}}><Card style={{textAlign:"center",padding:38}}>
     <div className="nf-task-ready-mark"><NFIcon name="clock" size={26}/></div>
-    <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary}}>Pausa {number} de {total}</div>
+    <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary}}>Pausa {number} de {total}</div>
     <h2 style={{margin:"8px 0"}}>Pausa entre bloques</h2>
-    <p style={{color:COLORS.textMuted,lineHeight:1.7,fontSize:".9rem",maxWidth:560,margin:"0 auto 22px"}}>Puedes descansar y continuar hoy, o guardar el progreso para retomar la evaluación en la próxima cita.</p>
+    <p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.7,fontSize:"var(--nf-activity-text, .9rem)",maxWidth:560,margin:"0 auto 22px"}}>Puedes descansar y continuar hoy, o guardar el progreso para retomar la evaluación en la próxima cita.</p>
     <div style={{display:"grid",gridTemplateColumns:onSaveForLater?"1fr 1fr":"1fr",gap:11}}>
       {onSaveForLater&&<BtnSecondary onClick={()=>onSaveForLater(pauseData())} style={{padding:13}}>Guardar y continuar en otra cita</BtnSecondary>}
       <BtnPrimary onClick={()=>onContinue(pauseData())} style={{padding:13}}>Continuar evaluación</BtnPrimary>
@@ -8486,23 +8611,23 @@ function AssessmentV2ProfileView({ evalData, paciente, onIniciarSesion }) {
         <Badge label={typeof d.descriptiveIndex==="number"?`${d.descriptiveIndex} · ${band.label}`:band.label} color={band.color}/>
       </summary>
       <div style={{marginTop:12,paddingTop:12,borderTop:`1px solid ${COLORS.border}`}}>
-        <p style={{fontSize:".73rem",color:COLORS.textMuted,lineHeight:1.55,margin:"0 0 10px"}}>
-          Índice descriptivo interno construido a partir de tareas primarias NeuroFlex. No es una puntuación normativa ni un percentil.</p>{d.evidenceQuality&&<div style={{fontSize:".71rem",padding:"8px 10px",borderRadius:9,background:COLORS.bg,marginBottom:10}}><strong>Calidad de evidencia: {d.evidenceQuality.label}.</strong> {d.evidenceQuality.reason}</div>}<p style={{display:"none"}}>
+        <p style={{fontSize:"var(--nf-activity-meta, .73rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.55,margin:"0 0 10px"}}>
+          Índice descriptivo interno construido a partir de tareas primarias NeuroFlex. No es una puntuación normativa ni un percentil.</p>{d.evidenceQuality&&<div style={{fontSize:"var(--nf-activity-meta, .71rem)",padding:"8px 10px",borderRadius:9,background:COLORS.bg,marginBottom:10}}><strong>Calidad de evidencia: {d.evidenceQuality.label}.</strong> {d.evidenceQuality.reason}</div>}<p style={{display:"none"}}>
         </p>
         {(d.processes || []).map(p=>{
           const pb=assessmentPerformanceBand(p.descriptiveIndex);
           return <div key={p.id} style={{padding:"8px 0",borderBottom:`1px solid ${COLORS.border}`}}>
             <div style={{display:"flex",justifyContent:"space-between",gap:8}}>
-              <span style={{fontSize:".8rem",fontWeight:650}}>{formatAssessmentProcessLabelV2(p.processId)}</span>
-              <span style={{fontSize:".76rem",fontWeight:700,color:pb.color}}>{typeof p.descriptiveIndex==="number"?p.descriptiveIndex:"Revisar"}</span>
+              <span style={{fontSize:"var(--nf-activity-text, .8rem)",fontWeight:650}}>{formatAssessmentProcessLabelV2(p.processId)}</span>
+              <span style={{fontSize:"var(--nf-activity-text, .76rem)",fontWeight:700,color:pb.color}}>{typeof p.descriptiveIndex==="number"?p.descriptiveIndex:"Revisar"}</span>
             </div>
-            <div style={{fontSize:".69rem",color:COLORS.textMuted,marginTop:3}}>
+            <div style={{fontSize:"var(--nf-activity-meta, .69rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>
               Evidencia: {p.evidence?.map(e=>e.taskId).join(", ") || "sin medida automática"}
               {p.reviewOnlyEvidence?.length ? ` · revisión: ${p.reviewOnlyEvidence.join(", ")}`:""}
             </div>
           </div>
         })}
-        <div style={{fontSize:".72rem",color:COLORS.textMuted,marginTop:9}}>
+        <div style={{fontSize:"var(--nf-activity-meta, .72rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:9}}>
           Tareas principales: {d.taskEvidence?.map(e=>e.taskId).join(", ") || "—"}
           {d.secondaryEvidenceFrom?.length ? ` · evidencia secundaria: ${[...new Set(d.secondaryEvidenceFrom)].join(", ")}`:""}
         </div>
@@ -8516,7 +8641,7 @@ function AssessmentV2ProfileView({ evalData, paciente, onIniciarSesion }) {
       <div>
       <div className="nf-v2-dashboard-kicker">Perfil cognitivo</div>
       <h2>Perfil cognitivo multidimensional</h2>
-      <p style={{margin:0,fontSize:".79rem",lineHeight:1.65,color:COLORS.textSecond}}>
+      <p style={{margin:0,fontSize:"var(--nf-activity-text, .79rem)",lineHeight:1.65,color:COLORS.textSecond}}>
         Este perfil describe el desempeño observado en {tasks.length} tareas de NeuroFlex por dominio y subproceso,
         e integra patrones de error, variación temporal y evidencia entre tareas. Los índices son internos y provisionales:
         no corresponden a baremos, percentiles ni puntuaciones de WAIS, Stroop, TMT, BANFE u otras pruebas de referencia.
@@ -8533,7 +8658,7 @@ function AssessmentV2ProfileView({ evalData, paciente, onIniciarSesion }) {
 
     <Card className="nf-v2-profile-domains-card" style={{marginBottom:20}}>
       <p style={{fontWeight:800,margin:"0 0 4px"}}>Dominios y subprocesos</p>
-      <p style={{fontSize:".74rem",color:COLORS.textMuted,lineHeight:1.5,margin:"0 0 14px"}}>Abre cada dominio para revisar procesos y las tareas que aportaron evidencia.</p>
+      <p style={{fontSize:"var(--nf-activity-meta, .74rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.5,margin:"0 0 14px"}}>Abre cada dominio para revisar procesos y las tareas que aportaron evidencia.</p>
       <div style={{display:"grid",gap:9}}>{domains.map(domainCard)}</div>
     </Card>
 
@@ -8650,16 +8775,16 @@ function NFE32Metacognition({ paciente, onDone }) {
   return <AssessmentTaskShell taskId="NF-E32" paciente={paciente}>
     {answer===null?<div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:12}}>
-        <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary}}>Primero responde la pregunta</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary}}>Primero responde la pregunta</div>
         <NFAudioReadButton text={`${item.q} Opciones: ${item.opts.join(", ")}.`} label="Escuchar pregunta" mayor={mayor}/>
       </div>
       <p style={{fontWeight:700,textAlign:"center",fontSize:mayor?"1.18rem":"1.04rem"}}>{item.q}</p>
       <div style={{display:"grid",gap:11,maxWidth:540,margin:"24px auto 0"}}>
-        {item.opts.map((o,i)=><button key={o} onClick={()=>setAnswer(i)} style={{minHeight:mayor?70:62,padding:13,borderRadius:11,border:`1.5px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:700,fontSize:mayor?"1rem":".9rem"}}>{o}</button>)}
+        {item.opts.map((o,i)=><button key={o} onClick={()=>setAnswer(i)} style={{minHeight:mayor?70:62,padding:13,borderRadius:11,border:`1.5px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontWeight:700,fontSize:mayor?"1rem":"var(--nf-activity-text, .9rem)"}}>{o}</button>)}
       </div>
     </div>:<div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:12}}>
-        <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary}}>Ahora valora tu seguridad</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary}}>Ahora valora tu seguridad</div>
         <NFAudioReadButton text="¿Qué tan seguro estás de la respuesta que acabas de dar? Opciones: poco seguro, bastante seguro, muy seguro." label="Escuchar pregunta" mayor={mayor}/>
       </div>
       <p style={{textAlign:"center",fontWeight:700,fontSize:mayor?"1.15rem":"1rem"}}>¿Qué tan seguro estás de la respuesta que acabas de dar?</p>
@@ -8673,7 +8798,7 @@ function NFE33PraxiasProfessional({ paciente, onDone }) {
   const items=["Muestra cómo usarías un peine, sin tener uno en la mano.","Haz el gesto de despedirte de alguien.","Muestra con gestos cómo abrirías una puerta con una llave.","Representa en orden cómo prepararías y beberías una taza de café o té."];
   const [idx,setIdx]=useState(0);const [records,setRecords]=useState([]);
   const rate=(value)=>{const next=[...records,value];if(idx+1>=items.length){const correct=next.filter(x=>x==="adequate").length;const seq=next.filter(x=>x==="sequence").length;onDone(nfTaskResult("NF-E33",{correct,total:items.length,errors:items.length-correct,sequenceErrors:seq,selfCorrections:null,taskVersionAdministered:"NF-E33-1.0"},{requiresProfessionalReview:true,notes:"Registro observacional profesional de gestos/acciones; interpretar considerando limitaciones motoras, sensoriales y comprensión."}))}else{setRecords(next);setIdx(i=>i+1)}};
-  return <AssessmentTaskShell taskId="NF-E33" paciente={paciente}><div style={{textAlign:"center",padding:10}}><div style={{fontSize:".7rem",fontWeight:800,color:COLORS.accent,marginBottom:8}}>ACTIVIDAD CON OBSERVACIÓN PROFESIONAL</div><p style={{fontWeight:700,fontSize:"1.05rem",lineHeight:1.6}}>{items[idx]}</p></div><div style={{borderTop:`1px solid ${COLORS.border}`,paddingTop:12,marginTop:10}}><p style={{fontSize:".7rem",fontWeight:800}}>Registro del profesional</p><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}><BtnSecondary onClick={()=>rate("adequate")}>Adecuado</BtnSecondary><BtnSecondary onClick={()=>rate("error")}>Error gestual</BtnSecondary><BtnSecondary onClick={()=>rate("sequence")}>Error de secuencia</BtnSecondary></div></div></AssessmentTaskShell>;
+  return <AssessmentTaskShell taskId="NF-E33" paciente={paciente}><div style={{textAlign:"center",padding:10}}><div style={{fontSize:"var(--nf-activity-meta, .7rem)",fontWeight:800,color:COLORS.accent,marginBottom:8}}>ACTIVIDAD CON OBSERVACIÓN PROFESIONAL</div><p style={{fontWeight:700,fontSize:"1.05rem",lineHeight:1.6}}>{items[idx]}</p></div><div style={{borderTop:`1px solid ${COLORS.border}`,paddingTop:12,marginTop:10}}><p style={{fontSize:"var(--nf-activity-meta, .7rem)",fontWeight:800}}>Registro del profesional</p><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}><BtnSecondary onClick={()=>rate("adequate")}>Adecuado</BtnSecondary><BtnSecondary onClick={()=>rate("error")}>Error gestual</BtnSecondary><BtnSecondary onClick={()=>rate("sequence")}>Error de secuencia</BtnSecondary></div></div></AssessmentTaskShell>;
 }
 
 function NFE34VisualLearning({ paciente, onDone }) {
@@ -8707,8 +8832,8 @@ function NFE34VisualLearning({ paciente, onDone }) {
   const pool=[...current.targets,...current.distractors];
   return <AssessmentTaskShell taskId="NF-E34" paciente={paciente}>
     <div style={{textAlign:"center",marginBottom:12}}>
-      <div style={{fontSize:".72rem",fontWeight:800,color:COLORS.primary}}>Nivel {stage+1} de {stages.length}</div>
-      <div style={{fontSize:".78rem",color:COLORS.textMuted,marginTop:3}}>{stage===0?"Empezamos con pocas figuras.":stage===1?"Ahora aumenta un poco la cantidad.":"Último nivel: mayor cantidad de información visual."}</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary}}>Nivel {stage+1} de {stages.length}</div>
+      <div style={{fontSize:"var(--nf-activity-text, .78rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3}}>{stage===0?"Empezamos con pocas figuras.":stage===1?"Ahora aumenta un poco la cantidad.":"Último nivel: mayor cantidad de información visual."}</div>
     </div>
     {phase==="study"?<div style={{textAlign:"center"}}>
       <Badge label={`Memoriza · ${seconds}s`} color={COLORS.primary}/>
@@ -8791,9 +8916,9 @@ function AssessmentTaskPickerV2({ selectedTaskIds, onToggle }) {
   return <div style={{display:"grid",gap:10}}>
     {grouped.map(group=><details key={group.domainId} open={group.tasks.some(t=>selectedTaskIds.includes(t.id))}
       style={{border:`1px solid ${COLORS.border}`,borderRadius:11,padding:"10px 12px",background:COLORS.white}}>
-      <summary style={{cursor:"pointer",fontWeight:800,fontSize:".78rem",listStyle:"none",display:"flex",justifyContent:"space-between",gap:10}}>
+      <summary style={{cursor:"pointer",fontWeight:800,fontSize:"var(--nf-activity-text, .78rem)",listStyle:"none",display:"flex",justifyContent:"space-between",gap:10}}>
         <span>{group.domain.label}</span>
-        <span style={{fontSize:".67rem",color:COLORS.textMuted}}>
+        <span style={{fontSize:"var(--nf-activity-meta, .67rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>
           {group.tasks.filter(t=>selectedTaskIds.includes(t.id)).length}/{group.tasks.length}
         </span>
       </summary>
@@ -8801,8 +8926,8 @@ function AssessmentTaskPickerV2({ selectedTaskIds, onToggle }) {
         {group.tasks.map(task=><label key={task.id} style={{display:"flex",gap:9,alignItems:"flex-start",padding:"8px 9px",borderRadius:9,background:selectedTaskIds.includes(task.id)?COLORS.primary+"08":COLORS.bg,cursor:"pointer"}}>
           <input type="checkbox" checked={selectedTaskIds.includes(task.id)} onChange={()=>onToggle(task.id)} style={{marginTop:3}}/>
           <span>
-            <span style={{display:"block",fontSize:".74rem",fontWeight:700}}>{task.name}</span>
-            <span style={{display:"block",fontSize:".65rem",color:COLORS.textMuted,marginTop:2}}>{task.estimatedMinutes} min aprox. · {task.processes.slice(0,3).map(formatAssessmentProcessLabelV2).join(" · ")}</span>
+            <span style={{display:"block",fontSize:"var(--nf-activity-meta, .74rem)",fontWeight:700}}>{task.name}</span>
+            <span style={{display:"block",fontSize:"var(--nf-activity-meta, .65rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:2}}>{task.estimatedMinutes} min aprox. · {task.processes.slice(0,3).map(formatAssessmentProcessLabelV2).join(" · ")}</span>
           </span>
         </label>)}
       </div>
@@ -8834,26 +8959,26 @@ function PersonalizedAssessmentConfiguratorV2({ paciente, onStart, onCancel }) {
 
   return <div style={{maxWidth:980,margin:"0 auto"}}>
     <Card style={{marginBottom:14,border:`1px solid ${COLORS.primary}20`}}>
-      <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary,letterSpacing:".05em"}}>{NEUROFLEX_PHASE62_2_PERSONALIZED.version}</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary,letterSpacing:".05em"}}>{NEUROFLEX_PHASE62_2_PERSONALIZED.version}</div>
       <h2 style={{margin:"5px 0 6px"}}>Evaluación personalizada</h2>
-      <p style={{margin:0,fontSize:".76rem",lineHeight:1.6,color:COLORS.textMuted}}>
+      <p style={{margin:0,fontSize:"var(--nf-activity-text, .76rem)",lineHeight:1.6,color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>
         Selecciona las áreas que deseas explorar según historia clínica, motivo de consulta y criterio profesional. NeuroFlex propone las tareas principales de cada área y puedes modificarlas antes de iniciar.
       </p>
       {latestScreening?.suggestedDomainIds?.length>0 && <div style={{marginTop:12,padding:10,borderRadius:10,background:COLORS.primary+"08",border:`1px solid ${COLORS.primary}20`}}>
         <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",flexWrap:"wrap"}}>
-          <div style={{fontSize:".69rem",color:COLORS.textSecond}}>
+          <div style={{fontSize:"var(--nf-activity-meta, .69rem)",color:COLORS.textSecond}}>
             Último tamizaje: {latestScreening.suggestedDomainIds.length} área(s) sugeridas para profundizar.
           </div>
           <BtnSecondary onClick={()=>{
             const domains=[...latestScreening.suggestedDomainIds];
             setSelectedDomains(domains);
             setSelectedTaskIds(nfPrimaryAssessmentTasksForDomains(domains));
-          }} style={{padding:"7px 10px",fontSize:".68rem"}}>Cargar sugerencia del tamizaje</BtnSecondary>
+          }} style={{padding:"7px 10px",fontSize:"var(--nf-activity-meta, .68rem)"}}>Cargar sugerencia del tamizaje</BtnSecondary>
         </div>
         <div style={{display:"grid",gap:5,marginTop:8}}>
           {(latestScreening.screeningClinicalReview?.recommendations || [])
             .filter(r=>r.status==="review")
-            .map(r=><div key={r.domainId} style={{fontSize:".64rem",color:COLORS.textMuted,lineHeight:1.45}}>
+            .map(r=><div key={r.domainId} style={{fontSize:"var(--nf-activity-meta, .64rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.45}}>
               <strong>{r.domainLabel}:</strong> {r.reason} Profundización sugerida: {r.suggestedTaskIds.join(", ")}.
             </div>)}
         </div>
@@ -8862,33 +8987,33 @@ function PersonalizedAssessmentConfiguratorV2({ paciente, onStart, onCancel }) {
 
     <div style={{display:"grid",gridTemplateColumns:"minmax(280px,.9fr) minmax(340px,1.1fr)",gap:14,alignItems:"start"}}>
       <Card>
-        <div style={{fontSize:".72rem",fontWeight:800,marginBottom:10}}>1. Áreas a evaluar</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,marginBottom:10}}>1. Áreas a evaluar</div>
         <div style={{display:"grid",gap:7}}>
           {Object.entries(ASSESSMENT_DOMAINS_V2).map(([id,dom])=><label key={id} style={{display:"flex",gap:9,alignItems:"center",padding:"9px 10px",borderRadius:9,border:`1px solid ${selectedDomains.includes(id)?COLORS.primary+"55":COLORS.border}`,background:selectedDomains.includes(id)?COLORS.primary+"08":"#fff",cursor:"pointer"}}>
             <input type="checkbox" checked={selectedDomains.includes(id)} onChange={()=>toggleDomain(id)}/>
-            <span style={{fontSize:".75rem",fontWeight:700}}>{dom.label}</span>
+            <span style={{fontSize:"var(--nf-activity-meta, .75rem)",fontWeight:700}}>{dom.label}</span>
           </label>)}
         </div>
       </Card>
 
       <Card>
         <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",marginBottom:10,flexWrap:"wrap"}}>
-          <div style={{fontSize:".72rem",fontWeight:800}}>2. Revisa las tareas</div>
+          <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800}}>2. Revisa las tareas</div>
           <Badge label={`${selectedTaskIds.length} tarea(s) · ~${minutes} min`} color={COLORS.primary}/>
         </div>
         {!selectedTaskIds.length
-          ? <div style={{padding:24,textAlign:"center",color:COLORS.textMuted,fontSize:".75rem"}}>Selecciona al menos un área para generar el protocolo.</div>
+          ? <div style={{padding:24,textAlign:"center",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-meta, .75rem)"}}>Selecciona al menos un área para generar el protocolo.</div>
           : <AssessmentTaskPickerV2 selectedTaskIds={selectedTaskIds} onToggle={toggleTask}/>}
       </Card>
     </div>
 
     <Card style={{marginTop:14}}>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,marginBottom:12}}>
-        <div style={{padding:10,borderRadius:9,background:COLORS.bg}}><div style={{fontSize:".63rem",color:COLORS.textMuted}}>Áreas representadas</div><strong>{representedDomains.length}</strong></div>
-        <div style={{padding:10,borderRadius:9,background:COLORS.bg}}><div style={{fontSize:".63rem",color:COLORS.textMuted}}>Tareas</div><strong>{selectedTaskIds.length}</strong></div>
-        <div style={{padding:10,borderRadius:9,background:COLORS.bg}}><div style={{fontSize:".63rem",color:COLORS.textMuted}}>Duración estimada</div><strong>~{minutes} min</strong></div>
+        <div style={{padding:10,borderRadius:9,background:COLORS.bg}}><div style={{fontSize:"var(--nf-activity-meta, .63rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Áreas representadas</div><strong>{representedDomains.length}</strong></div>
+        <div style={{padding:10,borderRadius:9,background:COLORS.bg}}><div style={{fontSize:"var(--nf-activity-meta, .63rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Tareas</div><strong>{selectedTaskIds.length}</strong></div>
+        <div style={{padding:10,borderRadius:9,background:COLORS.bg}}><div style={{fontSize:"var(--nf-activity-meta, .63rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Duración estimada</div><strong>~{minutes} min</strong></div>
       </div>
-      <p style={{fontSize:".68rem",color:COLORS.textMuted,lineHeight:1.5,margin:"0 0 12px"}}>
+      <p style={{fontSize:"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.5,margin:"0 0 12px"}}>
         La duración es una estimación basada en las tareas seleccionadas. NeuroFlex no interpreta como “no evaluado” aquello que no fue incluido: simplemente se conserva como área sin evidencia administrada en este protocolo.
       </p>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
@@ -8961,20 +9086,20 @@ function nfBuildScreeningClinicalReview(domainSignals=[]){
 
 function ScreeningClinicalReviewV2({ record }){
   const review=record?.screeningClinicalReview || nfBuildScreeningClinicalReview(record?.domainSignals || []);
-  if(!review?.recommendations?.length)return <Card style={{marginTop:12}}><p style={{margin:0,fontSize:".72rem",color:COLORS.textMuted}}>No se generaron áreas para revisión adicional dentro de este tamizaje.</p></Card>;
+  if(!review?.recommendations?.length)return <Card style={{marginTop:12}}><p style={{margin:0,fontSize:"var(--nf-activity-meta, .72rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>No se generaron áreas para revisión adicional dentro de este tamizaje.</p></Card>;
   return <Card style={{marginTop:12}}>
-    <div style={{fontSize:".69rem",fontWeight:800,color:COLORS.primary}}>ORIENTACIÓN PARA PROFUNDIZACIÓN</div>
-    <p style={{fontSize:".71rem",color:COLORS.textMuted,lineHeight:1.55,margin:"6px 0 12px"}}>
+    <div style={{fontSize:"var(--nf-activity-meta, .69rem)",fontWeight:800,color:COLORS.primary}}>ORIENTACIÓN PARA PROFUNDIZACIÓN</div>
+    <p style={{fontSize:"var(--nf-activity-meta, .71rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.55,margin:"6px 0 12px"}}>
       Las siguientes sugerencias explican por qué un área merece revisión y qué tareas completas podrían aportar evidencia adicional. La selección final corresponde al profesional.
     </p>
     <div style={{display:"grid",gap:9}}>
       {review.recommendations.map(rec=><div key={rec.domainId} style={{padding:11,borderRadius:10,border:`1px solid ${COLORS.border}`,background:"#fff"}}>
         <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-          <strong style={{fontSize:".76rem"}}>{rec.domainLabel}</strong>
+          <strong style={{fontSize:"var(--nf-activity-text, .76rem)"}}>{rec.domainLabel}</strong>
           <Badge label={rec.status==="review"?"Profundizar":"Revisar contexto"} color={rec.status==="review"?COLORS.accent:COLORS.warning}/>
         </div>
-        <p style={{fontSize:".68rem",color:COLORS.textSecond,lineHeight:1.5,margin:"7px 0"}}>{rec.reason}</p>
-        <div style={{fontSize:".65rem",color:COLORS.textMuted}}>
+        <p style={{fontSize:"var(--nf-activity-meta, .68rem)",color:COLORS.textSecond,lineHeight:1.5,margin:"7px 0"}}>{rec.reason}</p>
+        <div style={{fontSize:"var(--nf-activity-meta, .65rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>
           Tareas completas sugeridas: {rec.suggestedTasks.map(t=>`${t.id} · ${t.name}`).join(" · ")} · ~{rec.estimatedMinutes} min
         </div>
       </div>)}
@@ -9066,9 +9191,9 @@ function NFScreeningChoiceBlock({ title, instruction, items, paciente, onDone })
   if(!item){
     return <div style={{maxWidth:820,margin:"0 auto"}}>
       <Card style={{padding:mayor?34:28,textAlign:"center"}}>
-        <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent}}>RECUPERACIÓN DEL BLOQUE</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.accent}}>RECUPERACIÓN DEL BLOQUE</div>
         <h2 style={{margin:"7px 0"}}>Este ejercicio necesita reiniciarse</h2>
-        <p style={{fontSize:".76rem",color:COLORS.textMuted,lineHeight:1.6}}>
+        <p style={{fontSize:"var(--nf-activity-text, .76rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.6}}>
           No se perdió la evaluación completa. Reinicia únicamente este bloque para continuar.
         </p>
         <BtnPrimary onClick={resetBlock}>Reiniciar bloque</BtnPrimary>
@@ -9080,10 +9205,10 @@ function NFScreeningChoiceBlock({ title, instruction, items, paciente, onDone })
     <Card style={{padding:mayor?38:32}}>
       <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",marginBottom:18}}>
         <div>
-          <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary,letterSpacing:".04em"}}>TAMIZAJE NEUROFLEX</div>
+          <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary,letterSpacing:".04em"}}>TAMIZAJE NEUROFLEX</div>
           <h2 style={{margin:"5px 0 0",fontSize:mayor?"1.55rem":"1.35rem"}}>{title}</h2>
         </div>
-        <div style={{padding:"6px 10px",borderRadius:999,background:COLORS.bg,color:COLORS.textMuted,fontSize:".68rem",fontWeight:700}}>
+        <div style={{padding:"6px 10px",borderRadius:999,background:COLORS.bg,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:700}}>
           {idx+1} de {safeItems.length}
         </div>
       </div>
@@ -9094,7 +9219,7 @@ function NFScreeningChoiceBlock({ title, instruction, items, paciente, onDone })
         border:`1px solid ${COLORS.border}`,
         background:COLORS.primary+"05",
         color:COLORS.textSecond,
-        fontSize:mayor?".96rem":".8rem",
+        fontSize:mayor?"var(--nf-activity-text, .96rem)":"var(--nf-activity-text, .8rem)",
         lineHeight:1.6,
         marginBottom:22
       }}>
@@ -9140,7 +9265,7 @@ function NFScreeningChoiceBlock({ title, instruction, items, paciente, onDone })
             border:`2px solid ${COLORS.border}`,
             background:"#fff",
             fontFamily:"inherit",
-            fontSize:mayor?"1rem":".88rem",
+            fontSize:mayor?"1rem":"var(--nf-activity-text, .88rem)",
             fontWeight:800,
             cursor:locked?"default":"pointer",
             opacity:locked?.75:1
@@ -9241,12 +9366,12 @@ function NFScreeningWorkingMemoryTrial({ paciente, onDone }) {
 
   return <div style={{maxWidth:760,margin:"0 auto"}}>
     <Card style={{padding:mayor?30:24,textAlign:"center"}}>
-      <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIA DE TRABAJO</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>MEMORIA DE TRABAJO</div>
       <h2 style={{margin:"6px 0 8px"}}>Mantén y transforma la información</h2>
-      <div style={{fontSize:".67rem",color:COLORS.textMuted,marginBottom:14}}>{idx+1} de {trials.length}</div>
+      <div style={{fontSize:"var(--nf-activity-meta, .67rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:14}}>{idx+1} de {trials.length}</div>
 
       {phase==="ready" && <>
-        <p style={{fontSize:mayor?".95rem":".8rem",lineHeight:1.6,color:COLORS.textSecond,maxWidth:560,margin:"0 auto 16px"}}>
+        <p style={{fontSize:mayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",lineHeight:1.6,color:COLORS.textSecond,maxWidth:560,margin:"0 auto 16px"}}>
           {trial.instruction} La secuencia se mostrará solo unos segundos y desaparecerá antes de que aparezcan las respuestas.
         </p>
         <BtnPrimary onClick={present}>Mostrar secuencia</BtnPrimary>
@@ -9257,11 +9382,11 @@ function NFScreeningWorkingMemoryTrial({ paciente, onDone }) {
         <div aria-label="secuencia a memorizar" style={{fontSize:mayor?"2.2rem":"1.9rem",fontWeight:900,letterSpacing:10,padding:"30px 10px"}}>
           {trial.sequence.join("   ")}
         </div>
-        <p style={{fontSize:".7rem",color:COLORS.textMuted}}>No respondas todavía. Las opciones aparecerán cuando la secuencia desaparezca.</p>
+        <p style={{fontSize:"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>No respondas todavía. Las opciones aparecerán cuando la secuencia desaparezca.</p>
       </>}
 
       {phase==="answer" && <>
-        <div style={{padding:16,borderRadius:11,background:COLORS.bg,marginBottom:14,fontSize:mayor?".95rem":".78rem",fontWeight:700,lineHeight:1.55}}>
+        <div style={{padding:16,borderRadius:11,background:COLORS.bg,marginBottom:14,fontSize:mayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .78rem)",fontWeight:700,lineHeight:1.55}}>
           {trial.instruction}
         </div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:9}}>
@@ -9290,7 +9415,7 @@ function NFScreeningMemoryBlock({ paciente, onDone }) {
   },[phase]);
 
   if(phase==="study")return <div style={{maxWidth:860,margin:"0 auto"}}><Card style={{textAlign:"center",padding:mayor?38:32}}>
-    <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIA</div>
+    <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>MEMORIA</div>
     <h2>Recuerda estas palabras</h2>
     <Badge label={`${seconds}s`} color={COLORS.primary}/>
     <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginTop:22}}>
@@ -9318,12 +9443,12 @@ function NFScreeningDelayedMemory({ encodedWords, paciente, onDone }) {
     onDone({observations});
   };
   return <div style={{maxWidth:860,margin:"0 auto"}}><Card style={{padding:mayor?38:32}}>
-    <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>MEMORIA DIFERIDA</div>
+    <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>MEMORIA DIFERIDA</div>
     <h2>¿Qué palabras viste antes?</h2>
-    <p style={{fontSize:".75rem",color:COLORS.textMuted}}>Selecciona únicamente las palabras que recuerdas haber visto.</p>
+    <p style={{fontSize:"var(--nf-activity-meta, .75rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Selecciona únicamente las palabras que recuerdas haber visto.</p>
     <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:14,marginTop:22}}>
       {pool.map(w=><button key={w} onClick={()=>setSelected(x=>x.includes(w)?x.filter(y=>y!==w):[...x,w])}
-        style={{minHeight:64,padding:16,borderRadius:12,border:`2px solid ${selected.includes(w)?COLORS.primary:COLORS.border}`,background:"#fff",fontWeight:800,fontSize:mayor?"1rem":".88rem"}}>{w}</button>)}
+        style={{minHeight:64,padding:16,borderRadius:12,border:`2px solid ${selected.includes(w)?COLORS.primary:COLORS.border}`,background:"#fff",fontWeight:800,fontSize:mayor?"1rem":"var(--nf-activity-text, .88rem)"}}>{w}</button>)}
     </div>
     <BtnPrimary onClick={finish} style={{width:"100%",marginTop:14}}>Confirmar</BtnPrimary>
   </Card></div>;
@@ -9334,7 +9459,7 @@ function NFScreeningVisualMemory({ paciente, onDone }) {
   const pool=["●▲","■◆","▲□","◆○","●■","■▲","○◆","□▲"];
   const [phase,setPhase]=useState("study"),[seconds,setSeconds]=useState(8),[selected,setSelected]=useState([]);
   useEffect(()=>{if(phase!=="study")return;const tm=setInterval(()=>setSeconds(v=>{if(v<=1){clearInterval(tm);setPhase("recognition");return 0}return v-1}),1000);return()=>clearInterval(tm)},[phase]);
-  if(phase==="study")return <div style={{maxWidth:760,margin:"0 auto"}}><Card style={{textAlign:"center",padding:28}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>Memoria visual</div><h2>Memoriza las configuraciones</h2><Badge label={`${seconds}s`} color={COLORS.primary}/><div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:9,maxWidth:500,margin:"20px auto"}}>{targets.map(x=><div key={x} style={{padding:18,border:`1px solid ${COLORS.border}`,borderRadius:10,fontSize:mayor?"2.5rem":"2.15rem",minHeight:92,display:"grid",placeItems:"center"}}>{x}</div>)}</div></Card></div>;
+  if(phase==="study")return <div style={{maxWidth:760,margin:"0 auto"}}><Card style={{textAlign:"center",padding:28}}><div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>Memoria visual</div><h2>Memoriza las configuraciones</h2><Badge label={`${seconds}s`} color={COLORS.primary}/><div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:9,maxWidth:500,margin:"20px auto"}}>{targets.map(x=><div key={x} style={{padding:18,border:`1px solid ${COLORS.border}`,borderRadius:10,fontSize:mayor?"2.5rem":"2.15rem",minHeight:92,display:"grid",placeItems:"center"}}>{x}</div>)}</div></Card></div>;
   const finish=()=>{
     const set=new Set(targets);
     onDone({observations:pool.map(x=>({domainId:"memoria_visual",pass:set.has(x)?selected.includes(x):!selected.includes(x),valid:true,source:"Memoria visual breve",itemId:x}))});
@@ -9346,7 +9471,7 @@ function NFScreeningPraxias({ paciente, onDone }) {
   const items=["Haz el gesto de despedirte.","Muestra cómo usarías un peine sin tenerlo en la mano.","Representa cómo abrirías una puerta con una llave.","Muestra en orden cómo prepararías una bebida caliente."];
   const [idx,setIdx]=useState(0),rec=useRef([]);
   const rate=pass=>{rec.current.push(pass);if(idx+1>=items.length)onDone({observations:rec.current.map((x,i)=>({domainId:"praxias",pass:x,valid:true,source:"Observación práxica breve",itemId:`praxis${i+1}`}))});else setIdx(i=>i+1)};
-  return <div style={{maxWidth:860,margin:"0 auto"}}><Card style={{padding:mayor?38:32}}><div style={{fontSize:".68rem",fontWeight:800,color:COLORS.accent}}>OBSERVACIÓN PROFESIONAL</div><h2>Praxias</h2><p style={{fontWeight:700,fontSize:"1.05rem",lineHeight:1.6,textAlign:"center",padding:mayor?28:24,background:"#fff",border:`2px solid ${COLORS.border}`,borderRadius:14,minHeight:130,display:"flex",alignItems:"center",justifyContent:"center"}}>{items[idx]}</p><p style={{fontSize:".7rem",color:COLORS.textMuted}}>Registra la ejecución considerando comprensión, movilidad y limitaciones sensoriales.</p><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}><BtnSecondary onClick={()=>rate(false)}>Requiere revisión</BtnSecondary><BtnPrimary onClick={()=>rate(true)}>Adecuado</BtnPrimary></div></Card></div>;
+  return <div style={{maxWidth:860,margin:"0 auto"}}><Card style={{padding:mayor?38:32}}><div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.accent}}>OBSERVACIÓN PROFESIONAL</div><h2>Praxias</h2><p style={{fontWeight:700,fontSize:"1.05rem",lineHeight:1.6,textAlign:"center",padding:mayor?28:24,background:"#fff",border:`2px solid ${COLORS.border}`,borderRadius:14,minHeight:130,display:"flex",alignItems:"center",justifyContent:"center"}}>{items[idx]}</p><p style={{fontSize:"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Registra la ejecución considerando comprensión, movilidad y limitaciones sensoriales.</p><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}><BtnSecondary onClick={()=>rate(false)}>Requiere revisión</BtnSecondary><BtnPrimary onClick={()=>rate(true)}>Adecuado</BtnPrimary></div></Card></div>;
 }
 
 
@@ -9367,11 +9492,11 @@ class NFScreeningErrorBoundary extends React.Component {
         <Card style={{padding:30,textAlign:"center"}}>
           <div className="nf-task-ready-mark"><NFIcon name="alert" size={26}/></div>
           <h2 style={{margin:"8px 0"}}>No pudimos continuar este bloque</h2>
-          <p style={{fontSize:".76rem",lineHeight:1.6,color:COLORS.textMuted}}>
+          <p style={{fontSize:"var(--nf-activity-text, .76rem)",lineHeight:1.6,color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>
             Se produjo un error técnico dentro del tamizaje. La aplicación evitó dejar la pantalla en blanco.
             Sal del tamizaje y vuelve a iniciarlo después de revisar la incidencia.
           </p>
-          <div style={{padding:9,borderRadius:9,background:COLORS.bg,fontSize:".65rem",color:COLORS.textMuted,margin:"12px 0"}}>
+          <div style={{padding:9,borderRadius:9,background:COLORS.bg,fontSize:"var(--nf-activity-meta, .65rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",margin:"12px 0"}}>
             Incidencia técnica: {this.state.errorMessage}
           </div>
           <BtnPrimary onClick={this.props.onExit} style={{width:"100%"}}>Volver a evaluación</BtnPrimary>
@@ -9477,9 +9602,9 @@ function NeuroFlexScreeningProtocolV2({ paciente, familiarization, onSave, onExi
     const observe=finalRecord.domainSignals.filter(x=>x.status==="observe");
     return <div style={{maxWidth:920,margin:"0 auto"}}>
       <Card style={{marginBottom:14,border:`1px solid ${COLORS.primary}20`}}>
-        <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary}}>TAMIZAJE · {NEUROFLEX_PHASE62_3_SCREENING.version}</div>
+        <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary}}>TAMIZAJE · {NEUROFLEX_PHASE62_3_SCREENING.version}</div>
         <h2 style={{margin:"5px 0"}}>Resultado del tamizaje cognitivo</h2>
-        <p style={{fontSize:".75rem",color:COLORS.textMuted,lineHeight:1.6}}>Este resultado orienta qué áreas conviene explorar con mayor profundidad. No es diagnóstico, baremo ni sustituto de una evaluación clínica completa.</p>
+        <p style={{fontSize:"var(--nf-activity-meta, .75rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.6}}>Este resultado orienta qué áreas conviene explorar con mayor profundidad. No es diagnóstico, baremo ni sustituto de una evaluación clínica completa.</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:8}}>
           <div style={{padding:10,borderRadius:9,background:COLORS.bg}}><small>Señal para profundizar</small><strong style={{display:"block",fontSize:"1.3rem"}}>{review.length}</strong></div>
           <div style={{padding:10,borderRadius:9,background:COLORS.bg}}><small>Observación aislada</small><strong style={{display:"block",fontSize:"1.3rem"}}>{observe.length}</strong></div>
@@ -9489,11 +9614,11 @@ function NeuroFlexScreeningProtocolV2({ paciente, familiarization, onSave, onExi
       <Card>
         <div style={{display:"grid",gap:8}}>
           {finalRecord.domainSignals.map(d=><div key={d.domainId} style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",padding:"10px 11px",borderRadius:9,border:`1px solid ${COLORS.border}`}}>
-            <div><div style={{fontSize:".76rem",fontWeight:700}}>{d.label}</div><div style={{fontSize:".64rem",color:COLORS.textMuted}}>{d.observations} observaciones · {d.failed} con dificultad</div></div>
+            <div><div style={{fontSize:"var(--nf-activity-text, .76rem)",fontWeight:700}}>{d.label}</div><div style={{fontSize:"var(--nf-activity-meta, .64rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>{d.observations} observaciones · {d.failed} con dificultad</div></div>
             <Badge label={d.statusLabel} color={nfScreenStatusColor(d.status)}/>
           </div>)}
         </div>
-        <div style={{marginTop:12,padding:10,borderRadius:9,background:COLORS.primary+"07",fontSize:".67rem",color:COLORS.textMuted,lineHeight:1.5}}>
+        <div style={{marginTop:12,padding:10,borderRadius:9,background:COLORS.primary+"07",fontSize:"var(--nf-activity-meta, .67rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.5}}>
           Regla interna transparente: dos o más dificultades dentro del mismo dominio generan “señal para profundizar”; una dificultad aislada se conserva como observación. Esta regla es de triage interno y no constituye punto de corte clínico validado.
         </div>
         <ScreeningClinicalReviewV2 record={finalRecord}/>
@@ -9507,7 +9632,7 @@ function NeuroFlexScreeningProtocolV2({ paciente, familiarization, onSave, onExi
 
   if(step>=blocks.length)return <div style={{maxWidth:680,margin:"0 auto"}}><Card style={{textAlign:"center",padding:30}}>Integrando señales del tamizaje…</Card></div>;
   const current=blocks[step],progress=Math.round((step/blocks.length)*100);
-  return <div><div style={{maxWidth:760,margin:"0 auto 10px"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:".7rem",color:COLORS.textMuted,marginBottom:5}}><span>Tamizaje cognitivo · bloque {step+1} de {blocks.length}</span><span>{progress}%</span></div><ProgressBar value={progress} color={COLORS.primary}/></div>{current.comp}</div>;
+  return <div><div style={{maxWidth:760,margin:"0 auto 10px"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:5}}><span>Tamizaje cognitivo · bloque {step+1} de {blocks.length}</span><span>{progress}%</span></div><ProgressBar value={progress} color={COLORS.primary}/></div>{current.comp}</div>;
 }
 
 function PersonalizedAssessmentProtocolV2({ paciente, familiarization, selection, onSave, onExit }) {
@@ -9554,7 +9679,7 @@ function PersonalizedAssessmentProtocolV2({ paciente, familiarization, selection
   const progress=Math.round((completed/Math.max(1,taskIds.length))*100);
   if(current.type==="pause")return <AssessmentPauseScreen number={current.number} total={current.total || 1} onContinue={data=>{setPauses(p=>[...p,data]);if(data.interruptionNote)setInterruptions(x=>[...x,{...data,type:"pause_interruption"}]);advance()}}/>;
 
-  const wrapper=child=><div><div style={{maxWidth:760,margin:"0 auto 12px"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:".72rem",color:COLORS.textMuted,marginBottom:6}}><span>Evaluación personalizada · {completed}/{taskIds.length} tareas registradas</span><span>{progress}%</span></div><ProgressBar value={progress} color={COLORS.primary}/></div>{child}</div>;
+  const wrapper=child=><div><div style={{maxWidth:760,margin:"0 auto 12px"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:"var(--nf-activity-meta, .72rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:6}}><span>Evaluación personalizada · {completed}/{taskIds.length} tareas registradas</span><span>{progress}%</span></div><ProgressBar value={progress} color={COLORS.primary}/></div>{child}</div>;
   if(current.id==="NF-E09-encode")return wrapper(<NFE09LearningPhase paciente={paciente} onEncoded={data=>{setVerbalMemory(data);advance()}}/>);
   if(current.id==="NF-E11-encode")return wrapper(<NFE11ProspectiveEncode paciente={paciente} onEncoded={data=>{setProspective(data);advance()}}/>);
   if(current.id==="NF-E09-delayed")return wrapper(<NFE09DelayedPhase paciente={paciente} memoryData={verbalMemory} onDone={pushResult}/>);
@@ -11960,7 +12085,7 @@ function SelectiveReassessmentProtocolV2({ paciente, familiarization, onSave, on
     return <div style={{maxWidth:680,margin:"0 auto"}}><Card style={{textAlign:"center",padding:32}}>
       <div className="nf-task-ready-mark"><NFLineIcon name="perception" size={26}/></div>
       <h3 style={{margin:"0 0 8px"}}>No hay una reevaluación selectiva sugerida</h3>
-      <p style={{fontSize:".78rem",lineHeight:1.6,color:COLORS.textMuted}}>{plan.reason}</p>
+      <p style={{fontSize:"var(--nf-activity-text, .78rem)",lineHeight:1.6,color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>{plan.reason}</p>
       <BtnSecondary onClick={onExit}>Volver</BtnSecondary>
     </Card></div>;
   }
@@ -11975,7 +12100,7 @@ function SelectiveReassessmentProtocolV2({ paciente, familiarization, onSave, on
 
   const item=sequence[step];
   const progress=Math.round((step/Math.max(1,sequence.length))*100);
-  const wrap=child=><div><div style={{maxWidth:760,margin:"0 auto 12px"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:".7rem",color:COLORS.textMuted,marginBottom:5}}><span>Reevaluación selectiva · {plan.taskIds.length} tareas objetivo</span><span>{progress}%</span></div><ProgressBar value={progress}/></div>{child}</div>;
+  const wrap=child=><div><div style={{maxWidth:760,margin:"0 auto 12px"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:5}}><span>Reevaluación selectiva · {plan.taskIds.length} tareas objetivo</span><span>{progress}%</span></div><ProgressBar value={progress}/></div>{child}</div>;
 
   if(item.id==="NF-E09-encode")return wrap(<NFE09LearningPhase paciente={paciente} onEncoded={data=>{setVerbalMemory(data);setStep(s=>s+1)}}/>);
   if(item.id==="NF-E09-delayed")return wrap(<NFE09DelayedPhase paciente={paciente} memoryData={verbalMemory} onDone={pushResult}/>);
@@ -12023,18 +12148,18 @@ function SelectiveReassessmentSuggestionCard({ paciente, onStart }) {
         <h3>{plan.recommended?"Hay áreas candidatas para reevaluación":"Seguimiento sin indicación selectiva actual"}</h3>
       </div>
     </div>
-    <p style={{fontSize:".73rem",lineHeight:1.55,color:COLORS.textMuted,margin:"0 0 10px"}}>{plan.reason}</p>
-    {plan.mappingReviewRequired && <div style={{fontSize:".7rem",padding:9,borderRadius:8,background:COLORS.bg,marginBottom:10,color:COLORS.textSecond}}>
+    <p style={{fontSize:"var(--nf-activity-meta, .73rem)",lineHeight:1.55,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",margin:"0 0 10px"}}>{plan.reason}</p>
+    {plan.mappingReviewRequired && <div style={{fontSize:"var(--nf-activity-meta, .7rem)",padding:9,borderRadius:8,background:COLORS.bg,marginBottom:10,color:COLORS.textSecond}}>
       <strong>Revisión de mapeo requerida.</strong> Áreas sin correspondencia segura: {(plan.unmappedTreatmentDomainIds||[]).map(id=>DOMINIOS_ADULTO[id]?.label || id).join(", ")}.
     </div>}
     {plan.recommended&&<>
-      <div style={{fontSize:".71rem",color:COLORS.textSecond,marginBottom:5}}>
+      <div style={{fontSize:"var(--nf-activity-meta, .71rem)",color:COLORS.textSecond,marginBottom:5}}>
         Áreas terapéuticas que activaron la revisión: {(plan.triggerTreatmentDomainIds||[]).map(id=>DOMINIOS_ADULTO[id]?.label || id).join(", ") || "—"}
       </div>
-      <div style={{fontSize:".71rem",color:COLORS.textSecond,marginBottom:8}}>
+      <div style={{fontSize:"var(--nf-activity-meta, .71rem)",color:COLORS.textSecond,marginBottom:8}}>
         Dominios de evaluación resultantes: {(plan.assessmentDomainIds||[]).map(id=>ASSESSMENT_DOMAINS_V2[id]?.label || id).join(", ") || "—"}
       </div>
-      <div style={{fontSize:".69rem",color:COLORS.textMuted,marginBottom:12}}>
+      <div style={{fontSize:"var(--nf-activity-meta, .69rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:12}}>
         Tareas sugeridas: {plan.taskIds.join(", ")} · ~{plan.estimatedMinutes} min
       </div>
       <BtnPrimary onClick={onStart} style={{width:"100%"}}>Iniciar reevaluación selectiva</BtnPrimary>
@@ -12206,9 +12331,9 @@ function LongitudinalV2ReportOverview({ paciente }) {
   const comparability=buildLongitudinalComparabilitySummaryV2(paciente);
 
   return <section style={{marginBottom:22,padding:14,border:"1px solid #dfe3ea",borderRadius:10,background:"#fbfcfe"}}>
-    <div style={{fontSize:".68rem",fontWeight:800,color:"#5b5bd6",letterSpacing:".05em"}}>SEGUIMIENTO COGNITIVO</div>
+    <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:"#5b5bd6",letterSpacing:".05em"}}>SEGUIMIENTO COGNITIVO</div>
     <h3 style={{fontSize:"1rem",margin:"5px 0 8px"}}>Integración longitudinal de la evaluación</h3>
-    <p style={{fontSize:".73rem",lineHeight:1.55,color:"#667085",margin:"0 0 12px"}}>
+    <p style={{fontSize:"var(--nf-activity-meta, .73rem)",lineHeight:1.55,color:"#667085",margin:"0 0 12px"}}>
       Resume la trayectoria entre línea base, intervención y reevaluaciones selectivas. Las diferencias son descriptivas y no constituyen por sí solas evidencia de cambio clínicamente significativo.
     </p>
 
@@ -12219,38 +12344,38 @@ function LongitudinalV2ReportOverview({ paciente }) {
         ["Reevaluaciones",timeline.reassessments.length],
         ["Eventos trazados",timeline.events.length],
       ].map(([label,value])=><div key={label} style={{padding:9,border:"1px solid #eceef3",borderRadius:8,textAlign:"center",background:"#fff"}}>
-        <div style={{fontWeight:900}}>{value}</div><div style={{fontSize:".64rem",color:"#667085"}}>{label}</div>
+        <div style={{fontWeight:900}}>{value}</div><div style={{fontSize:"var(--nf-activity-meta, .64rem)",color:"#667085"}}>{label}</div>
       </div>)}
     </div>
 
     {comparability.linkedReassessments>0 && <div style={{marginBottom:12,padding:10,border:"1px solid #eceef3",borderRadius:8,background:"#fff"}}>
-      <div style={{fontWeight:800,fontSize:".76rem",marginBottom:6}}>Comparabilidad longitudinal</div>
+      <div style={{fontWeight:800,fontSize:"var(--nf-activity-text, .76rem)",marginBottom:6}}>Comparabilidad longitudinal</div>
       <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
         <Badge label={`${comparability.exactComparisons} comparación(es) exacta(s)`} color={COLORS.success}/>
         {comparability.versionMismatch>0 && <Badge label={`${comparability.versionMismatch} con versión diferente`} color={COLORS.warning}/>}
         {comparability.uncertainLegacy>0 && <Badge label={`${comparability.uncertainLegacy} sin versión suficiente`} color={COLORS.warning}/>}
       </div>
-      <p style={{fontSize:".67rem",color:"#667085",lineHeight:1.5,margin:"7px 0 0"}}>
+      <p style={{fontSize:"var(--nf-activity-meta, .67rem)",color:"#667085",lineHeight:1.5,margin:"7px 0 0"}}>
         Solo las comparaciones con la misma tarea y versión administrada se utilizan para describir diferencias cuantitativas.
       </p>
     </div>}
 
     <div style={{marginBottom:12}}>
-      <div style={{fontWeight:800,fontSize:".78rem",marginBottom:6}}>Cronología reciente</div>
+      <div style={{fontWeight:800,fontSize:"var(--nf-activity-text, .78rem)",marginBottom:6}}>Cronología reciente</div>
       {recentEvents.map((e,i)=><div key={`${e.id}_${i}`} style={{display:"grid",gridTemplateColumns:"95px 1fr",gap:8,padding:"5px 0",borderBottom:"1px solid #eceef3"}}>
-        <div style={{fontSize:".66rem",color:"#667085"}}>{e.date?new Date(e.date).toLocaleDateString("es"):"—"}</div>
-        <div><strong style={{fontSize:".7rem"}}>{e.title}</strong><div style={{fontSize:".67rem",color:"#667085"}}>{e.detail}</div></div>
+        <div style={{fontSize:"var(--nf-activity-meta, .66rem)",color:"#667085"}}>{e.date?new Date(e.date).toLocaleDateString("es"):"—"}</div>
+        <div><strong style={{fontSize:"var(--nf-activity-meta, .7rem)"}}>{e.title}</strong><div style={{fontSize:"var(--nf-activity-meta, .67rem)",color:"#667085"}}>{e.detail}</div></div>
       </div>)}
     </div>
 
     {timeline.reassessments.length>0 && <div>
-      <div style={{fontWeight:800,fontSize:".78rem",marginBottom:6}}>Cambios selectivos por dominio</div>
+      <div style={{fontWeight:800,fontSize:"var(--nf-activity-text, .78rem)",marginBottom:6}}>Cambios selectivos por dominio</div>
       {domainRows.filter(r=>r.latestSelective).map(r=>{
         const c=r.latestSelective;
         const label=c.direction==="higher"?"Mayor en última reevaluación":c.direction==="lower"?"Menor en última reevaluación":c.direction==="same"?"Sin cambio":c.direction==="mixed"?"Cambio mixto":"Evidencia insuficiente";
         return <div key={r.domainId} style={{display:"flex",justifyContent:"space-between",gap:10,padding:"6px 0",borderBottom:"1px solid #eceef3"}}>
-          <span style={{fontSize:".7rem",fontWeight:700}}>{r.label}</span>
-          <span style={{fontSize:".67rem",color:"#667085"}}>{label}{nfFinite(c.meanTaskDelta)?` · ${c.meanTaskDelta>0?"+":""}${c.meanTaskDelta} pts`:""}</span>
+          <span style={{fontSize:"var(--nf-activity-meta, .7rem)",fontWeight:700}}>{r.label}</span>
+          <span style={{fontSize:"var(--nf-activity-meta, .67rem)",color:"#667085"}}>{label}{nfFinite(c.meanTaskDelta)?` · ${c.meanTaskDelta>0?"+":""}${c.meanTaskDelta} pts`:""}</span>
         </div>
       })}
     </div>}
@@ -12264,14 +12389,14 @@ function SessionFollowUpReportBlock({ sesion }) {
   if(!follow?.domainFollowUp?.length) return null;
   return <section style={{marginTop:20,marginBottom:20}}>
     <h3 style={{fontSize:"1rem",marginBottom:8}}>Seguimiento terapéutico posterior a la sesión</h3>
-    <p style={{fontSize:".72rem",color:"#667085",lineHeight:1.5}}>
+    <p style={{fontSize:"var(--nf-activity-meta, .72rem)",color:"#667085",lineHeight:1.5}}>
       Snapshot generado al guardar la sesión. No modifica automáticamente objetivos ni prescripción.
     </p>
     {follow.domainFollowUp.map(d=>{
       const a=nfFollowUpActionLabel(d.action);
       return <div key={d.domainId} style={{display:"flex",justifyContent:"space-between",gap:10,padding:"7px 0",borderBottom:"1px solid #eceef3"}}>
-        <span style={{fontSize:".72rem",fontWeight:700}}>{DOMINIOS_ADULTO[d.domainId]?.label || d.domainId}</span>
-        <span style={{fontSize:".68rem",color:a.color}}>{a.label}</span>
+        <span style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:700}}>{DOMINIOS_ADULTO[d.domainId]?.label || d.domainId}</span>
+        <span style={{fontSize:"var(--nf-activity-meta, .68rem)",color:a.color}}>{a.label}</span>
       </div>
     })}
   </section>;
@@ -12449,8 +12574,8 @@ function AssessmentVersionTracePanelV2({ evalData }) {
     <details>
       <summary style={{cursor:"pointer",listStyle:"none",display:"flex",justifyContent:"space-between",gap:10,alignItems:"center"}}>
         <div>
-          <div style={{fontSize:".68rem",fontWeight:800,color:COLORS.primary,letterSpacing:".05em"}}>FASE 47 · {trace.policyVersion}</div>
-          <div style={{fontWeight:800,fontSize:".86rem",marginTop:3}}>Trazabilidad de versiones</div>
+          <div style={{fontSize:"var(--nf-activity-meta, .68rem)",fontWeight:800,color:COLORS.primary,letterSpacing:".05em"}}>FASE 47 · {trace.policyVersion}</div>
+          <div style={{fontWeight:800,fontSize:"var(--nf-activity-text, .86rem)",marginTop:3}}>Trazabilidad de versiones</div>
         </div>
         <Badge
           label={trace.complete?"Versiones registradas":`${trace.missingCount} sin versión`}
@@ -12458,7 +12583,7 @@ function AssessmentVersionTracePanelV2({ evalData }) {
         />
       </summary>
       <div style={{paddingTop:12,marginTop:12,borderTop:`1px solid ${COLORS.border}`}}>
-        <p style={{fontSize:".72rem",color:COLORS.textMuted,lineHeight:1.55,margin:"0 0 10px"}}>
+        <p style={{fontSize:"var(--nf-activity-meta, .72rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.55,margin:"0 0 10px"}}>
           Esta información protege la comparabilidad longitudinal. Si una tarea cambia de estímulos, reglas, temporización o forma de respuesta, debe conservar una nueva versión administrada.
         </p>
         <div style={{display:"flex",gap:7,flexWrap:"wrap",marginBottom:10}}>
@@ -12469,11 +12594,11 @@ function AssessmentVersionTracePanelV2({ evalData }) {
         </div>
         <div style={{display:"grid",gap:6,maxHeight:320,overflowY:"auto"}}>
           {trace.rows.map(r=><div key={r.taskId} style={{display:"grid",gridTemplateColumns:"90px 1fr auto",gap:8,alignItems:"center",padding:"7px 9px",borderRadius:8,background:COLORS.bg}}>
-            <strong style={{fontSize:".68rem"}}>{r.taskId}</strong>
-            <div style={{fontSize:".68rem",color:COLORS.textSecond}}>
+            <strong style={{fontSize:"var(--nf-activity-meta, .68rem)"}}>{r.taskId}</strong>
+            <div style={{fontSize:"var(--nf-activity-meta, .68rem)",color:COLORS.textSecond}}>
               {r.taskName} · {r.administeredVersionId || "versión administrada no registrada"}
             </div>
-            <span style={{fontSize:".64rem",fontWeight:700,color:r.traceStatus==="missing"?COLORS.warning:r.traceStatus==="custom_or_newer"?COLORS.accent:COLORS.success}}>
+            <span style={{fontSize:"var(--nf-activity-meta, .64rem)",fontWeight:700,color:r.traceStatus==="missing"?COLORS.warning:r.traceStatus==="custom_or_newer"?COLORS.accent:COLORS.success}}>
               {r.traceStatus==="missing"?"REVISAR":r.traceStatus==="custom_or_newer"?"VARIANTE":"OK"}
             </span>
           </div>)}
@@ -12880,15 +13005,15 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
       <Card className="nf-workspace-familiarization" style={{ padding: mayor ? 32 : 26 }}>
         <div style={{ display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",marginBottom:18 }}>
           <div>
-            <div style={{ fontSize:".72rem",fontWeight:800,color:COLORS.primary,letterSpacing:".04em",textTransform:"uppercase" }}>
+            <div style={{ fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary,letterSpacing:".04em",textTransform:"uppercase" }}>
               Familiarización · No puntuable
             </div>
             <h2 style={{ margin:"5px 0 6px",fontSize:mayor?"1.45rem":"1.25rem" }}>{current.title}</h2>
-            <p style={{ margin:0,color:"#405574",lineHeight:1.6,fontSize:mayor?"1.05rem":".95rem" }}>
+            <p style={{ margin:0,color:"#405574",lineHeight:1.6,fontSize:mayor?"1.05rem":"var(--nf-activity-text, .95rem)" }}>
               {current.instruction}
             </p>
           </div>
-          <div style={{ fontSize:".76rem",color:"#405574",whiteSpace:"nowrap" }}>{step+1}/{steps.length}</div>
+          <div style={{ fontSize:"var(--nf-activity-text, .76rem)",color:"#405574",whiteSpace:"nowrap" }}>{step+1}/{steps.length}</div>
         </div>
 
         <ProgressBar value={Math.round(((step + 1) / steps.length) * 100)} color={COLORS.primary} />
@@ -12928,7 +13053,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                   }}
                 >
                   <div style={{ fontSize:mayor?"2rem":"1.65rem",lineHeight:1 }}>{opt.shape}</div>
-                  <div style={{ marginTop:7,fontSize:mayor?".95rem":".8rem",fontWeight:700 }}>{opt.label}</div>
+                  <div style={{ marginTop:7,fontSize:mayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",fontWeight:700 }}>{opt.label}</div>
                 </button>
               ))}
             </div>
@@ -12948,7 +13073,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                 }}
               >
                 ↔ Tarjeta
-                <div style={{fontSize:".7rem",color:"#405574",marginTop:5}}>Arrastra o toca</div>
+                <div style={{fontSize:"var(--nf-activity-meta, .7rem)",color:"#405574",marginTop:5}}>Arrastra o toca</div>
               </div>
               <div
                 onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -12999,7 +13124,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 
               {!speechAvailable && heard && (
                 <div style={{padding:14,borderRadius:11,background:COLORS.bg,border:`1px solid ${COLORS.border}`}}>
-                  <p style={{fontSize:".76rem",color:"#405574",lineHeight:1.5,margin:"0 0 10px"}}>
+                  <p style={{fontSize:"var(--nf-activity-text, .76rem)",color:"#405574",lineHeight:1.5,margin:"0 0 10px"}}>
                     El audio no está disponible en este dispositivo. Para familiarización solamente, usa esta instrucción visual:
                     <strong> toca el triángulo rojo.</strong>
                   </p>
@@ -13008,7 +13133,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
               )}
 
               {listenChoice && listenChoice!=="redTriangle" && (
-                <p style={{fontSize:".76rem",color:"#405574",margin:"12px 0 0"}}>
+                <p style={{fontSize:"var(--nf-activity-text, .76rem)",color:"#405574",margin:"12px 0 0"}}>
                   Inténtalo nuevamente. Puedes volver a escuchar la instrucción. Esta práctica no puntúa.
                 </p>
               )}
@@ -13039,7 +13164,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                 Confirmar respuesta
               </BtnPrimary>
               {response && response !== "AZUL" && (
-                <p style={{fontSize:".76rem",color:"#405574",textAlign:"center",marginBottom:0}}>
+                <p style={{fontSize:"var(--nf-activity-text, .76rem)",color:"#405574",textAlign:"center",marginBottom:0}}>
                   Prueba nuevamente. Esta práctica no afecta ningún resultado.
                 </p>
               )}
@@ -13061,7 +13186,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
             }}
             style={{
               border:"none",background:"transparent",color:"#405574",
-              textDecoration:"underline",cursor:"pointer",fontSize:".74rem"
+              textDecoration:"underline",cursor:"pointer",fontSize:"var(--nf-activity-meta, .74rem)"
             }}
           >
             Omitir por decisión profesional
@@ -13201,7 +13326,7 @@ function ContenidoEvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }
             ["phase38", "Cognición funcional"],
           ].map(([path, label]) => (
             <BtnSecondary key={path} onClick={() => { setEvaluationPath(path); setPhase("familiarization"); }}
-              style={{ fontSize: ".98rem", lineHeight: 1.35, padding: "8px 12px" }}>
+              style={{ fontSize: "var(--nf-activity-text, .98rem)", lineHeight: 1.35, padding: "8px 12px" }}>
               {label}
             </BtnSecondary>
           ))}
@@ -13209,7 +13334,7 @@ function ContenidoEvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }
       </details>
 
       <div className="nf-route-picker__footer">
-        <BtnSecondary onClick={onCancel} style={{ fontSize: ".98rem" }}>Cancelar</BtnSecondary>
+        <BtnSecondary onClick={onCancel} style={{ fontSize: "var(--nf-activity-text, .98rem)" }}>Cancelar</BtnSecondary>
       </div>
     </section>
   );
@@ -13340,16 +13465,16 @@ function ContenidoEvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }
       <Card style={{ textAlign: "center", padding: 40 }}>
         <div className="nf-eval-complete-mark"><NFIcon name="check" size={28}/></div>
         <h2 style={{ fontWeight: 700, marginBottom: 8 }}>Evaluación completada</h2>
-        <p style={{ color: COLORS.textMuted, marginBottom: 24 }}>Todos los dominios han sido evaluados correctamente.</p>
+        <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginBottom: 24 }}>Todos los dominios han sido evaluados correctamente.</p>
         <div style={{ marginBottom: 24 }}>
           {Object.entries(results).map(([id, r]) => {
             const dom = DOMINIOS_ADULTO[id];
             return (
               <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${COLORS.border}` }}>
-                <span style={{ fontSize: ".88rem" }}><span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span></span>
+                <span style={{ fontSize: "var(--nf-activity-text, .88rem)" }}><span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span></span>
                 {typeof r.pct === "number"
                   ? <span style={{ fontWeight: 700, color: gradeColor(r.pct) }}>{r.pct}%</span>
-                  : <span style={{ fontSize: ".75rem", color: COLORS.accent, fontWeight: 600 }}>Valoración profesional</span>}
+                  : <span style={{ fontSize: "var(--nf-activity-meta, .75rem)", color: COLORS.accent, fontWeight: 600 }}>Valoración profesional</span>}
               </div>
             );
           })}
@@ -13380,8 +13505,8 @@ function ContenidoEvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }
       {/* Progress header */}
       <Card className="nf-eval-progress-card" style={{ marginBottom: 16, padding: "14px 18px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <span style={{ fontSize: ".82rem", color: COLORS.textMuted }}>Dominio {domIdx + 1} de {dominios.length}</span>
-          <span style={{ fontSize: ".82rem", fontWeight: 600, color: COLORS.primary }}>{progress}%</span>
+          <span style={{ fontSize: "var(--nf-activity-text, .82rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")" }}>Dominio {domIdx + 1} de {dominios.length}</span>
+          <span style={{ fontSize: "var(--nf-activity-text, .82rem)", fontWeight: 600, color: COLORS.primary }}>{progress}%</span>
         </div>
         <ProgressBar value={progress} color={COLORS.primary} />
       </Card>
@@ -13392,13 +13517,13 @@ function ContenidoEvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }
           <div className="nf-eval-domain-head__icon" style={{color:dom.color}}><NFLineIcon name={dom.icon || "default"} size={19}/></div>
           <div>
             <p style={{ fontWeight: 700, margin: 0 }}>{dom.label}</p>
-            <p style={{ color: COLORS.textMuted, fontSize: ".78rem", margin: 0 }}>{curEx?.nombre}</p>
+            <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: "var(--nf-activity-text, .78rem)", margin: 0 }}>{curEx?.nombre}</p>
           </div>
         </div>
 
         {/* Instrucción */}
         <div className="nf-eval-instruction">
-          <p style={{ margin: 0, fontSize: ".88rem", color: COLORS.primary, fontWeight: 500, display:"flex", alignItems:"flex-start", gap:8 }}><NFLineIcon name="plan" size={17}/><span>{curEx?.instruccion}</span></p>
+          <p style={{ margin: 0, fontSize: "var(--nf-activity-text, .88rem)", color: COLORS.primary, fontWeight: 500, display:"flex", alignItems:"flex-start", gap:8 }}><NFLineIcon name="plan" size={17}/><span>{curEx?.instruccion}</span></p>
         </div>
 
         {/* Exercise */}
@@ -18102,7 +18227,7 @@ function DemoScreen({ exId, onContinuar, mayor }) {
           <h3 style={{ fontWeight: 700, fontSize: mayor ? "1.3rem" : "1.1rem", marginBottom: 4 }}>
             Cómo hacer: {demo.titulo}
           </h3>
-          <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".9rem" : ".78rem" }}>
+          <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: mayor ? "var(--nf-activity-text, .9rem)" : "var(--nf-activity-text, .78rem)" }}>
             Sigue estos pasos
           </p>
         </div>
@@ -18113,7 +18238,7 @@ function DemoScreen({ exId, onContinuar, mayor }) {
             <div key={i} className="nf-demo-step">
               <span className="nf-demo-step__num">{i + 1}</span>
               <div>
-                <span style={{ fontSize: mayor ? "1rem" : ".9rem", color: COLORS.textPrimary, fontWeight: 500, lineHeight: 1.5 }}>
+                <span style={{ fontSize: mayor ? "1rem" : "var(--nf-activity-text, .9rem)", color: COLORS.textPrimary, fontWeight: 500, lineHeight: 1.5 }}>
                   <strong style={{ color: COLORS.primary }}>Paso {i + 1}:</strong> {paso.texto}
                 </span>
               </div>
@@ -18124,20 +18249,20 @@ function DemoScreen({ exId, onContinuar, mayor }) {
         {/* Ejemplo */}
         {demo.ejemplo && (
           <div style={{ background: COLORS.primary + "08", borderRadius: 14, padding: mayor ? "18px 20px" : "14px 16px", marginBottom: 24, border: `1px solid ${COLORS.primary}20` }}>
-            <p style={{ fontWeight: 700, fontSize: mayor ? ".95rem" : ".82rem", color: COLORS.primary, marginBottom: 10, display:"flex",alignItems:"center",gap:7 }}><NFIcon name="example" size={17}/>Ejemplo</p>
+            <p style={{ fontWeight: 700, fontSize: mayor ? "var(--nf-activity-text, .95rem)" : "var(--nf-activity-text, .82rem)", color: COLORS.primary, marginBottom: 10, display:"flex",alignItems:"center",gap:7 }}><NFIcon name="example" size={17}/>Ejemplo</p>
             <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
               <div style={{ background: COLORS.white, borderRadius: 10, padding: "8px 14px", border: `1px solid ${COLORS.border}` }}>
-                <p style={{ margin: 0, fontSize: mayor ? "1rem" : ".85rem", color: COLORS.textSecond }}>{demo.ejemplo.muestra}</p>
+                <p style={{ margin: 0, fontSize: mayor ? "1rem" : "var(--nf-activity-text, .85rem)", color: COLORS.textSecond }}>{demo.ejemplo.muestra}</p>
               </div>
-              <span style={{ color: COLORS.textMuted, fontSize: "1.2rem" }}>→</span>
+              <span style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: "1.2rem" }}>→</span>
               <div style={{ background: COLORS.success + "12", borderRadius: 10, padding: "8px 14px", border: `1px solid ${COLORS.success}30` }}>
-                <p style={{ margin: 0, fontSize: mayor ? "1rem" : ".85rem", color: COLORS.success, fontWeight: 600 }}>{demo.ejemplo.respuesta}</p>
+                <p style={{ margin: 0, fontSize: mayor ? "1rem" : "var(--nf-activity-text, .85rem)", color: COLORS.success, fontWeight: 600 }}>{demo.ejemplo.respuesta}</p>
               </div>
             </div>
           </div>
         )}
 
-        <BtnPrimary onClick={onContinuar} style={{ width: "100%", padding: mayor ? "18px" : "14px", fontSize: mayor ? "1.1rem" : ".95rem" }}>
+        <BtnPrimary onClick={onContinuar} style={{ width: "100%", padding: mayor ? "18px" : "14px", fontSize: mayor ? "1.1rem" : "var(--nf-activity-text, .95rem)" }}>
           Entendido, comenzar
         </BtnPrimary>
       </Card>
@@ -18367,7 +18492,7 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
       <Card style={{ marginBottom: 18 }}>
         <h2 style={{ fontWeight: 800, marginBottom: 5,display:"flex",alignItems:"center",gap:8 }}><NFLineIcon name="plan" size={21}/>Prescripción de sesión</h2>
-        <p style={{ color: COLORS.textMuted, fontSize: ".84rem", lineHeight: 1.55, margin: 0 }}>
+        <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: "var(--nf-activity-text, .84rem)", lineHeight: 1.55, margin: 0 }}>
           NeuroFlex preparó una propuesta. Revísala antes de iniciar: puedes cambiar el orden, sustituir un ejercicio o ajustar su nivel.
            La propuesta prioriza los objetivos definidos a partir de la evaluación cognitiva y del seguimiento reciente.
         </p>
@@ -18377,7 +18502,7 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
           <Badge label={`${liveVariety.distinctMechanics} mecánicas`} color={COLORS.success}/>
           <Badge label="Revisión profesional requerida" color={COLORS.accent}/>
         </div>
-        <div style={{marginTop:10,padding:"10px 12px",borderRadius:10,background:COLORS.bg,border:`1px solid ${COLORS.border}`,fontSize:".72rem",color:COLORS.textMuted,lineHeight:1.55}}>
+        <div style={{marginTop:10,padding:"10px 12px",borderRadius:10,background:COLORS.bg,border:`1px solid ${COLORS.border}`,fontSize:"var(--nf-activity-meta, .72rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.55}}>
           <strong style={{color:COLORS.textSecond}}>Curva de sesión:</strong> entrada → núcleo → complemento → cierre · {liveStructure.distinctAssessmentDomains} objetivo(s) cognitivo(s) · ~{liveReview.minutes} min.
           <div style={{marginTop:5}}>
             Variedad: {liveVariety.distinctModalities} modalidad(es) · {liveVariety.distinctMechanics} mecánica(s) · {liveVariety.distinctResponseTypes} tipo(s) de respuesta.
@@ -18388,13 +18513,13 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
             {liveCurve.balanced?" Curva terapéutica adecuada.":" Requiere revisión de la progresión."}
           </div>
         </div>
-        {config?.therapeuticPrescriptionBlueprint?.longitudinalAdaptation && <div style={{marginTop:8,padding:"9px 11px",borderRadius:9,background:COLORS.primary+"06",border:`1px solid ${COLORS.primary}18`,fontSize:".7rem",color:COLORS.textSecond,lineHeight:1.5}}>
+        {config?.therapeuticPrescriptionBlueprint?.longitudinalAdaptation && <div style={{marginTop:8,padding:"9px 11px",borderRadius:9,background:COLORS.primary+"06",border:`1px solid ${COLORS.primary}18`,fontSize:"var(--nf-activity-meta, .7rem)",color:COLORS.textSecond,lineHeight:1.5}}>
           <strong>Adaptación longitudinal activa.</strong> NeuroFlex compara el desempeño reciente para sugerir mantener, progresar o reducir carga. Los cambios no se aplican fuera de esta propuesta y requieren tu confirmación.
         </div>}
       </Card>
 
       <div style={{display:"flex",gap:7,flexWrap:"wrap",margin:"-5px 0 14px"}}>
-        {["Reordenar","Sustituir","Nivel 1–5"].map(x=><span key={x} style={{padding:"5px 8px",borderRadius:999,background:COLORS.bg,border:`1px solid ${COLORS.border}`,fontSize:".68rem",color:COLORS.textMuted}}>{x}</span>)}
+        {["Reordenar","Sustituir","Nivel 1–5"].map(x=><span key={x} style={{padding:"5px 8px",borderRadius:999,background:COLORS.bg,border:`1px solid ${COLORS.border}`,fontSize:"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>{x}</span>)}
       </div>
       <Card style={{ marginBottom: 18, background: COLORS.primary + "06", border: `1px solid ${COLORS.primary}18` }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(125px, 1fr))", gap: 10 }}>
@@ -18406,7 +18531,7 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
           ].map(([label, value]) => (
             <div key={label} style={{ textAlign: "center", padding: 10, background: COLORS.white, borderRadius: 10 }}>
               <div style={{ fontWeight: 900, color: COLORS.primary, fontSize: "1.15rem" }}>{value}</div>
-              <div style={{ fontSize: ".68rem", color: COLORS.textMuted }}>{label}</div>
+              <div style={{ fontSize: "var(--nf-activity-meta, .68rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")" }}>{label}</div>
             </div>
           ))}
         </div>
@@ -18427,15 +18552,15 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: ".92rem" }}><span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span></div>
-                      <div style={{ fontSize: ".75rem", color: COLORS.textMuted, marginTop: 2 }}>
+                      <div style={{ fontWeight: 800, fontSize: "var(--nf-activity-text, .92rem)" }}><span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span></div>
+                      <div style={{ fontSize: "var(--nf-activity-meta, .75rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginTop: 2 }}>
                         {meta?.subcomponente || "Subcomponente no especificado"}
                       </div>
                       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:7}}>
-                        <span style={{padding:"3px 7px",borderRadius:999,background:COLORS.primary+"0A",color:COLORS.primary,fontSize:".62rem",fontWeight:800,textTransform:"capitalize"}}>{item.sessionRole==="complementario"?"complemento":item.sessionRole}</span>
-                        <span style={{padding:"3px 7px",borderRadius:999,background:COLORS.bg,color:COLORS.textMuted,fontSize:".62rem",fontWeight:700,textTransform:"capitalize"}}>{nfSessionVarietyProfile(item.exId).modality.replaceAll("_"," ")}</span>
-                        <span style={{padding:"3px 7px",borderRadius:999,background:COLORS.bg,color:COLORS.textMuted,fontSize:".62rem",fontWeight:700}}>{nfSessionVarietyProfile(item.exId).mechanic.replaceAll("_"," ")}</span>
-                        <span style={{padding:"3px 7px",borderRadius:999,background:nfF64CurveLabel(nfF64EffectiveLoad(item)).tone+"12",color:nfF64CurveLabel(nfF64EffectiveLoad(item)).tone,fontSize:".62rem",fontWeight:800}}>{nfF64CurveLabel(nfF64EffectiveLoad(item)).label} · {nfF64EffectiveLoad(item).toFixed(1)}</span>
+                        <span style={{padding:"3px 7px",borderRadius:999,background:COLORS.primary+"0A",color:COLORS.primary,fontSize:"var(--nf-activity-meta, .62rem)",fontWeight:800,textTransform:"capitalize"}}>{item.sessionRole==="complementario"?"complemento":item.sessionRole}</span>
+                        <span style={{padding:"3px 7px",borderRadius:999,background:COLORS.bg,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-meta, .62rem)",fontWeight:700,textTransform:"capitalize"}}>{nfSessionVarietyProfile(item.exId).modality.replaceAll("_"," ")}</span>
+                        <span style={{padding:"3px 7px",borderRadius:999,background:COLORS.bg,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-meta, .62rem)",fontWeight:700}}>{nfSessionVarietyProfile(item.exId).mechanic.replaceAll("_"," ")}</span>
+                        <span style={{padding:"3px 7px",borderRadius:999,background:nfF64CurveLabel(nfF64EffectiveLoad(item)).tone+"12",color:nfF64CurveLabel(nfF64EffectiveLoad(item)).tone,fontSize:"var(--nf-activity-meta, .62rem)",fontWeight:800}}>{nfF64CurveLabel(nfF64EffectiveLoad(item)).label} · {nfF64EffectiveLoad(item).toFixed(1)}</span>
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 6 }}>
@@ -18448,14 +18573,14 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
 
                   <div style={{ display: "grid", gridTemplateColumns: "1.6fr .8fr", gap: 10, marginTop: 12 }}>
                     <div>
-                      <label style={{ fontSize: ".69rem", color: COLORS.textMuted, fontWeight: 700 }}>Ejercicio</label>
+                      <label style={{ fontSize: "var(--nf-activity-meta, .69rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontWeight: 700 }}>Ejercicio</label>
                       <select value={item.exId || ""} onChange={e => replaceExercise(index, e.target.value)}
                         style={{ width: "100%", marginTop: 4, padding: "9px 10px", borderRadius: 9, border: `1.5px solid ${COLORS.border}`, background: COLORS.white, fontFamily: "inherit" }}>
                         {exs.map(ex => <option key={ex.id} value={ex.id}>{ex.nombre}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label style={{ fontSize: ".69rem", color: COLORS.textMuted, fontWeight: 700 }}>Nivel</label>
+                      <label style={{ fontSize: "var(--nf-activity-meta, .69rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontWeight: 700 }}>Nivel</label>
                       <select value={item.adaptiveLevel || 2} onChange={e => updateLevel(index, Number(e.target.value))}
                         style={{ width: "100%", marginTop: 4, padding: "9px 10px", borderRadius: 9, border: `1.5px solid ${COLORS.border}`, background: COLORS.white, fontFamily: "inherit" }}>
                         {[1,2,3,4,5].map(n => <option key={n} value={n}>Nivel {n}</option>)}
@@ -18464,10 +18589,10 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
                   </div>
 
                   <div style={{ marginTop: 9, padding: "8px 10px", borderRadius: 8, background: COLORS.bg }}>
-                    <div style={{ fontSize: ".69rem", color: item.professionalOverride ? COLORS.accent : COLORS.textMuted }}>
+                    <div style={{ fontSize: "var(--nf-activity-meta, .69rem)", color: item.professionalOverride ? COLORS.accent : COLORS.textMuted }}>
                       <span style={{display:"inline-flex",alignItems:"center",gap:6}}><NFLineIcon name={item.professionalOverride ? "plan" : "reasoning"} size={16}/>{getPrescriptionReasonText(item)}</span>
                     </div>
-                    {item.longitudinalAction && item.longitudinalAction!=="insufficient" && <div style={{marginTop:5,fontSize:".66rem",color:nfFollowUpActionLabel(item.longitudinalAction).color}}>
+                    {item.longitudinalAction && item.longitudinalAction!=="insufficient" && <div style={{marginTop:5,fontSize:"var(--nf-activity-meta, .66rem)",color:nfFollowUpActionLabel(item.longitudinalAction).color}}>
                       {nfFollowUpActionLabel(item.longitudinalAction).label}
                       {item.longitudinalLevelDelta!==0 ? ` · nivel ${item.longitudinalLevelDelta>0?"+":""}${item.longitudinalLevelDelta}` : ""}
                     </div>}
@@ -18482,8 +18607,8 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
       <Card style={{marginBottom:18}}>
         <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",marginBottom:12,flexWrap:"wrap"}}>
           <div>
-            <div style={{fontWeight:850,fontSize:".82rem",color:COLORS.textSecond}}>Curva de dificultad</div>
-            <div style={{fontSize:".68rem",color:COLORS.textMuted,marginTop:2}}>La carga combina demanda del ejercicio + nivel adaptativo. El objetivo es entrar suave, alcanzar el mayor reto en el núcleo y reducir carga al cierre.</div>
+            <div style={{fontWeight:850,fontSize:"var(--nf-activity-text, .82rem)",color:COLORS.textSecond}}>Curva de dificultad</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:2}}>La carga combina demanda del ejercicio + nivel adaptativo. El objetivo es entrar suave, alcanzar el mayor reto en el núcleo y reducir carga al cierre.</div>
           </div>
           <Badge label={liveCurve.balanced?"Curva adecuada":"Revisar curva"} color={liveCurve.balanced?COLORS.success:COLORS.warning}/>
         </div>
@@ -18492,20 +18617,20 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
             <div style={{height:78,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
               <div title={`Carga ${row.load}`} style={{width:"72%",maxWidth:46,minWidth:22,height:`${Math.max(22,Math.min(76,row.load/5*76))}px`,borderRadius:"8px 8px 4px 4px",background:info.tone+"22",border:`1px solid ${info.tone}55`}}/>
             </div>
-            <div style={{fontSize:".65rem",fontWeight:850,color:COLORS.textSecond,marginTop:5}}>{i+1}</div>
-            <div style={{fontSize:".57rem",color:COLORS.textMuted,textTransform:"capitalize"}}>{row.role==="complementario"?"complemento":row.role}</div>
-            <div style={{fontSize:".59rem",fontWeight:800,color:info.tone}}>{row.load.toFixed(1)}</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .65rem)",fontWeight:850,color:COLORS.textSecond,marginTop:5}}>{i+1}</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .57rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",textTransform:"capitalize"}}>{row.role==="complementario"?"complemento":row.role}</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .59rem)",fontWeight:800,color:info.tone}}>{row.load.toFixed(1)}</div>
           </div>})}
         </div>
-        {!liveCurve.balanced&&<div style={{marginTop:10,padding:"8px 10px",borderRadius:8,background:COLORS.warning+"08",fontSize:".68rem",color:COLORS.textMuted,lineHeight:1.45}}>{liveCurve.warnings.join(" ")}</div>}
+        {!liveCurve.balanced&&<div style={{marginTop:10,padding:"8px 10px",borderRadius:8,background:COLORS.warning+"08",fontSize:"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.45}}>{liveCurve.warnings.join(" ")}</div>}
       </Card>
 
       <Card style={{marginBottom:18,border:`1px solid ${(liveVariety.balanced&&liveCurve.balanced)?COLORS.success:COLORS.warning}28`,background:((liveVariety.balanced&&liveCurve.balanced)?COLORS.success:COLORS.warning)+"07"}}>
         <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
           <NFLineIcon name={liveVariety.balanced?"next":"warning"} size={18}/>
           <div>
-            <div style={{fontWeight:850,fontSize:".8rem",color:COLORS.textSecond}}>{liveVariety.balanced&&liveCurve.balanced?"Sesión equilibrada":"Revisar equilibrio de la sesión"}</div>
-            <div style={{fontSize:".71rem",color:COLORS.textMuted,lineHeight:1.5,marginTop:3}}>
+            <div style={{fontWeight:850,fontSize:"var(--nf-activity-text, .8rem)",color:COLORS.textSecond}}>{liveVariety.balanced&&liveCurve.balanced?"Sesión equilibrada":"Revisar equilibrio de la sesión"}</div>
+            <div style={{fontSize:"var(--nf-activity-meta, .71rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.5,marginTop:3}}>
               {liveVariety.distinctMechanics} mecánicas · {liveVariety.distinctModalities} modalidades · máximo {liveVariety.maxSameMechanic} ejercicio(s) con la misma mecánica.
               {!liveStructure.withinTargetWindow?` La duración estimada (${liveReview.minutes} min) queda fuera de la ventana terapéutica de 17–23 min.`:""}
               {liveStructure.excessiveDomainConcentration?" Hay concentración excesiva en un mismo objetivo cognitivo.":""}{!liveCurve.balanced?` ${liveCurve.warnings.join(" ")}`:""}
@@ -18515,7 +18640,7 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
       </Card>
 
       <Card style={{ marginBottom: 18, background: COLORS.warning + "08", border: `1px solid ${COLORS.warning}25` }}>
-        <p style={{ margin: 0, fontSize: ".76rem", color: COLORS.textSecond, lineHeight: 1.55 }}>
+        <p style={{ margin: 0, fontSize: "var(--nf-activity-text, .76rem)", color: COLORS.textSecond, lineHeight: 1.55 }}>
           Los cambios realizados aquí quedan registrados como ajustes profesionales. La prescripción no modifica la evaluación ni el plan de intervención.
         </p>
       </Card>
@@ -19395,14 +19520,14 @@ function TaskLearningScreen({ exId, mayor, onContinue, onSkip }) {
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <div className="nf-task-ready-mark"><NFLineIcon name="reading" size={26}/></div>
           <h3 style={{ margin: "0 0 5px", fontSize: mayor ? "1.35rem" : "1.1rem" }}>Aprendamos la regla</h3>
-          <p style={{ color: COLORS.textMuted, margin: 0, fontSize: mayor ? ".95rem" : ".78rem" }}>{p.title}</p>
+          <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", margin: 0, fontSize: mayor ? "var(--nf-activity-text, .95rem)" : "var(--nf-activity-text, .78rem)" }}>{p.title}</p>
         </div>
         <div style={{ padding: mayor ? 18 : 14, background: COLORS.primary+"07", borderRadius: 12, border:`1px solid ${COLORS.primary}18`, marginBottom: 14 }}>
-          <p style={{ margin: 0, lineHeight: 1.65, fontSize: mayor ? "1.05rem" : ".86rem" }}>{p.teaching}</p>
+          <p style={{ margin: 0, lineHeight: 1.65, fontSize: mayor ? "1.05rem" : "var(--nf-activity-text, .86rem)" }}>{p.teaching}</p>
         </div>
         <div style={{ padding: mayor ? 18 : 14, background: COLORS.bg, borderRadius: 12, marginBottom: 20 }}>
-          <div style={{ fontSize: ".7rem", color: COLORS.textMuted, fontWeight: 700, marginBottom: 5 }}>EJEMPLO</div>
-          <p style={{ margin: 0, lineHeight: 1.6, fontSize: mayor ? "1rem" : ".83rem" }}>{p.example}</p>
+          <div style={{ fontSize: "var(--nf-activity-meta, .7rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontWeight: 700, marginBottom: 5 }}>EJEMPLO</div>
+          <p style={{ margin: 0, lineHeight: 1.6, fontSize: mayor ? "1rem" : "var(--nf-activity-text, .83rem)" }}>{p.example}</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <BtnPrimary onClick={onContinue} style={{ flex: 2, padding: mayor ? 16 : 12 }}>Practicar →</BtnPrimary>
@@ -19427,10 +19552,10 @@ function GuidedPracticeScreen({ exId, mayor, onComplete }) {
         <div style={{ textAlign: "center", marginBottom: 18 }}>
           <div className="nf-task-ready-mark"><NFLineIcon name="plan" size={26}/></div>
           <h3 style={{ margin: "0 0 5px", fontSize: mayor ? "1.35rem" : "1.1rem" }}>Práctica guiada</h3>
-          <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".95rem" : ".78rem", margin: 0 }}>Esta práctica no cuenta para el resultado de la sesión.</p>
+          <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: mayor ? "var(--nf-activity-text, .95rem)" : "var(--nf-activity-text, .78rem)", margin: 0 }}>Esta práctica no cuenta para el resultado de la sesión.</p>
         </div>
 
-        <p style={{ fontWeight: 700, lineHeight: 1.55, fontSize: mayor ? "1.1rem" : ".9rem", marginBottom: 14 }}>{p.prompt}</p>
+        <p style={{ fontWeight: 700, lineHeight: 1.55, fontSize: mayor ? "1.1rem" : "var(--nf-activity-text, .9rem)", marginBottom: 14 }}>{p.prompt}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
           {p.options.map(opt => (
             <button key={opt} onClick={() => setSelected(opt)} disabled={selected !== null} style={{
@@ -19441,14 +19566,14 @@ function GuidedPracticeScreen({ exId, mayor, onComplete }) {
               background: selected === null ? COLORS.white : opt === p.answer ? COLORS.success+"12" : selected === opt ? COLORS.error+"10" : COLORS.white,
               textAlign: "left",
               fontFamily: "inherit",
-              fontSize: mayor ? "1rem" : ".84rem",
+              fontSize: mayor ? "1rem" : "var(--nf-activity-text, .84rem)",
               cursor: selected === null ? "pointer" : "default"
             }}>{opt}</button>
           ))}
         </div>
 
         {selected !== null && (
-          <div style={{ marginTop: 14, padding: 12, borderRadius: 10, background: correct ? COLORS.success+"10" : COLORS.warning+"10", fontSize: mayor ? ".98rem" : ".78rem", lineHeight: 1.5 }}>
+          <div style={{ marginTop: 14, padding: 12, borderRadius: 10, background: correct ? COLORS.success+"10" : COLORS.warning+"10", fontSize: mayor ? "var(--nf-activity-text, .98rem)" : "var(--nf-activity-text, .78rem)", lineHeight: 1.5 }}>
             {correct ? <span className="nf-feedback nf-feedback--success"><NFLineIcon name="next" size={18}/>Correcto. La regla está comprendida.</span> : <span className="nf-feedback nf-feedback--info"><NFLineIcon name="reasoning" size={18}/>La respuesta de práctica es <strong>{p.answer}</strong>. Revisa la regla antes de comenzar.</span>}
           </div>
         )}
@@ -19498,21 +19623,21 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
   return (
     <div style={{ maxWidth: 1180, width: "100%", margin: "0 auto" }}>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
-        {["1. Áreas","2. Duración","3. Adaptación","4. Prescripción"].map((s,i)=><span key={s} style={{padding:"5px 8px",borderRadius:999,background:i<3?COLORS.primary+"09":COLORS.success+"0d",color:i<3?COLORS.primary:COLORS.success,fontSize:".67rem",fontWeight:700,border:`1px solid ${i<3?COLORS.primary+"18":COLORS.success+"20"}`}}>{s}</span>)}
+        {["1. Áreas","2. Duración","3. Adaptación","4. Prescripción"].map((s,i)=><span key={s} style={{padding:"5px 8px",borderRadius:999,background:i<3?COLORS.primary+"09":COLORS.success+"0d",color:i<3?COLORS.primary:COLORS.success,fontSize:"var(--nf-activity-meta, .67rem)",fontWeight:700,border:`1px solid ${i<3?COLORS.primary+"18":COLORS.success+"20"}`}}>{s}</span>)}
       </div>
       <Card style={{ marginBottom: 20, padding: "22px 24px", background: COLORS.primary + "04", border: `1px solid ${COLORS.primary}16` }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
           <div>
             <h2 style={{ fontWeight: 800, margin: "0 0 4px", fontSize: "1.25rem",display:"flex",alignItems:"center",gap:8 }}><NFLineIcon name="settings" size={21}/>Configurar sesión</h2>
-            <p style={{ color: COLORS.textMuted, fontSize: ".86rem", margin: 0 }}>
+            <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: "var(--nf-activity-text, .86rem)", margin: 0 }}>
               {paciente.nombre} · Sesión #{(paciente.sesiones?.length || 0) + 1}
             </p>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <span style={{ padding: "7px 10px", borderRadius: 999, background: COLORS.white, border: `1px solid ${COLORS.border}`, fontSize: ".72rem", color: COLORS.textSecond }}>
+            <span style={{ padding: "7px 10px", borderRadius: 999, background: COLORS.white, border: `1px solid ${COLORS.border}`, fontSize: "var(--nf-activity-meta, .72rem)", color: COLORS.textSecond }}>
               {modo === "auto" ? "Automático" : "Manual"}
             </span>
-            <span style={{ padding: "7px 10px", borderRadius: 999, background: COLORS.white, border: `1px solid ${COLORS.border}`, fontSize: ".72rem", color: COLORS.textSecond }}>
+            <span style={{ padding: "7px 10px", borderRadius: 999, background: COLORS.white, border: `1px solid ${COLORS.border}`, fontSize: "var(--nf-activity-meta, .72rem)", color: COLORS.textSecond }}>
               {duracion} ejercicios
             </span>
           </div>
@@ -19528,13 +19653,13 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
               const dom = DOMINIOS_ADULTO[id];
               const area = interventionAreas.find(a => a.id === id);
               return (
-                <span key={id} style={{ padding: "6px 9px", background: COLORS.white, borderRadius: 9, border: `1px solid ${COLORS.border}`, fontSize: ".73rem" }}>
+                <span key={id} style={{ padding: "6px 9px", background: COLORS.white, borderRadius: 9, border: `1px solid ${COLORS.border}`, fontSize: "var(--nf-activity-meta, .73rem)" }}>
                   <span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span> · {area?.prioridad || "media"}
                 </span>
               );
             })}
           </div>
-          <p style={{ fontSize: ".7rem", color: COLORS.textMuted, margin: "8px 0 0" }}>
+          <p style={{ fontSize: "var(--nf-activity-meta, .7rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", margin: "8px 0 0" }}>
             La selección inteligente usará estas prioridades junto con historial, dificultad y apoyos recientes.
           </p>
         </Card>
@@ -19551,8 +19676,8 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
         <div style={{ display: "flex", gap: 12, marginBottom: 4 }}>
           {[{ id: "auto", label: "Automático", desc: "Basado en perfil de intervención" }, { id: "manual", label: "Manual", desc: "Elijo las áreas" }].map(m => (
             <button key={m.id} onClick={() => setModo(m.id)} style={{ flex: 1, padding: "14px 12px", borderRadius: 12, border: `2px solid ${modo === m.id ? COLORS.primary : COLORS.border}`, background: modo === m.id ? COLORS.primary + "10" : COLORS.white, cursor: "pointer", fontFamily: "inherit" }}>
-              <div style={{ fontWeight: 700, fontSize: ".9rem", color: modo === m.id ? COLORS.primary : COLORS.textPrimary }}>{m.label}</div>
-              <div style={{ fontSize: ".75rem", color: COLORS.textMuted, marginTop: 4 }}>{m.desc}</div>
+              <div style={{ fontWeight: 700, fontSize: "var(--nf-activity-text, .9rem)", color: modo === m.id ? COLORS.primary : COLORS.textPrimary }}>{m.label}</div>
+              <div style={{ fontSize: "var(--nf-activity-meta, .75rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginTop: 4 }}>{m.desc}</div>
             </button>
           ))}
         </div>
@@ -19565,7 +19690,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
           {DURACIONES.map(d => (
             <button key={d.value} onClick={() => setDuracion(d.value)} style={{ padding: "12px", borderRadius: 12, border: `2px solid ${duracion === d.value ? COLORS.primary : COLORS.border}`, background: duracion === d.value ? COLORS.primary + "10" : COLORS.white, cursor: "pointer", fontFamily: "inherit", textAlign: "center" }}>
               <div style={{ fontWeight: 700, color: duracion === d.value ? COLORS.primary : COLORS.textPrimary }}>{d.label}</div>
-              <div style={{ fontSize: ".75rem", color: COLORS.textMuted, marginTop: 2 }}>{d.desc}</div>
+              <div style={{ fontSize: "var(--nf-activity-meta, .75rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginTop: 2 }}>{d.desc}</div>
             </button>
           ))}
         </div>
@@ -19578,21 +19703,21 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
         <p style={{ fontWeight: 700, marginBottom: 12 }}>Áreas a trabajar</p>
         {modo === "auto" ? (
           <div>
-            {areasAuto.length > 0 && <p style={{ fontSize: ".82rem", color: COLORS.textMuted, marginBottom: 10 }}>Priorizando objetivos definidos en el plan de intervención:</p>}
+            {areasAuto.length > 0 && <p style={{ fontSize: "var(--nf-activity-text, .82rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginBottom: 10 }}>Priorizando objetivos definidos en el plan de intervención:</p>}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 8 }}>
               {(areasAuto.length > 0 ? areasAuto.slice(0, 3) : allDoms.slice(0, 3)).map(id => {
                 const dom = DOMINIOS_ADULTO[id];
                 const h = evalHist.find(x => x.id === id);
                 return (
                   <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, padding: "11px 12px", background: COLORS.error + "08", borderRadius: 10, border: `1px solid ${COLORS.error}14` }}>
-                    <span style={{ fontWeight: 600, fontSize: ".88rem" }}><span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span></span>
+                    <span style={{ fontWeight: 600, fontSize: "var(--nf-activity-text, .88rem)" }}><span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span></span>
                     {h && typeof h.pct === "number" && <Badge label={`${h.pct}%`} color={gradeColor(h.pct)} />}
                   </div>
                 );
               })}
             </div>
             {areasAuto.length === 0 && (
-              <p style={{ color: autoBlockedByPlan ? COLORS.warning : COLORS.textMuted, fontSize: ".85rem", lineHeight: 1.5 }}>
+              <p style={{ color: autoBlockedByPlan ? COLORS.warning : COLORS.textMuted, fontSize: "var(--nf-activity-text, .85rem)", lineHeight: 1.5 }}>
                 {autoBlockedByPlan
                   ? "El plan de intervención no tiene objetivos activos. Ajusta el plan o utiliza el modo manual; NeuroFlex no reactivará áreas excluidas o en mantenimiento automáticamente."
                   : "No hay áreas prioritarias derivadas de la evaluación; puedes elegir las áreas manualmente."}
@@ -19607,7 +19732,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
               const sel = areasSelec.includes(id);
               return (
                 <button key={id} onClick={() => toggleArea(id)} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: 10, border: `2px solid ${sel ? COLORS.primary : COLORS.border}`, background: sel ? COLORS.primary + "08" : COLORS.white, cursor: "pointer", fontFamily: "inherit" }}>
-                  <span style={{ fontWeight: sel ? 600 : 400, fontSize: ".88rem" }}><span className={`nf-check ${sel ? "is-selected" : ""}`} aria-hidden="true">{sel ? "✓" : ""}</span> <span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span></span>
+                  <span style={{ fontWeight: sel ? 600 : 400, fontSize: "var(--nf-activity-text, .88rem)" }}><span className={`nf-check ${sel ? "is-selected" : ""}`} aria-hidden="true">{sel ? "✓" : ""}</span> <span style={{display:"inline-flex",alignItems:"center",gap:7}}><NFLineIcon name={dom?.icon || "default"} size={17}/>{dom?.label}</span></span>
                   {h && typeof h.pct === "number" && <Badge label={`${h.pct}%`} color={gradeColor(h.pct)} />}
                 </button>
               );
@@ -19620,7 +19745,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
       {/* Selección inteligente */}
       <Card style={{ height: "100%" }}>
         <p style={{ fontWeight: 700, marginBottom: 4 }}>Selección inteligente de ejercicios</p>
-        <p style={{ fontSize: ".82rem", color: COLORS.textMuted, marginBottom: 12, lineHeight: 1.55 }}>
+        <p style={{ fontSize: "var(--nf-activity-text, .82rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginBottom: 12, lineHeight: 1.55 }}>
           Combina objetivos del plan, historial reciente, variedad, apoyos utilizados y nivel actual.
           Evita repetir por repetir, pero puede volver a una tarea cuando sigue siendo terapéuticamente útil.
         </p>
@@ -19636,7 +19761,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
               cursor: "pointer", fontFamily: "inherit", textAlign: "center"
             }}>
               <div style={{ fontWeight: 700, color: seleccionInteligente === opt.id ? COLORS.primary : COLORS.textPrimary }}>{opt.label}</div>
-              <div style={{ fontSize: ".75rem", color: COLORS.textMuted, marginTop: 2 }}>{opt.desc}</div>
+              <div style={{ fontSize: "var(--nf-activity-meta, .75rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginTop: 2 }}>{opt.desc}</div>
             </button>
           ))}
         </div>
@@ -19645,7 +19770,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
       {/* Dificultad adaptativa */}
       <Card style={{ height: "100%" }}>
         <p style={{ fontWeight: 700, marginBottom: 4 }}>Dificultad adaptativa</p>
-        <p style={{ fontSize: ".82rem", color: COLORS.textMuted, marginBottom: 12 }}>
+        <p style={{ fontSize: "var(--nf-activity-text, .82rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginBottom: 12 }}>
           NeuroFlex puede usar el desempeño previo para seleccionar ejercicios cercanos al nivel actual del paciente.
           La edad no determina automáticamente la dificultad.
         </p>
@@ -19656,7 +19781,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
           ].map(opt => (
             <button key={String(opt.id)} onClick={() => setAdaptativo(opt.id)} style={{ flex: 1, padding: "12px", borderRadius: 12, border: `2px solid ${adaptativo === opt.id ? COLORS.primary : COLORS.border}`, background: adaptativo === opt.id ? COLORS.primary + "10" : COLORS.white, cursor: "pointer", fontFamily: "inherit", textAlign: "center" }}>
               <div style={{ fontWeight: 700, color: adaptativo === opt.id ? COLORS.primary : COLORS.textPrimary }}>{opt.label}</div>
-              <div style={{ fontSize: ".75rem", color: COLORS.textMuted, marginTop: 2 }}>{opt.desc}</div>
+              <div style={{ fontSize: "var(--nf-activity-meta, .75rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginTop: 2 }}>{opt.desc}</div>
             </button>
           ))}
         </div>
@@ -19671,7 +19796,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
             <p style={{ fontWeight: 700, margin: "0 0 4px",display:"flex",alignItems:"center",gap:7 }}><NFLineIcon name="reading" size={17}/>Preparación antes de puntuar</p>
           </div>
         </div>
-        <p style={{ fontSize: ".82rem", color: COLORS.textMuted, marginBottom: 12, lineHeight: 1.55 }}>
+        <p style={{ fontSize: "var(--nf-activity-text, .82rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginBottom: 12, lineHeight: 1.55 }}>
           En tareas con una regla que conviene comprobar primero, NeuroFlex puede enseñar y practicar antes de comenzar.
           La práctica guiada nunca suma ni resta puntos.
         </p>
@@ -19686,8 +19811,8 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
               padding:"10px 8px",borderRadius:11,border:`2px solid ${preparacionTarea===opt.id?COLORS.primary:COLORS.border}`,
               background:preparacionTarea===opt.id?COLORS.primary+"09":COLORS.white,cursor:"pointer",fontFamily:"inherit"
             }}>
-              <div style={{fontWeight:700,fontSize:".77rem",color:preparacionTarea===opt.id?COLORS.primary:COLORS.textPrimary}}>{opt.label}</div>
-              <div style={{fontSize:".64rem",color:COLORS.textMuted,marginTop:3,lineHeight:1.35}}>{opt.desc}</div>
+              <div style={{fontWeight:700,fontSize:"var(--nf-activity-text, .77rem)",color:preparacionTarea===opt.id?COLORS.primary:COLORS.textPrimary}}>{opt.label}</div>
+              <div style={{fontSize:"var(--nf-activity-meta, .64rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:3,lineHeight:1.35}}>{opt.desc}</div>
             </button>
           ))}
         </div>
@@ -19697,7 +19822,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
       {/* Avance Manual vs Automático */}
       <Card style={{ height: "100%" }}>
         <p style={{ fontWeight: 700, marginBottom: 4,display:"flex",alignItems:"center",gap:7 }}><NFLineIcon name="next" size={17}/>Control de avance</p>
-        <p style={{ fontSize: ".82rem", color: COLORS.textMuted, marginBottom: 12 }}>¿Cómo pasa el paciente al siguiente ejercicio?</p>
+        <p style={{ fontSize: "var(--nf-activity-text, .82rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginBottom: 12 }}>¿Cómo pasa el paciente al siguiente ejercicio?</p>
         <div style={{ display: "flex", gap: 12 }}>
           {[
             { id: true, label: "Manual", desc: "El paciente toca Siguiente" },
@@ -19705,7 +19830,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
           ].map(opt => (
             <button key={String(opt.id)} onClick={() => setAvanceManual(opt.id)} style={{ flex: 1, padding: "12px", borderRadius: 12, border: `2px solid ${avanceManual === opt.id ? COLORS.accent : COLORS.border}`, background: avanceManual === opt.id ? COLORS.accent + "10" : COLORS.white, cursor: "pointer", fontFamily: "inherit", textAlign: "center" }}>
               <div style={{ fontWeight: 700, color: avanceManual === opt.id ? COLORS.accent : COLORS.textPrimary }}>{opt.label}</div>
-              <div style={{ fontSize: ".75rem", color: COLORS.textMuted, marginTop: 2 }}>{opt.desc}</div>
+              <div style={{ fontSize: "var(--nf-activity-meta, .75rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginTop: 2 }}>{opt.desc}</div>
             </button>
           ))}
         </div>
@@ -19715,7 +19840,7 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
       {mayor && (
         <Card style={{ height: "100%", background: COLORS.accent + "08", border: `1.5px solid ${COLORS.accent}30` }}>
           <p style={{ fontWeight: 700, color: COLORS.accent, margin: "0 0 4px",display:"flex",alignItems:"center",gap:7 }}><NFLineIcon name="person" size={17}/>Modo accesible activo</p>
-          <p style={{ fontSize: ".82rem", color: COLORS.textMuted, margin: 0 }}>Texto más grande, botones amplios y más tiempo por ejercicio</p>
+          <p style={{ fontSize: "var(--nf-activity-text, .82rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", margin: 0 }}>Texto más grande, botones amplios y más tiempo por ejercicio</p>
         </Card>
       )}
 
@@ -19724,8 +19849,8 @@ function ConfiguradorSesion({ paciente, onIniciar, onCancelar }) {
       <Card style={{ padding: 16, border: `1px solid ${COLORS.primary}18`, background: COLORS.white }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ flex: 1, minWidth: 220 }}>
-            <div style={{ fontWeight: 800, fontSize: ".82rem" }}>Sesión lista para revisar</div>
-            <div style={{ color: COLORS.textMuted, fontSize: ".7rem", marginTop: 2 }}>
+            <div style={{ fontWeight: 800, fontSize: "var(--nf-activity-text, .82rem)" }}>Sesión lista para revisar</div>
+            <div style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: "var(--nf-activity-meta, .7rem)", marginTop: 2 }}>
               {duracion} ejercicios · {modo === "auto" ? "selección automática" : `${areasSelec.length} área(s) seleccionada(s)`} · {adaptativo ? "adaptativa" : "estándar"}
             </div>
           </div>
@@ -19804,12 +19929,12 @@ function MetacognitiveCheck({ result, mayor, onContinue }) {
         <div style={{ textAlign: "center", marginBottom: 16 }}>
           <div className="nf-task-ready-mark"><NFIcon name="brain" size={26}/></div>
           <h3 style={{ margin: "0 0 4px", fontSize: mayor ? "1.3rem" : "1.05rem" }}>¿Cómo resolviste esta tarea?</h3>
-          <p style={{ margin: 0, color: COLORS.textMuted, fontSize: mayor ? ".95rem" : ".76rem" }}>
+          <p style={{ margin: 0, color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: mayor ? "var(--nf-activity-text, .95rem)" : "var(--nf-activity-text, .76rem)" }}>
             Estas respuestas no cambian tu puntuación.
           </p>
         </div>
 
-        <p style={{ fontWeight: 700, fontSize: mayor ? "1rem" : ".82rem", marginBottom: 8 }}>¿Qué estrategia utilizaste principalmente?</p>
+        <p style={{ fontWeight: 700, fontSize: mayor ? "1rem" : "var(--nf-activity-text, .82rem)", marginBottom: 8 }}>¿Qué estrategia utilizaste principalmente?</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 7, marginBottom: 16 }}>
           {METACOGNITIVE_STRATEGIES.map(s => (
             <button key={s} type="button" onClick={() => setData(d => ({ ...d, strategy: s }))} style={{
@@ -19817,12 +19942,12 @@ function MetacognitiveCheck({ result, mayor, onContinue }) {
               border: `1.5px solid ${data.strategy === s ? COLORS.primary : COLORS.border}`,
               background: data.strategy === s ? COLORS.primary+"0C" : COLORS.white,
               color: data.strategy === s ? COLORS.primary : COLORS.textPrimary,
-              fontFamily: "inherit", fontSize: mayor ? ".92rem" : ".72rem", cursor: "pointer"
+              fontFamily: "inherit", fontSize: mayor ? "var(--nf-activity-text, .92rem)" : "var(--nf-activity-meta, .72rem)", cursor: "pointer"
             }}>{s}</button>
           ))}
         </div>
 
-        <p style={{ fontWeight: 700, fontSize: mayor ? "1rem" : ".82rem", marginBottom: 8 }}>¿Tuviste que cambiar de estrategia?</p>
+        <p style={{ fontWeight: 700, fontSize: mayor ? "1rem" : "var(--nf-activity-text, .82rem)", marginBottom: 8 }}>¿Tuviste que cambiar de estrategia?</p>
         <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
           {[["Sí",true],["No",false]].map(([label,value]) => (
             <button key={label} type="button" onClick={() => setData(d => ({ ...d, changedStrategy: value }))} style={{
@@ -19834,7 +19959,7 @@ function MetacognitiveCheck({ result, mayor, onContinue }) {
           ))}
         </div>
 
-        <p style={{ fontWeight: 700, fontSize: mayor ? "1rem" : ".82rem", marginBottom: 8 }}>¿Cómo sentiste la dificultad?</p>
+        <p style={{ fontWeight: 700, fontSize: mayor ? "1rem" : "var(--nf-activity-text, .82rem)", marginBottom: 8 }}>¿Cómo sentiste la dificultad?</p>
         <div style={{ display: "flex", gap: 7, marginBottom: 16, flexWrap: "wrap" }}>
           {[["Fácil",1],["Adecuada",2],["Difícil",3]].map(([label,value]) => (
             <button key={label} type="button" onClick={() => setData(d => ({ ...d, perceivedDifficulty: value }))} style={{
@@ -19850,7 +19975,7 @@ function MetacognitiveCheck({ result, mayor, onContinue }) {
           value={data.note}
           onChange={e => setData(d => ({ ...d, note: e.target.value }))}
           placeholder="¿Qué te ayudó? (opcional)"
-          style={{ width:"100%",boxSizing:"border-box",padding:11,borderRadius:9,border:`1px solid ${COLORS.border}`,fontFamily:"inherit",fontSize:mayor?".95rem":".76rem",marginBottom:14 }}
+          style={{ width:"100%",boxSizing:"border-box",padding:11,borderRadius:9,border:`1px solid ${COLORS.border}`,fontFamily:"inherit",fontSize:mayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .76rem)",marginBottom:14 }}
         />
 
         <div style={{ display:"flex",gap:9 }}>
@@ -20235,7 +20360,7 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
 
   if (queue.length === 0) return (
     <Card style={{ textAlign: "center", padding: 40 }}>
-      <p style={{ color: COLORS.textMuted }}>No hay ejercicios disponibles para las áreas seleccionadas.</p>
+      <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")" }}>No hay ejercicios disponibles para las áreas seleccionadas.</p>
       <BtnSecondary onClick={onCancelar} style={{ marginTop: 16 }}>Volver</BtnSecondary>
     </Card>
   );
@@ -20282,22 +20407,22 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
       <Card style={{ textAlign: "center", padding: 40 }}>
         <div className="nf-eval-complete-mark"><NFIcon name="check" size={28}/></div>
         <h2 style={{ fontWeight: 700, marginBottom: 8 }}>¡Sesión completada!</h2>
-        <p style={{ color: COLORS.textMuted, marginBottom: 20 }}>
+        <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginBottom: 20 }}>
           {results.length} ejercicios · {fmt(Math.round((Date.now() - t0.current) / 1000))}
           {results.some(r => typeof r.pct === "number") && ` · ${Math.round(results.filter(r => typeof r.pct === "number").reduce((a, b) => a + b.pct, 0) / results.filter(r => typeof r.pct === "number").length)}% indicador de tareas`}
         </p>
-        {(loadChecks.length>0||pauseSeconds>0)&&<div style={{margin:"0 0 18px",padding:"10px 12px",borderRadius:10,background:COLORS.bg,border:`1px solid ${COLORS.border}`,fontSize:mayor?".82rem":".7rem",color:COLORS.textMuted,lineHeight:1.5}}>
+        {(loadChecks.length>0||pauseSeconds>0)&&<div style={{margin:"0 0 18px",padding:"10px 12px",borderRadius:10,background:COLORS.bg,border:`1px solid ${COLORS.border}`,fontSize:mayor?"var(--nf-activity-text, .82rem)":"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",lineHeight:1.5}}>
           Control de carga: {loadChecks.length} registro(s) · {loadChecks.filter(x=>x.rating==="alta").length} carga(s) alta(s) · {queue.filter(x=>x.inSessionLoadAdjustment).length} ajuste(s) de nivel durante sesión{pauseSeconds>0?` · ${fmt(pauseSeconds)} de pausa`:""}.
         </div>}
         <div style={{ marginBottom: 24 }}>
           {results.map((r, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${COLORS.border}` }}>
-              <span style={{ fontSize: ".85rem" }}><NFLineIcon name={DOMINIOS_ADULTO[r.domId]?.icon || "default"} size={17}/> {r.nombre}</span>
+              <span style={{ fontSize: "var(--nf-activity-text, .85rem)" }}><NFLineIcon name={DOMINIOS_ADULTO[r.domId]?.icon || "default"} size={17}/> {r.nombre}</span>
               <div style={{ textAlign: "right" }}>
                 {typeof r.pct === "number"
                   ? <span style={{ fontWeight: 700, color: gradeColor(r.pct) }}>{r.pct}%</span>
-                  : <span style={{ fontSize: ".72rem", color: COLORS.accent, fontWeight: 600 }}>Valoración profesional</span>}
-                <div style={{ color: COLORS.textMuted, fontSize: ".66rem", marginTop: 2 }}>{supportLabel(getTrackedSupportLevel(r))}</div>
+                  : <span style={{ fontSize: "var(--nf-activity-meta, .72rem)", color: COLORS.accent, fontWeight: 600 }}>Valoración profesional</span>}
+                <div style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: "var(--nf-activity-meta, .66rem)", marginTop: 2 }}>{supportLabel(getTrackedSupportLevel(r))}</div>
               </div>
             </div>
           ))}
@@ -20314,19 +20439,19 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
         <h3 style={{ fontWeight: 700, marginBottom: 8, fontSize: mayor ? "1.4rem" : "1.1rem" }}>
           Ejercicio registrado
         </h3>
-        <p style={{ color: COLORS.textMuted, marginBottom: 6, fontSize: mayor ? "1rem" : ".9rem" }}>{lastResult?.nombre}</p>
+        <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", marginBottom: 6, fontSize: mayor ? "1rem" : "var(--nf-activity-text, .9rem)" }}>{lastResult?.nombre}</p>
         {typeof lastResult?.pct === "number"
           ? <p style={{ fontSize: mayor ? "2rem" : "1.5rem", fontWeight: 900, color: gradeColor(lastResult.pct), marginBottom: 24 }}>{lastResult.pct}%</p>
-          : <p style={{ fontSize: mayor ? "1.1rem" : ".9rem", fontWeight: 700, color: COLORS.accent, marginBottom: 24 }}>Pendiente de valoración profesional</p>}
-        <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".92rem" : ".78rem", margin: "-12px 0 20px" }}>
+          : <p style={{ fontSize: mayor ? "1.1rem" : "var(--nf-activity-text, .9rem)", fontWeight: 700, color: COLORS.accent, marginBottom: 24 }}>Pendiente de valoración profesional</p>}
+        <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: mayor ? "var(--nf-activity-text, .92rem)" : "var(--nf-activity-text, .78rem)", margin: "-12px 0 20px" }}>
           Nivel de apoyo: <strong>{supportLabel(getTrackedSupportLevel(lastResult))}</strong>
         </p>
 
         {shouldMonitorLoad() && <div style={{margin:"0 0 20px",padding:mayor?18:14,borderRadius:14,border:`1px solid ${COLORS.border}`,background:COLORS.bg,textAlign:"left"}}>
           <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",marginBottom:8}}>
             <div>
-              <div style={{fontSize:mayor?".95rem":".8rem",fontWeight:850,color:COLORS.textSecond}}>Control de carga</div>
-              <div style={{fontSize:mayor?".82rem":".7rem",color:COLORS.textMuted,marginTop:2}}>Registra cómo se sintió la demanda antes de continuar.</div>
+              <div style={{fontSize:mayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",fontWeight:850,color:COLORS.textSecond}}>Control de carga</div>
+              <div style={{fontSize:mayor?"var(--nf-activity-text, .82rem)":"var(--nf-activity-meta, .7rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginTop:2}}>Registra cómo se sintió la demanda antes de continuar.</div>
             </div>
             <Badge label={`Carga ${nfF64EffectiveLoad({exId:queue[cur]?.ex?.id,adaptiveLevel:queue[cur]?.adaptiveLevel}).toFixed(1)}`} color={COLORS.info}/>
           </div>
@@ -20337,28 +20462,28 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
               {id:"alta",label:"Alta"},
             ].map(opt=><button key={opt.id} onClick={()=>registerLoadRating(opt.id)} style={{
               minHeight:44,borderRadius:9,border:`1.5px solid ${currentLoadRating===opt.id?COLORS.primary:COLORS.border}`,
-              background:currentLoadRating===opt.id?COLORS.primary+"0D":"#fff",fontFamily:"inherit",fontWeight:800,fontSize:mayor?".88rem":".74rem",cursor:"pointer"
+              background:currentLoadRating===opt.id?COLORS.primary+"0D":"#fff",fontFamily:"inherit",fontWeight:800,fontSize:mayor?"var(--nf-activity-text, .88rem)":"var(--nf-activity-meta, .74rem)",cursor:"pointer"
             }}>{opt.label}</button>)}
           </div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             <BtnSecondary onClick={toggleClinicalPause}>{pauseStartedAt?"Finalizar pausa":"Pausa breve"}</BtnSecondary>
             {currentLoadRating==="alta" && cur+1<queue.length && <BtnSecondary onClick={reduceNextLevel}>Reducir nivel del siguiente</BtnSecondary>}
           </div>
-          {pauseStartedAt&&<div style={{marginTop:8,fontSize:mayor?".8rem":".68rem",color:COLORS.textMuted}}>Pausa en curso. Continúa cuando el paciente esté listo.</div>}
-          {currentLoadRating==="alta"&&<div style={{marginTop:8,fontSize:mayor?".8rem":".68rem",color:COLORS.textMuted}}>La carga alta queda registrada. El nivel siguiente solo cambia si el profesional lo indica.</div>}
+          {pauseStartedAt&&<div style={{marginTop:8,fontSize:mayor?"var(--nf-activity-text, .8rem)":"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Pausa en curso. Continúa cuando el paciente esté listo.</div>}
+          {currentLoadRating==="alta"&&<div style={{marginTop:8,fontSize:mayor?"var(--nf-activity-text, .8rem)":"var(--nf-activity-meta, .68rem)",color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>La carga alta queda registrada. El nivel siguiente solo cambia si el profesional lo indica.</div>}
         </div>}
 
         {avanceManual ? (
           <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-            <BtnPrimary onClick={siguiente} style={{ padding: mayor ? "16px 32px" : "11px 24px", fontSize: mayor ? "1.05rem" : ".9rem" }}>
+            <BtnPrimary onClick={siguiente} style={{ padding: mayor ? "16px 32px" : "11px 24px", fontSize: mayor ? "1.05rem" : "var(--nf-activity-text, .9rem)" }}>
               Siguiente ejercicio
             </BtnPrimary>
-            <BtnSecondary onClick={() => setPhase("done")} style={{ fontSize: mayor ? "1rem" : ".9rem" }}>Terminar</BtnSecondary>
+            <BtnSecondary onClick={() => setPhase("done")} style={{ fontSize: mayor ? "1rem" : "var(--nf-activity-text, .9rem)" }}>Terminar</BtnSecondary>
           </div>
         ) : (
           <div>
-            <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".95rem" : ".82rem", marginBottom: 12 }}>Continuando en 3 segundos...</p>
-            <BtnSecondary onClick={siguiente} style={{ fontSize: mayor ? "1rem" : ".9rem" }}>Continuar ahora</BtnSecondary>
+            <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: mayor ? "var(--nf-activity-text, .95rem)" : "var(--nf-activity-text, .82rem)", marginBottom: 12 }}>Continuando en 3 segundos...</p>
+            <BtnSecondary onClick={siguiente} style={{ fontSize: mayor ? "1rem" : "var(--nf-activity-text, .9rem)" }}>Continuar ahora</BtnSecondary>
           </div>
         )}
       </Card>
@@ -20371,15 +20496,15 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
       <div className="nf-exercise-progress-head nf-v2-session-progress">
         <div className="nf-exercise-progress-row">
           <div>
-            <span style={{ fontSize: mayor ? ".95rem" : ".78rem", color: COLORS.textMuted }}>Ejercicio {cur + 1} de {queue.length}</span>
+            <span style={{ fontSize: mayor ? "var(--nf-activity-text, .95rem)" : "var(--nf-activity-text, .78rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")" }}>Ejercicio {cur + 1} de {queue.length}</span>
             <div style={{fontWeight:650,fontSize:mayor?"1.2rem":"1rem",color:COLORS.textPrimary,marginTop:2}}>{curItem?.ex?.nombre}</div>
             <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:5}}>
-              {curItem?.sessionRole&&<span style={{fontSize:mayor?".72rem":".62rem",fontWeight:800,color:COLORS.primary,textTransform:"capitalize"}}>{curItem.sessionRole==="complementario"?"complemento":curItem.sessionRole}</span>}
-              <span style={{fontSize:mayor?".72rem":".62rem",fontWeight:750,color:nfF64CurveLabel(nfF64EffectiveLoad({exId:curItem?.ex?.id,adaptiveLevel:curItem?.adaptiveLevel})).tone}}>{nfF64CurveLabel(nfF64EffectiveLoad({exId:curItem?.ex?.id,adaptiveLevel:curItem?.adaptiveLevel})).label}</span>
+              {curItem?.sessionRole&&<span style={{fontSize:mayor?"var(--nf-activity-meta, .72rem)":"var(--nf-activity-meta, .62rem)",fontWeight:800,color:COLORS.primary,textTransform:"capitalize"}}>{curItem.sessionRole==="complementario"?"complemento":curItem.sessionRole}</span>}
+              <span style={{fontSize:mayor?"var(--nf-activity-meta, .72rem)":"var(--nf-activity-meta, .62rem)",fontWeight:750,color:nfF64CurveLabel(nfF64EffectiveLoad({exId:curItem?.ex?.id,adaptiveLevel:curItem?.adaptiveLevel})).tone}}>{nfF64CurveLabel(nfF64EffectiveLoad({exId:curItem?.ex?.id,adaptiveLevel:curItem?.adaptiveLevel})).label}</span>
             </div>
           </div>
           <button onClick={() => { if (confirm("¿Terminar la sesión?")) setPhase("done"); }}
-            style={{ minHeight:44, padding:"8px 12px", fontSize: mayor ? ".9rem" : ".76rem", color: COLORS.textMuted, background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius:10, cursor: "pointer", fontFamily:"inherit" }}>
+            style={{ minHeight:44, padding:"8px 12px", fontSize: mayor ? "var(--nf-activity-text, .9rem)" : "var(--nf-activity-text, .76rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius:10, cursor: "pointer", fontFamily:"inherit" }}>
             Terminar sesión
           </button>
         </div>
@@ -20390,35 +20515,35 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
         <div className="nf-exercise-domain-head nf-v2-session-domain">
           <div className="nf-exercise-domain-icon" style={{ width: mayor ? 48 : 42, height: mayor ? 48 : 42, color:curDom?.color || COLORS.primary }}><NFLineIcon name={curDom?.icon || "default"} size={mayor?23:20}/></div>
           <div>
-            <p style={{ fontWeight: 650, margin: 0, fontSize: mayor ? "1.05rem" : ".9rem", color:COLORS.textPrimary }}>{curDom?.label}</p>
-            {config.adaptativo !== false && curItem?.adaptiveLevel ? <p style={{ color: COLORS.textMuted, fontSize: mayor ? ".86rem" : ".72rem", margin: "2px 0 0" }}>Nivel {curItem.adaptiveLevel} de 5</p> : null}
+            <p style={{ fontWeight: 650, margin: 0, fontSize: mayor ? "1.05rem" : "var(--nf-activity-text, .9rem)", color:COLORS.textPrimary }}>{curDom?.label}</p>
+            {config.adaptativo !== false && curItem?.adaptiveLevel ? <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: mayor ? "var(--nf-activity-text, .86rem)" : "var(--nf-activity-meta, .72rem)", margin: "2px 0 0" }}>Nivel {curItem.adaptiveLevel} de 5</p> : null}
           </div>
         </div>
 
         <div className="nf-exercise-instruction nf-v2-session-instruction" style={{ padding: mayor ? "18px 20px" : "14px 16px" }}>
           <div className="nf-exercise-instruction__label"><NFLineIcon name="plan" size={15}/>Instrucción</div>
-          <p style={{ margin: 0, fontSize: mayor ? "1.08rem" : ".9rem", color: COLORS.textPrimary, lineHeight: 1.65, fontWeight: 500 }}>
+          <p style={{ margin: 0, fontSize: mayor ? "1.08rem" : "var(--nf-activity-text, .9rem)", color: COLORS.textPrimary, lineHeight: 1.65, fontWeight: 500 }}>
             {curItem?.ex?.instruccion}
           </p>
-          <button onClick={() => { registerSupport("repeat"); speakInstruction(curItem?.ex?.instruccion, { immediate: true }); }} style={{ marginTop: 10, minHeight:44, background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: 9, padding: "7px 12px", cursor: "pointer", fontSize: mayor ? ".9rem" : ".76rem", color: COLORS.primaryDark, fontFamily: "inherit", display:"inline-flex", alignItems:"center", gap:7 }}>
+          <button onClick={() => { registerSupport("repeat"); speakInstruction(curItem?.ex?.instruccion, { immediate: true }); }} style={{ marginTop: 10, minHeight:44, background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: 9, padding: "7px 12px", cursor: "pointer", fontSize: mayor ? "var(--nf-activity-text, .9rem)" : "var(--nf-activity-text, .76rem)", color: COLORS.primaryDark, fontFamily: "inherit", display:"inline-flex", alignItems:"center", gap:7 }}>
             <NFIcon name="volume" size={17} /> Escuchar instrucción
           </button>
         </div>
 
         {/* Apoyos funcionales: discretos y separados del estímulo */}
         <div style={{ marginBottom: 18, display:"flex", justifyContent:"space-between", gap:10, alignItems:"center", flexWrap:"wrap" }}>
-          <span style={{ fontSize: mayor ? ".88rem" : ".73rem", color: COLORS.textMuted }}>
+          <span style={{ fontSize: mayor ? "var(--nf-activity-text, .88rem)" : "var(--nf-activity-meta, .73rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")" }}>
             Apoyo: <strong style={{ color: currentSupport.maxSupportLevel ? COLORS.accent : COLORS.textSecond }}>{supportLabel(currentSupport.maxSupportLevel)}</strong>
           </span>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {DEMOS[curItem?.ex?.id] && (
               <button onClick={() => { registerSupport("example"); setSupportOverlay("example"); }}
-                style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
+                style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?"var(--nf-activity-text, .88rem)":"var(--nf-activity-meta, .74rem)",display:"inline-flex",alignItems:"center",gap:6}}>
                 <NFIcon name="example" size={17}/> Ver ejemplo
               </button>
             )}
             <button onClick={() => { registerSupport("strategy"); setSupportOverlay("strategy"); }}
-              style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?".88rem":".74rem",display:"inline-flex",alignItems:"center",gap:6}}>
+              style={{minHeight:44,border:`1px solid ${COLORS.border}`,background:COLORS.white,color:COLORS.primaryDark,borderRadius:9,padding:"7px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:mayor?"var(--nf-activity-text, .88rem)":"var(--nf-activity-meta, .74rem)",display:"inline-flex",alignItems:"center",gap:6}}>
               <NFIcon name="hint" size={17}/> Pista estratégica
             </button>
           </div>
@@ -20443,7 +20568,7 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
                   <h3 style={{ margin: "0 0 14px", fontSize: mayor ? "1.25rem" : "1.05rem",display:"flex",alignItems:"center",gap:8 }}><NFIcon name="example" size={21}/> Ejemplo adicional</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
                     {DEMOS[curItem.ex.id].pasos?.map((p, i) => (
-                      <div key={i} style={{ padding: "10px 12px", background: COLORS.bg, border:`1px solid ${COLORS.border}`, borderRadius: 9, fontSize: mayor ? ".95rem" : ".82rem" }}>
+                      <div key={i} style={{ padding: "10px 12px", background: COLORS.bg, border:`1px solid ${COLORS.border}`, borderRadius: 9, fontSize: mayor ? "var(--nf-activity-text, .95rem)" : "var(--nf-activity-text, .82rem)" }}>
                         {p.texto}
                       </div>
                     ))}
@@ -20457,10 +20582,10 @@ function ContenidoSesionActiva({ paciente, config, sesionNum, onFinalizar, onCan
               ) : (
                 <>
                   <h3 style={{ margin: "0 0 12px", fontSize: mayor ? "1.25rem" : "1.05rem",display:"flex",alignItems:"center",gap:8 }}><NFIcon name="hint" size={21}/> Pista estratégica</h3>
-                  <p style={{ lineHeight: 1.65, color: COLORS.textSecond, fontSize: mayor ? "1rem" : ".88rem" }}>
+                  <p style={{ lineHeight: 1.65, color: COLORS.textSecond, fontSize: mayor ? "1rem" : "var(--nf-activity-text, .88rem)" }}>
                     {SUPPORT_STRATEGIES[curItem?.domId] || "Detente un momento, identifica la regla principal y resuelve un paso a la vez."}
                   </p>
-                  <p style={{ color: COLORS.textMuted, fontSize: ".74rem", marginTop: 10 }}>
+                  <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: "var(--nf-activity-meta, .74rem)", marginTop: 10 }}>
                     La pista orienta la estrategia sin revelar la respuesta.
                   </p>
                 </>
