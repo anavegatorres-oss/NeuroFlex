@@ -672,6 +672,39 @@ body{background:
 .nf-rotation-options button{padding:8px;min-width:0;display:grid;place-items:center}
 .nf-rotation-options svg{max-width:100%;height:auto}
 @media(max-width:560px){.nf-rotation-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.nf-assessment-columns{display:grid;gap:16px;align-items:start}
+.nf-orientation-fields,.nf-orientation-register{
+  min-width:0;
+  padding:14px 16px;
+  border:1px solid #DDE6F1;
+  border-radius:12px;
+}
+.nf-orientation-fields{background:#F5F8FC}
+.nf-orientation-fields > p,.nf-orientation-register > p{margin:0 0 10px}
+.nf-orientation-inputs{display:grid;gap:8px}
+.nf-orientation-inputs > *{width:100%;min-width:0}
+.nf-cancellation-instruction{margin-bottom:12px}
+.nf-assessment-action{display:flex;justify-content:flex-end;margin-top:12px}
+.nf-assessment-action button{min-width:min(100%,180px)}
+.nf-signal-task{width:min(100%,560px);margin-inline:auto;text-align:center}
+.nf-signal-task__stimulus{
+  display:grid;
+  place-items:center;
+  min-height:clamp(130px,28dvh,235px);
+  margin-block:12px;
+  border:1px solid #DDE6F1;
+  border-radius:12px;
+  font-size:5rem;
+  font-weight:900;
+}
+@media(min-width:850px){
+  .nf-orientation-layout{grid-template-columns:minmax(220px,2fr) minmax(0,3fr)}
+  .nf-cancellation-layout{grid-template-columns:minmax(175px,1fr) minmax(0,3fr)}
+  .nf-cancellation-layout .nf-cancellation-instruction{
+    grid-template-columns:1fr!important;
+    margin-bottom:0!important;
+  }
+}
 .nf-cancellation-grid{
   --nf-grid-rows:6;
   --nf-grid-columns:8;
@@ -6855,17 +6888,21 @@ function NFE01Orientation({ paciente, onDone }) {
     }, { requiresProfessionalReview: professional.length < 3, notes:'Orientación temporal autocalculada; orientación personal, espacial y contextual registrada por observación profesional.' }));
   };
   return <AssessmentTaskShell taskId='NF-E01' paciente={paciente} note='Los elementos de lugar, persona y contexto se registran por observación profesional para no inventar una respuesta correcta sobre el entorno real.'>
-    <p style={{fontWeight:700,marginBottom:12}}>Responde sin consultar reloj ni calendario.</p>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}>
-      <select value={month} onChange={e=>setMonth(e.target.value)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}><option value=''>Mes actual…</option>{months.map(x=><option key={x}>{x}</option>)}</select>
-      <input value={year} onChange={e=>setYear(e.target.value)} inputMode='numeric' placeholder='Año actual' style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}/>
-      <select value={weekday} onChange={e=>setWeekday(e.target.value)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}><option value=''>Día de la semana…</option>{weekdays.map(x=><option key={x}>{x}</option>)}</select>
+    <div className="nf-assessment-columns nf-orientation-layout">
+    <section className="nf-orientation-fields">
+    <p style={{fontWeight:700}}>Responde sin consultar reloj ni calendario.</p>
+    <div className="nf-orientation-inputs">
+      <select aria-label='Mes actual' value={month} onChange={e=>setMonth(e.target.value)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}><option value=''>Mes actual…</option>{months.map(x=><option key={x}>{x}</option>)}</select>
+      <input aria-label='Año actual' value={year} onChange={e=>setYear(e.target.value)} inputMode='numeric' placeholder='Año actual' style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}/>
+      <select aria-label='Día de la semana' value={weekday} onChange={e=>setWeekday(e.target.value)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}><option value=''>Día de la semana…</option>{weekdays.map(x=><option key={x}>{x}</option>)}</select>
     </div>
-    <div style={{marginTop:20,paddingTop:16,borderTop:`1px solid ${COLORS.border}`}}>
+    </section>
+    <section className="nf-orientation-register">
       <p style={{fontWeight:700,fontSize:'var(--nf-activity-text, .98rem)',marginBottom:10}}>Registro del profesional</p>
       {[['personal','Reconoce adecuadamente su identidad / información personal básica'],['spatial','Reconoce adecuadamente el lugar o entorno actual'],['contextual','Comprende adecuadamente la situación actual de evaluación']].map(([k,label])=><div key={k} style={{display:'flex',justifyContent:'space-between',gap:10,alignItems:'center',padding:'9px 0'}}><span style={{fontSize:'var(--nf-activity-text, .94rem)'}}>{label}</span><div style={{display:'flex',gap:6}}><button onClick={()=>setPro(p=>({...p,[k]:true}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===true?COLORS.success:COLORS.border}`,background:pro[k]===true?COLORS.success+'12':'#fff'}}>Sí</button><button onClick={()=>setPro(p=>({...p,[k]:false}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===false?COLORS.warning:COLORS.border}`,background:pro[k]===false?COLORS.warning+'12':'#fff'}}>No</button></div></div>)}
+    </section>
     </div>
-    <BtnPrimary disabled={!month||!year||!weekday} onClick={complete} style={{width:'100%',marginTop:18}}>Continuar</BtnPrimary>
+    <div className="nf-assessment-action"><BtnPrimary disabled={!month||!year||!weekday} onClick={complete}>Continuar</BtnPrimary></div>
   </AssessmentTaskShell>;
 }
 
@@ -6889,7 +6926,8 @@ function NFE02Cancellation({ paciente, onDone }) {
     onDone(nfTaskResult('NF-E02',{precision:pctSafe(correct,targetIds.length+commissions),correct,total:targetIds.length,omissions,commissions,errors:omissions+commissions,meanResponseMs:meanNum(rts),medianResponseMs:medianNum(rts),responseVariabilityMs:sdNum(rts),blockPerformance:[pctSafe(b1,block1Targets.length),pctSafe(b2,block2Targets.length)],latencyMs:Date.now()-started.current,taskVersionAdministered:'NF-E02-1.1'}));
   };
   return <AssessmentTaskShell taskId='NF-E02' paciente={paciente}>
-    <div style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:12,alignItems:"center",padding:"6px 10px",border:`1px solid ${COLORS.border}`,borderRadius:14,background:COLORS.bg,marginBottom:8}}>
+    <div className="nf-assessment-columns nf-cancellation-layout">
+    <div className="nf-cancellation-instruction" style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:12,alignItems:"center",padding:"6px 10px",border:`1px solid ${COLORS.border}`,borderRadius:14,background:COLORS.bg,marginBottom:8}}>
       <div style={{textAlign:"center"}}>
         <div style={{fontSize:"var(--nf-activity-meta, .72rem)",fontWeight:800,color:COLORS.primary,marginBottom:5}}>Figura objetivo</div>
         <div style={{fontSize:mayor?"2.15rem":"1.9rem",fontWeight:900,lineHeight:1}}>◆</div>
@@ -6899,12 +6937,15 @@ function NFE02Cancellation({ paciente, onDone }) {
         <div style={{fontSize:mayor?"var(--nf-activity-text, .9rem)":"var(--nf-activity-text, .8rem)",color:"#405574",marginTop:3}}>Toca todos los ◆ que encuentres. No selecciones figuras vacías ni otras formas.</div>
       </div>
     </div>
+    <div>
     <div className={`nf-cancellation-grid${mayor ? ' is-senior' : ''}`}>
       {items.map(it=><button key={it.id} onClick={()=>toggle(it.id)} aria-label={`Figura ${it.symbol}`} style={{borderRadius:10,border:`2px solid ${selected.includes(it.id)?COLORS.primary:COLORS.border}`,background:selected.includes(it.id)?COLORS.primary+'12':'#fff',fontSize:mayor?'1.75rem':'1.45rem',fontWeight:800}}>{it.symbol}</button>)}
     </div>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:6,gap:10}}>
       <span style={{fontSize:mayor?'var(--nf-activity-text, .88rem)':'var(--nf-activity-text, .78rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")"}}>Seleccionados: {selected.length}</span>
       <BtnPrimary onClick={finish}>Finalizar búsqueda</BtnPrimary>
+    </div>
+    </div>
     </div>
   </AssessmentTaskShell>;
 }
@@ -6931,7 +6972,7 @@ function TimedSignalTaskCore({ taskId, paciente, mode, onDone }) {
   };
   return <AssessmentTaskShell taskId={taskId} paciente={paciente} note={isCpt?'Pulsa RESPONDER solo cuando aparezca el círculo ●. No respondas a las otras figuras.':'Pulsa RESPONDER ante ●. Cuando aparezca ✕, debes inhibir la respuesta y esperar.'}>
     {!running&&!done&&<div style={{textAlign:'center',padding:'30px 0'}}><div style={{fontSize:'3rem',marginBottom:10}}>{isCpt?'● ■ ▲ ◆':'●  ✕'}</div><BtnPrimary onClick={start}>Comenzar tarea</BtnPrimary></div>}
-    {running&&<div style={{textAlign:'center'}}><div style={{fontSize:'var(--nf-activity-meta, .74rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:8}}>Ensayo {Math.min(idx+1,trials.length)} de {trials.length}</div><ProgressBar value={Math.max(0,((idx+1)/trials.length)*100)}/><div style={{height:190,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'5rem',fontWeight:900}}>{idx<trials.length?trials[idx]?.symbol:''}</div><BtnPrimary onClick={respond} style={{width:'100%',padding:18,fontSize:'1rem'}}>RESPONDER</BtnPrimary></div>}
+    {running&&<div className="nf-signal-task"><div style={{fontSize:'var(--nf-activity-meta, .74rem)',color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:8}}>Ensayo {Math.min(idx+1,trials.length)} de {trials.length}</div><ProgressBar value={Math.max(0,((idx+1)/trials.length)*100)}/><div className="nf-signal-task__stimulus">{idx<trials.length?trials[idx]?.symbol:''}</div><BtnPrimary onClick={respond} style={{width:'100%',padding:18,fontSize:'1rem'}}>RESPONDER</BtnPrimary></div>}
     {done&&<div style={{textAlign:'center',padding:'25px 0'}}><div style={{fontSize:'2.2rem',marginBottom:8}}>✓</div><p style={{color:"var(--nf-activity-muted, "+COLORS.textMuted+")",marginBottom:18}}>Tarea completada. Las métricas se calcularán separando omisiones, comisiones y tiempos de respuesta.</p><BtnPrimary onClick={finish}>Continuar</BtnPrimary></div>}
   </AssessmentTaskShell>;
 }
