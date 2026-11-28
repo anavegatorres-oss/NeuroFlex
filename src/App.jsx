@@ -531,16 +531,29 @@ body{background:
   gap:8px;
   text-align:left;
   padding:16px;
-  border:1px solid #BECDDF;
+  border:1px solid var(--nf-route-border);
+  border-top:3px solid var(--nf-route-accent);
   border-radius:12px;
-  background:#F6F9FD;
-  color:#243F64;
+  background:var(--nf-route-bg);
+  color:var(--nf-route-accent);
   font:inherit;
   cursor:pointer;
 }
-.nf-route-picker__option:hover{background:#EAF2FA;border-color:#718DAD}
+.nf-route-picker__option--screening{--nf-route-accent:#2858A1;--nf-route-border:#AFC8ED;--nf-route-bg:#EEF5FF;--nf-route-icon:#DDEBFF}
+.nf-route-picker__option--personalized{--nf-route-accent:#176960;--nf-route-border:#9CD1C6;--nf-route-bg:#EAF8F4;--nf-route-icon:#D1EEE7}
+.nf-route-picker__option--full{--nf-route-accent:#633F91;--nf-route-border:#CCB6E9;--nf-route-bg:#F5EFFC;--nf-route-icon:#E9DBFA}
+.nf-route-picker__option:hover{border-color:var(--nf-route-accent)}
+.nf-route-picker__option:focus-visible{outline:2px solid var(--nf-route-accent);outline-offset:3px}
+.nf-route-picker__icon{
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  background:var(--nf-route-icon);
+}
 .nf-route-picker__option strong{font-size:1.05rem;line-height:1.35}
-.nf-route-picker__option span{font-size:.98rem;line-height:1.5;color:#405574}
+.nf-route-picker__option > span:not(.nf-route-picker__icon){font-size:.98rem;line-height:1.5;color:#405574}
 .nf-route-picker__modules{margin-top:16px;border:1px solid #CBD6E3;border-radius:12px;padding:12px 14px}
 .nf-route-picker__modules summary{font-size:1rem;font-weight:700;cursor:pointer}
 .nf-route-picker__modules-grid{
@@ -13296,15 +13309,18 @@ function ContenidoEvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }
       )}
 
       <div className="nf-route-picker__grid">
-        <button className="nf-route-picker__option" onClick={() => { setEvaluationPath("phase62_screening"); setPhase("familiarization"); }}>
+        <button className="nf-route-picker__option nf-route-picker__option--screening" onClick={() => { setEvaluationPath("phase62_screening"); setPhase("familiarization"); }}>
+          <span className="nf-route-picker__icon" aria-hidden="true"><NFLineIcon name="attention" size={21} /></span>
           <strong>Tamizaje cognitivo</strong>
           <span>Explora todas las áreas en unos 20 minutos y orienta qué conviene profundizar.</span>
         </button>
-        <button className="nf-route-picker__option" onClick={() => { setEvaluationPath("phase62_personalized"); setPhase("phase62_personalized_config"); }}>
+        <button className="nf-route-picker__option nf-route-picker__option--personalized" onClick={() => { setEvaluationPath("phase62_personalized"); setPhase("phase62_personalized_config"); }}>
+          <span className="nf-route-picker__icon" aria-hidden="true"><NFLineIcon name="plan" size={21} /></span>
           <strong>Evaluación personalizada</strong>
           <span>Selecciona los dominios según la historia clínica y consulta la duración estimada.</span>
         </button>
-        <button className="nf-route-picker__option" onClick={() => { setEvaluationPath("phase39"); setPhase("familiarization"); }}>
+        <button className="nf-route-picker__option nf-route-picker__option--full" onClick={() => { setEvaluationPath("phase39"); setPhase("familiarization"); }}>
+          <span className="nf-route-picker__icon" aria-hidden="true"><NFLineIcon name="brain" size={21} /></span>
           <strong>Batería cognitiva completa</strong>
           <span>Aplica el protocolo completo de 34 tareas.</span>
         </button>
