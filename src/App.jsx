@@ -479,17 +479,20 @@ body{background:
   border-radius:20px;
   background:linear-gradient(125deg,#FAF8FF,#F4F8FD 60%,#F2FAF8);
 }
-.nf-session-workspace::before{
-  content:"";
-  background:url("/android-chrome-512x512.png") right 18px center / 26px no-repeat;
-  opacity:.26;
-  pointer-events:none;
+.nf-session-workspace__brand{
+  display:flex;
+  align-items:center;
+  padding-inline:clamp(12px,2vw,24px);
 }
 .nf-session-workspace__body{
   min-width:0;
   overflow:auto;
   overscroll-behavior:contain;
   scrollbar-gutter:stable both-edges;
+  margin-inline:clamp(6px,1vw,14px);
+  border-radius:14px;
+  background:#fff;
+  box-shadow:inset 0 0 0 1px #DCE5F0;
   padding:0 clamp(8px,2vw,24px) 8px;
 }
 #root:has(.nf-session-workspace) :is(.nf-v2-sidebar,.nf-mobile-backdrop,.nf-v2-topbar){
@@ -497,8 +500,39 @@ body{background:
 }
 #root:has(.nf-session-workspace) .nf-v2-shell{margin-left:0!important}
 #root:has(.nf-session-workspace) .nf-main-content{padding:12px!important}
+.nf-session-workspace :is(.nf-workspace-familiarization,.nf-eval-task-card,.nf-exercise-card,.nf-demo-card,.nf-eval-intro-card){
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+.nf-session-workspace :is(.nf-eval-task-card,.nf-exercise-card,.nf-eval-intro-card)::before{display:none}
+.nf-session-workspace .nf-workspace-notice{
+  background:#EFF5FC;
+  border:1px solid #CBDCEF;
+  color:#344A67;
+  font-size:.9rem;
+}
+.nf-session-workspace .nf-workspace-progress{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:4px 12px;
+  margin-bottom:6px;
+  color:#405574;
+  font-size:.95rem;
+  font-weight:650;
+}
+.nf-session-workspace :is(input,select,textarea){
+  font-size:1rem;
+  color:#253B55;
+}
+.nf-session-workspace :is(input,textarea)::placeholder{color:#526681;opacity:1}
+.nf-session-workspace [data-primary-action]:disabled{
+  color:#405574!important;
+  background:#E3EAF3!important;
+  opacity:1;
+}
 .nf-session-workspace .nf-eval-task-head{padding-bottom:4px!important;margin-bottom:6px!important}
-.nf-session-workspace .nf-eval-task-card{padding-block:clamp(12px,2dvh,24px)!important}
+.nf-session-workspace .nf-eval-task-card{padding-block:clamp(10px,1.6dvh,24px)!important}
 .nf-cancellation-grid{
   --nf-grid-rows:6;
   --nf-grid-columns:8;
@@ -913,7 +947,7 @@ const gradeColor = (p) => p >= 80 ? COLORS.success : p >= 60 ? COLORS.warning : 
 
 // Botón primario
 const BtnPrimary = ({ children, onClick, disabled, style = {} }) => (
-  <button onClick={onClick} disabled={disabled} style={{
+  <button data-primary-action="" onClick={onClick} disabled={disabled} style={{
     background: disabled ? "#D8DFEA" : "#2F8588",
     color: COLORS.white, border: "none", borderRadius: 13,
     minHeight: 48, padding: "12px 24px", fontWeight: 700, fontSize: "1rem",
@@ -1224,7 +1258,7 @@ const NeuroFlexMark = ({ size=92 }) => (
   />
 );
 
-const NeuroFlexBrandLogo = ({ width = 310, className = "", compact=false }) => {
+const NeuroFlexBrandLogo = ({ width = 310, className = "", compact=false, markSize=58, fontSize="1.48rem" }) => {
   if (!compact) {
     return (
       <img
@@ -1237,8 +1271,8 @@ const NeuroFlexBrandLogo = ({ width = 310, className = "", compact=false }) => {
   }
   return (
     <div className={className} style={{ width:"100%", maxWidth:width, display:"flex", alignItems:"center", gap:10 }}>
-      <NeuroFlexMark size={58}/>
-      <div style={{fontSize:"1.48rem",lineHeight:1,fontWeight:500,letterSpacing:"-.045em",color:COLORS.primaryDark,whiteSpace:"nowrap"}}>
+      <NeuroFlexMark size={markSize}/>
+      <div style={{fontSize,lineHeight:1,fontWeight:500,letterSpacing:"-.045em",color:COLORS.primaryDark,whiteSpace:"nowrap"}}>
         Neuro<span style={{fontWeight:650,background:`linear-gradient(90deg,${COLORS.brandPurple},${COLORS.brandBlue},${COLORS.brandTeal})`,WebkitBackgroundClip:"text",backgroundClip:"text",color:"transparent"}}>Flex</span>
       </div>
     </div>
@@ -6689,8 +6723,8 @@ function NFE01Orientation({ paciente, onDone }) {
       <select value={weekday} onChange={e=>setWeekday(e.target.value)} style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}><option value=''>Día de la semana…</option>{weekdays.map(x=><option key={x}>{x}</option>)}</select>
     </div>
     <div style={{marginTop:20,paddingTop:16,borderTop:`1px solid ${COLORS.border}`}}>
-      <p style={{fontWeight:700,fontSize:'.84rem',marginBottom:10}}>Registro del profesional</p>
-      {[['personal','Reconoce adecuadamente su identidad / información personal básica'],['spatial','Reconoce adecuadamente el lugar o entorno actual'],['contextual','Comprende adecuadamente la situación actual de evaluación']].map(([k,label])=><div key={k} style={{display:'flex',justifyContent:'space-between',gap:10,alignItems:'center',padding:'9px 0'}}><span style={{fontSize:'.8rem'}}>{label}</span><div style={{display:'flex',gap:6}}><button onClick={()=>setPro(p=>({...p,[k]:true}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===true?COLORS.success:COLORS.border}`,background:pro[k]===true?COLORS.success+'12':'#fff'}}>Sí</button><button onClick={()=>setPro(p=>({...p,[k]:false}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===false?COLORS.warning:COLORS.border}`,background:pro[k]===false?COLORS.warning+'12':'#fff'}}>No</button></div></div>)}
+      <p style={{fontWeight:700,fontSize:'.98rem',marginBottom:10}}>Registro del profesional</p>
+      {[['personal','Reconoce adecuadamente su identidad / información personal básica'],['spatial','Reconoce adecuadamente el lugar o entorno actual'],['contextual','Comprende adecuadamente la situación actual de evaluación']].map(([k,label])=><div key={k} style={{display:'flex',justifyContent:'space-between',gap:10,alignItems:'center',padding:'9px 0'}}><span style={{fontSize:'.94rem'}}>{label}</span><div style={{display:'flex',gap:6}}><button onClick={()=>setPro(p=>({...p,[k]:true}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===true?COLORS.success:COLORS.border}`,background:pro[k]===true?COLORS.success+'12':'#fff'}}>Sí</button><button onClick={()=>setPro(p=>({...p,[k]:false}))} style={{padding:'7px 12px',borderRadius:8,border:`1px solid ${pro[k]===false?COLORS.warning:COLORS.border}`,background:pro[k]===false?COLORS.warning+'12':'#fff'}}>No</button></div></div>)}
     </div>
     <BtnPrimary disabled={!month||!year||!weekday} onClick={complete} style={{width:'100%',marginTop:18}}>Continuar</BtnPrimary>
   </AssessmentTaskShell>;
@@ -6723,7 +6757,7 @@ function NFE02Cancellation({ paciente, onDone }) {
       </div>
       <div>
         <div style={{fontSize:mayor?"1.08rem":".96rem",fontWeight:800}}>Busca únicamente los rombos rellenos.</div>
-        <div style={{fontSize:mayor?".9rem":".8rem",color:COLORS.textMuted,marginTop:3}}>Toca todos los ◆ que encuentres. No selecciones figuras vacías ni otras formas.</div>
+        <div style={{fontSize:mayor?".9rem":".8rem",color:"#405574",marginTop:3}}>Toca todos los ◆ que encuentres. No selecciones figuras vacías ni otras formas.</div>
       </div>
     </div>
     <div className={`nf-cancellation-grid${mayor ? ' is-senior' : ''}`}>
@@ -9637,7 +9671,7 @@ function EvaluationV2FullProtocol({ paciente, familiarization, onSave, onExit, r
 
   const wrapper=(child)=><div>
     <div style={{maxWidth:760,margin:"0 auto 12px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",fontSize:".72rem",color:COLORS.textMuted,marginBottom:6}}>
+      <div className="nf-workspace-progress">
         <span>Evaluación cognitiva completa · {completed}/34 tareas registradas</span><span>{progress}%</span>
       </div>
       <ProgressBar value={progress} color={COLORS.primary}/>
@@ -12801,18 +12835,18 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 
   return (
     <div style={{ maxWidth: 680, margin: "0 auto" }}>
-      <Card style={{ padding: mayor ? 32 : 26 }}>
+      <Card className="nf-workspace-familiarization" style={{ padding: mayor ? 32 : 26 }}>
         <div style={{ display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",marginBottom:18 }}>
           <div>
             <div style={{ fontSize:".72rem",fontWeight:800,color:COLORS.primary,letterSpacing:".04em",textTransform:"uppercase" }}>
               Familiarización · No puntuable
             </div>
             <h2 style={{ margin:"5px 0 6px",fontSize:mayor?"1.45rem":"1.25rem" }}>{current.title}</h2>
-            <p style={{ margin:0,color:COLORS.textMuted,lineHeight:1.6,fontSize:mayor?"1rem":".86rem" }}>
+            <p style={{ margin:0,color:"#405574",lineHeight:1.6,fontSize:mayor?"1.05rem":".95rem" }}>
               {current.instruction}
             </p>
           </div>
-          <div style={{ fontSize:".76rem",color:COLORS.textMuted,whiteSpace:"nowrap" }}>{step+1}/{steps.length}</div>
+          <div style={{ fontSize:".76rem",color:"#405574",whiteSpace:"nowrap" }}>{step+1}/{steps.length}</div>
         </div>
 
         <ProgressBar value={Math.round(((step + 1) / steps.length) * 100)} color={COLORS.primary} />
@@ -12872,7 +12906,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                 }}
               >
                 ↔ Tarjeta
-                <div style={{fontSize:".7rem",color:COLORS.textMuted,marginTop:5}}>Arrastra o toca</div>
+                <div style={{fontSize:".7rem",color:"#405574",marginTop:5}}>Arrastra o toca</div>
               </div>
               <div
                 onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -12884,7 +12918,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                   border:`2px dashed ${dragOver||dragging?COLORS.primary:COLORS.border}`,
                   background:dragOver?COLORS.primary+"0D":COLORS.bg,
                   display:"flex",alignItems:"center",justifyContent:"center",textAlign:"center",
-                  padding:16,fontWeight:700,color:COLORS.textMuted,cursor:dragging?"pointer":"default"
+                  padding:16,fontWeight:700,color:"#405574",cursor:dragging?"pointer":"default"
                 }}
               >
                 Suelta aquí
@@ -12923,7 +12957,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
 
               {!speechAvailable && heard && (
                 <div style={{padding:14,borderRadius:11,background:COLORS.bg,border:`1px solid ${COLORS.border}`}}>
-                  <p style={{fontSize:".76rem",color:COLORS.textMuted,lineHeight:1.5,margin:"0 0 10px"}}>
+                  <p style={{fontSize:".76rem",color:"#405574",lineHeight:1.5,margin:"0 0 10px"}}>
                     El audio no está disponible en este dispositivo. Para familiarización solamente, usa esta instrucción visual:
                     <strong> toca el triángulo rojo.</strong>
                   </p>
@@ -12932,7 +12966,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
               )}
 
               {listenChoice && listenChoice!=="redTriangle" && (
-                <p style={{fontSize:".76rem",color:COLORS.textMuted,margin:"12px 0 0"}}>
+                <p style={{fontSize:".76rem",color:"#405574",margin:"12px 0 0"}}>
                   Inténtalo nuevamente. Puedes volver a escuchar la instrucción. Esta práctica no puntúa.
                 </p>
               )}
@@ -12963,7 +12997,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                 Confirmar respuesta
               </BtnPrimary>
               {response && response !== "AZUL" && (
-                <p style={{fontSize:".76rem",color:COLORS.textMuted,textAlign:"center",marginBottom:0}}>
+                <p style={{fontSize:".76rem",color:"#405574",textAlign:"center",marginBottom:0}}>
                   Prueba nuevamente. Esta práctica no afecta ningún resultado.
                 </p>
               )}
@@ -12971,7 +13005,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
           )}
         </div>
 
-        <div style={{marginTop:22,padding:12,borderRadius:10,background:COLORS.bg,fontSize:".72rem",color:COLORS.textMuted,lineHeight:1.5}}>
+        <div className="nf-workspace-notice" style={{marginTop:22,padding:12,borderRadius:10,lineHeight:1.5}}>
           Esta fase comprueba el manejo básico de la interfaz. <strong>No genera puntuación cognitiva</strong> y los intentos adicionales se registran únicamente como contexto de administración.
         </div>
 
@@ -12984,7 +13018,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
               }
             }}
             style={{
-              border:"none",background:"transparent",color:COLORS.textMuted,
+              border:"none",background:"transparent",color:"#405574",
               textDecoration:"underline",cursor:"pointer",fontSize:".74rem"
             }}
           >
@@ -19813,6 +19847,9 @@ function ActivityWorkspace({ label, children }) {
   const workspaceBody = useRef(null);
   return (
     <section className="nf-session-workspace" aria-label={label}>
+      <div className="nf-session-workspace__brand">
+        <NeuroFlexBrandLogo compact width={130} markSize={24} fontSize="1rem" />
+      </div>
       <div className="nf-session-workspace__body" ref={workspaceBody}>
         <ActivityWorkspaceContext.Provider value={workspaceBody}>
           {children}
