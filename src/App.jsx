@@ -505,6 +505,48 @@ body{background:
   box-shadow:none!important;
 }
 .nf-session-workspace :is(.nf-eval-task-card,.nf-exercise-card,.nf-eval-intro-card)::before{display:none}
+.nf-route-picker{
+  max-width:960px;
+  margin-inline:auto;
+  padding:clamp(18px,3vw,36px) 0 14px;
+  color:#233851;
+}
+.nf-route-picker h2{font-size:clamp(1.55rem,2.5vw,1.9rem);line-height:1.2;margin:0 0 8px}
+.nf-route-picker p{font-size:.98rem;line-height:1.5;color:#405574;margin:0}
+.nf-route-picker__header{margin-bottom:20px}
+.nf-route-picker__header p + p{margin-top:5px}
+.nf-route-picker__grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr));
+  gap:12px;
+}
+.nf-route-picker__option{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:8px;
+  text-align:left;
+  padding:16px;
+  border:1px solid #BECDDF;
+  border-radius:12px;
+  background:#F6F9FD;
+  color:#243F64;
+  font:inherit;
+  cursor:pointer;
+}
+.nf-route-picker__option:hover{background:#EAF2FA;border-color:#718DAD}
+.nf-route-picker__option strong{font-size:1.05rem;line-height:1.35}
+.nf-route-picker__option span{font-size:.98rem;line-height:1.5;color:#405574}
+.nf-route-picker__modules{margin-top:16px;border:1px solid #CBD6E3;border-radius:12px;padding:12px 14px}
+.nf-route-picker__modules summary{font-size:1rem;font-weight:700;cursor:pointer}
+.nf-route-picker__modules-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));
+  gap:8px;
+  margin-top:12px;
+}
+.nf-route-picker__footer{display:flex;justify-content:flex-end;margin-top:16px}
+.nf-route-picker .nf-workspace-notice{padding:12px 14px;border-radius:10px;margin-bottom:14px;font-size:.98rem}
 .nf-session-workspace .nf-workspace-notice{
   background:#EFF5FC;
   border:1px solid #CBDCEF;
@@ -13114,62 +13156,62 @@ function ContenidoEvaluacionAdulto({ paciente, onFinish, onCancel, onSaveDraft }
   }, [domIdx, exIdx, phase]);
 
   if (phase === "intro") return (
-    <div className="nf-eval-intro" style={{ maxWidth: 760, margin: "0 auto" }}>
-      <Card className="nf-eval-intro-card" style={{ padding: 34 }}>
-        <div style={{textAlign:"center"}}>
-          <div className="nf-eval-intro-mark"><NFIcon name="brain" size={31}/></div>
-          <div className="nf-eval-eyebrow" style={{marginBottom:6}}>Evaluación NeuroFlex</div>
-          {paciente?.evaluationDraft?.assessmentMode==="full" && <div style={{margin:"0 auto 16px",maxWidth:560,padding:"12px 14px",borderRadius:11,border:`1px solid ${COLORS.primary}35`,background:COLORS.primary+"08",textAlign:"left"}}>
-            <div style={{fontWeight:800,fontSize:".84rem",color:COLORS.primary}}>Evaluación completa pendiente</div>
-            <div style={{fontSize:".76rem",color:COLORS.textMuted,marginTop:3}}>Hay {paciente.evaluationDraft.completedTaskCount||0} de 34 tareas guardadas. Al elegir la evaluación completa se retomará desde el siguiente bloque.</div>
-          </div>}
-          <h2 style={{ fontWeight: 700, fontSize: "1.35rem", marginBottom: 8 }}>Elige la ruta de evaluación</h2>
-          <p style={{ color: COLORS.textMuted, margin:"0 0 6px" }}>Paciente: <strong>{paciente.nombre}</strong></p>
-          <p style={{ color: COLORS.textMuted, margin:"0 auto 22px", lineHeight: 1.6, fontSize: ".78rem",maxWidth:600 }}>
-            El tamizaje explora brevemente todas las áreas. La evaluación personalizada permite seleccionar dominios según historia clínica y motivo de consulta. Antes de cualquiera de las dos se realiza una familiarización breve que no puntúa.
-          </p>
+    <section className="nf-route-picker" aria-labelledby="nf-route-title">
+      <header className="nf-route-picker__header">
+        <h2 id="nf-route-title">Elige la ruta de evaluación</h2>
+        <p>Paciente: <strong>{paciente.nombre}</strong></p>
+        <p>La evaluación comienza con una familiarización breve que no puntúa.</p>
+      </header>
+
+      {paciente?.evaluationDraft?.assessmentMode === "full" && (
+        <div className="nf-workspace-notice">
+          <strong>Evaluación completa pendiente</strong>
+          <p>Hay {paciente.evaluationDraft.completedTaskCount || 0} de 34 tareas guardadas. Elige la batería completa para retomar desde el siguiente bloque.</p>
         </div>
+      )}
 
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12}}>
-          <button onClick={() => { setEvaluationPath("phase62_screening"); setPhase("familiarization"); }}
-            style={{textAlign:"left",padding:18,borderRadius:14,border:`1.5px solid ${COLORS.primary}35`,background:COLORS.primary+"07",cursor:"pointer",fontFamily:"inherit"}}>
-            <span style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:800,color:COLORS.primary}}><NFLineIcon name="search" size={18}/>Tamizaje cognitivo</span>
-            <span style={{display:"block",fontSize:".7rem",color:COLORS.textMuted,lineHeight:1.5,marginTop:7}}>~20 min · exploración transversal de todas las áreas · orienta qué conviene profundizar.</span>
-          </button>
+      <div className="nf-route-picker__grid">
+        <button className="nf-route-picker__option" onClick={() => { setEvaluationPath("phase62_screening"); setPhase("familiarization"); }}>
+          <strong>Tamizaje cognitivo</strong>
+          <span>Explora todas las áreas en unos 20 minutos y orienta qué conviene profundizar.</span>
+        </button>
+        <button className="nf-route-picker__option" onClick={() => { setEvaluationPath("phase62_personalized"); setPhase("phase62_personalized_config"); }}>
+          <strong>Evaluación personalizada</strong>
+          <span>Selecciona los dominios según la historia clínica y consulta la duración estimada.</span>
+        </button>
+        <button className="nf-route-picker__option" onClick={() => { setEvaluationPath("phase39"); setPhase("familiarization"); }}>
+          <strong>Batería cognitiva completa</strong>
+          <span>Aplica el protocolo completo de 34 tareas.</span>
+        </button>
+      </div>
 
-          <button onClick={() => { setEvaluationPath("phase62_personalized"); setPhase("phase62_personalized_config"); }}
-            style={{textAlign:"left",padding:18,borderRadius:14,border:`1.5px solid ${COLORS.accent}35`,background:COLORS.accent+"07",cursor:"pointer",fontFamily:"inherit"}}>
-            <span style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:800,color:COLORS.accent}}><NFLineIcon name="plan" size={18}/>Evaluación personalizada</span>
-            <span style={{display:"block",fontSize:".7rem",color:COLORS.textMuted,lineHeight:1.5,marginTop:7}}>Selecciona dominios según historia clínica. NeuroFlex arma las tareas y calcula la duración estimada.</span>
-          </button>
+      <SelectiveReassessmentSuggestionCard
+        paciente={paciente}
+        onStart={() => { setEvaluationPath("phase44"); setPhase("familiarization"); }}
+      />
+
+      <details className="nf-route-picker__modules">
+        <summary>Protocolos por área</summary>
+        <div className="nf-route-picker__modules-grid">
+          {[
+            ["phase34", "Orientación y atención"],
+            ["phase35", "Memoria"],
+            ["phase36", "Lenguaje y razonamiento"],
+            ["phase37", "Ejecutivas y visuoespaciales"],
+            ["phase38", "Cognición funcional"],
+          ].map(([path, label]) => (
+            <BtnSecondary key={path} onClick={() => { setEvaluationPath(path); setPhase("familiarization"); }}
+              style={{ fontSize: ".98rem", lineHeight: 1.35, padding: "8px 12px" }}>
+              {label}
+            </BtnSecondary>
+          ))}
         </div>
+      </details>
 
-        <div style={{marginTop:14}}>
-          <SelectiveReassessmentSuggestionCard
-            paciente={paciente}
-            onStart={() => { setEvaluationPath("phase44"); setPhase("familiarization"); }}
-          />
-        </div>
-
-        <details style={{marginTop:14,border:`1px solid ${COLORS.border}`,borderRadius:11,padding:"10px 12px"}}>
-          <summary style={{cursor:"pointer",fontSize:".72rem",fontWeight:800,color:COLORS.textSecond}}>Protocolos avanzados / batería completa</summary>
-          <div style={{display:"grid",gap:8,marginTop:10}}>
-            <BtnPrimary onClick={() => { setEvaluationPath("phase39"); setPhase("familiarization"); }} style={{ width:"100%", padding: 12 }}>
-              Batería cognitiva completa
-            </BtnPrimary>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:7}}>
-              <BtnSecondary onClick={() => { setEvaluationPath("phase34"); setPhase("familiarization"); }}>Orientación y atención</BtnSecondary>
-              <BtnSecondary onClick={() => { setEvaluationPath("phase35"); setPhase("familiarization"); }}>Memoria</BtnSecondary>
-              <BtnSecondary onClick={() => { setEvaluationPath("phase36"); setPhase("familiarization"); }}>Lenguaje y razonamiento</BtnSecondary>
-              <BtnSecondary onClick={() => { setEvaluationPath("phase37"); setPhase("familiarization"); }}>Ejecutivas y visuoespaciales</BtnSecondary>
-              <BtnSecondary onClick={() => { setEvaluationPath("phase38"); setPhase("familiarization"); }}>Cognición funcional</BtnSecondary>
-            </div>
-          </div>
-        </details>
-
-        <BtnSecondary onClick={onCancel} style={{width:"100%",marginTop:14}}>Cancelar</BtnSecondary>
-      </Card>
-    </div>
+      <div className="nf-route-picker__footer">
+        <BtnSecondary onClick={onCancel} style={{ fontSize: ".98rem" }}>Cancelar</BtnSecondary>
+      </div>
+    </section>
   );
 
   if (phase === "phase62_personalized_config") return (
