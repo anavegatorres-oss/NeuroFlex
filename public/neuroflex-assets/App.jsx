@@ -1154,7 +1154,34 @@ const NF_STIMULUS_OBJECTS = {
   magnet:"Imán",accordion:"Acordeón",sun:"Sol"
 };
 
+// PNG clínicos con nombre semántico. Si un archivo todavía no existe, el estímulo
+// conserva su ilustración vectorial como respaldo.
+const NF_STIMULUS_PNG_ASSETS = {
+  bee:"/neuroflex-assets/stimuli/animals/bee.png", bird:"/neuroflex-assets/stimuli/animals/bird.png",
+  butterfly:"/neuroflex-assets/stimuli/animals/butterfly.png", cow:"/neuroflex-assets/stimuli/animals/cow.png",
+  elephant:"/neuroflex-assets/stimuli/animals/elephant.png", fish:"/neuroflex-assets/stimuli/animals/fish.png",
+  frog:"/neuroflex-assets/stimuli/animals/frog.png", otter:"/neuroflex-assets/stimuli/animals/otter.png",
+  penguin:"/neuroflex-assets/stimuli/animals/penguin.png", rabbit:"/neuroflex-assets/stimuli/animals/rabbit.png",
+  turtle:"/neuroflex-assets/stimuli/animals/turtle.png", cat:"/neuroflex-assets/stimuli/objects/cat.png",
+  dog:"/neuroflex-assets/stimuli/objects/dog.png", accordion:"/neuroflex-assets/stimuli/objects/accordion.png",
+  anchor:"/neuroflex-assets/stimuli/objects/anchor.png", apple:"/neuroflex-assets/stimuli/objects/apple.png",
+  ball:"/neuroflex-assets/stimuli/objects/ball.png", balloon:"/neuroflex-assets/stimuli/objects/balloon.png",
+  book:"/neuroflex-assets/stimuli/objects/book.png", cactus:"/neuroflex-assets/stimuli/objects/cactus.png",
+  car:"/neuroflex-assets/stimuli/objects/car.png", clock:"/neuroflex-assets/stimuli/objects/clock.png",
+  flower:"/neuroflex-assets/stimuli/objects/flower.png", gift:"/neuroflex-assets/stimuli/objects/gift.png",
+  house:"/neuroflex-assets/stimuli/objects/house.png", key:"/neuroflex-assets/stimuli/objects/key.png",
+  lemon:"/neuroflex-assets/stimuli/objects/lemon.png", magnet:"/neuroflex-assets/stimuli/objects/magnet.png",
+  moon:"/neuroflex-assets/stimuli/objects/moon.png", phone:"/neuroflex-assets/stimuli/objects/phone.png",
+  puzzle:"/neuroflex-assets/stimuli/objects/puzzle.png", scissors:"/neuroflex-assets/stimuli/objects/scissors.png",
+  sun:"/neuroflex-assets/stimuli/objects/sun.png", thermometer:"/neuroflex-assets/stimuli/objects/thermometer.png",
+  umbrella:"/neuroflex-assets/stimuli/objects/umbrella.png", violin:"/neuroflex-assets/stimuli/objects/violin.png"
+};
+
 function NFStimulusObject({kind,size=58,stroke="#12265A",accent="#2A9D8F",label=null}) {
+  const [assetFailed,setAssetFailed]=useState(false);
+  useEffect(()=>setAssetFailed(false),[kind]);
+  const png=NF_STIMULUS_PNG_ASSETS[kind];
+  if(png&&!assetFailed)return <img src={png} alt={label||NF_STIMULUS_OBJECTS[kind]||"Estímulo visual"} width={size} height={size} loading="lazy" decoding="async" onError={()=>setAssetFailed(true)} style={{width:size,height:size,display:"block",objectFit:"contain"}}/>;
   const c={fill:"none",stroke,strokeWidth:2.15,strokeLinecap:"round",strokeLinejoin:"round"};
   const a={...c,stroke:accent};
   const style={width:size,height:size,display:"block"};
