@@ -13137,7 +13137,7 @@ function FamiliarizacionEvaluacion({ paciente, onComplete, onCancel }) {
                     background:selected===opt.id?COLORS.primary+"10":"#fff",cursor:"pointer"
                   }}
                 >
-                  <div style={{ fontSize:mayor?"2rem":"1.65rem",lineHeight:1 }}>{opt.shape}</div>
+                  <div style={{ fontSize:mayor?"2.3rem":"1.9rem",lineHeight:1 }}>{opt.shape}</div>
                   <div style={{ marginTop:7,fontSize:mayor?"var(--nf-activity-text, .95rem)":"var(--nf-activity-text, .8rem)",fontWeight:700 }}>{opt.label}</div>
                 </button>
               ))}
