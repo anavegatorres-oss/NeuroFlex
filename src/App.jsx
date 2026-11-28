@@ -621,6 +621,8 @@ body{background:
 .nf-visual-choice.is-senior .nf-visual-choice__glyph{font-size:clamp(3.7rem,9vw,5.6rem)}
 .nf-familiarization-choices .nf-visual-choice__glyph{font-size:clamp(3.6rem,8.8vw,5.5rem)}
 .nf-familiarization-choices .nf-visual-choice.is-senior .nf-visual-choice__glyph{font-size:clamp(4rem,9.9vw,6.15rem)}
+.nf-familiarization-audio-choices .nf-visual-choice__glyph{font-size:clamp(4rem,10vw,6.5rem)}
+.nf-familiarization-audio-choices .nf-visual-choice.is-senior .nf-visual-choice__glyph{font-size:clamp(4.4rem,11vw,7.2rem)}
 .nf-visual-choice svg{max-width:100%;height:auto}
 .nf-visual-choice[data-feedback="correct"]{background:#E4F4EB}
 .nf-visual-choice[data-feedback="incorrect"]{background:#FAE9E8}
