@@ -714,7 +714,17 @@ body{background:
 .nf-orientation-fields{background:#F5F8FC}
 .nf-orientation-fields > p,.nf-orientation-register > p{margin:0 0 10px}
 .nf-orientation-inputs{display:grid;gap:8px}
+.nf-guided-practice{width:min(100%,900px);margin-inline:auto}
+.nf-guided-practice .nf-practice-prompt{
+  margin:clamp(18px,4dvh,42px) 0 clamp(14px,3dvh,28px);
+  font-size:clamp(1.2rem,2.6vw,1.55rem);
+  font-weight:750;
+  line-height:1.45;
+}
+.nf-practice-options{display:grid;gap:clamp(12px,2.8dvh,26px)}
+.nf-practice-options button{min-height:clamp(54px,9dvh,96px);font-size:clamp(1.06rem,2vw,1.25rem)!important}
 .nf-orientation-menu{background:#fff;border:1px solid #B5C8DD;border-radius:10px}
+.nf-dropdown-disabled{width:100%;min-height:48px;color:#405574}
 .nf-orientation-menu summary{padding:12px;color:#253B55;font-size:1.08rem;font-weight:650;cursor:pointer}
 .nf-orientation-menu summary::marker{color:#2858A1}
 .nf-orientation-menu__options{
@@ -1224,13 +1234,41 @@ const Input = ({ label, value, onChange, type = "text", placeholder, disabled, s
   </div>
 );
 
+function NFDropdown({ label, value, onChange, children, disabled, style }) {
+  const options = React.Children.toArray(children).filter(option => option.type === "option");
+  const optionValue = option => String(option.props.value ?? option.props.children);
+  const selected = options.find(option => optionValue(option) === String(value ?? ""));
+  const display = selected?.props.children ?? label;
+  const text = label && display !== label ? <>{label}: {display}</> : display;
+
+  if (disabled) return <button type="button" className="nf-orientation-menu nf-dropdown-disabled" style={style} disabled>{text}</button>;
+
+  return (
+    <details className="nf-orientation-menu" name="nf-dropdown" style={style}>
+      <summary>{text}</summary>
+      <div className="nf-orientation-menu__options">
+        {options.map(option => {
+          const choice = optionValue(option);
+          return <button key={choice} type="button" disabled={option.props.disabled}
+            aria-pressed={selected === option} onClick={event => {
+              const menu = event.currentTarget.closest("details");
+              menu.open = false;
+              menu.querySelector("summary").focus();
+              onChange({target:{value:choice},currentTarget:{value:choice}});
+            }}>{option.props.children}</button>;
+        })}
+      </div>
+    </details>
+  );
+}
+
 // Select base
 const Select = ({ label, value, onChange, options, style = {} }) => (
   <div style={{ marginBottom: 16, ...style }}>
     {label && <label style={{ display: "block", fontWeight: 600, fontSize: ".82rem", color: COLORS.textSecond, marginBottom: 6 }}>{label}</label>}
-    <select value={value} onChange={onChange} style={{ width: "100%", minHeight: 48, padding: "11px 14px", borderRadius: 10, border: `1.5px solid ${COLORS.border}`, fontSize: "1rem", color: COLORS.textPrimary, background: COLORS.white, outline: "none" }}>
+    <NFDropdown label={label} value={value} onChange={onChange}>
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-    </select>
+    </NFDropdown>
   </div>
 );
 
@@ -6902,10 +6940,10 @@ function F61EvaluationPreparation({ taskId, paciente, onReady }) {
         <BtnPrimary onClick={()=>{try{window.speechSynthesis?.cancel()}catch(e){};setStage("practice")}} style={{width:"100%"}}>Hacer práctica</BtnPrimary>
       </div>}
 
-      {stage==="practice"&&<div>
+      {stage==="practice"&&<div className="nf-guided-practice">
         <div style={{textAlign:"center",marginBottom:16}}><div className="nf-task-ready-mark"><NFLineIcon name="plan" size={25}/></div><h3 style={{margin:"4px 0"}}>Práctica guiada</h3><p style={{margin:0,color:"var(--nf-activity-muted, "+COLORS.textMuted+")",fontSize:"var(--nf-activity-text, .76rem)"}}>Esta práctica no afecta el resultado de la evaluación.</p></div>
-        <p style={{fontWeight:700,lineHeight:1.6,fontSize:mayor?"1.05rem":"var(--nf-activity-text, .9rem)"}}>{practice.prompt}</p>
-        <div style={{display:"grid",gap:9}}>{practice.options.map(opt=><button key={opt} disabled={selected!==null} onClick={()=>setSelected(opt)} style={{padding:mayor?16:13,borderRadius:11,border:`2px solid ${selected===null?COLORS.border:opt===practice.answer?COLORS.success:selected===opt?COLORS.warning:COLORS.border}`,background:selected!==null&&opt===practice.answer?COLORS.success+"10":"#fff",fontWeight:700,textAlign:"left"}}>{opt}</button>)}</div>
+        <p className="nf-practice-prompt">{practice.prompt}</p>
+        <div className="nf-practice-options">{practice.options.map(opt=><button key={opt} disabled={selected!==null} onClick={()=>setSelected(opt)} style={{padding:mayor?16:13,borderRadius:11,border:`2px solid ${selected===null?COLORS.border:opt===practice.answer?COLORS.success:selected===opt?COLORS.warning:COLORS.border}`,background:selected!==null&&opt===practice.answer?COLORS.success+"10":"#fff",fontWeight:700,textAlign:"left"}}>{opt}</button>)}</div>
         {selected!==null&&<div style={{marginTop:14,padding:13,borderRadius:10,background:(correct?COLORS.success:COLORS.warning)+"10",lineHeight:1.55,fontSize:mayor?"var(--nf-activity-text, .98rem)":"var(--nf-activity-text, .8rem)"}}>{correct?practice.correct:practice.wrong}</div>}
         {selected!==null&&<BtnPrimary onClick={()=>setStage("ready")} style={{width:"100%",marginTop:16}}>Continuar</BtnPrimary>}
       </div>}
@@ -6924,24 +6962,6 @@ function F61EvaluationPreparation({ taskId, paciente, onReady }) {
 function F61EvaluationGate({ taskId, paciente, children }) {
   const [ready,setReady]=useState(false);
   return ready ? children : <F61EvaluationPreparation taskId={taskId} paciente={paciente} onReady={()=>setReady(true)}/>;
-}
-
-function OrientationMenu({ label, options, value, onChange }) {
-  return (
-    <details className="nf-orientation-menu" name="orientation-choice">
-      <summary>{value ? `${label}: ${value}` : label}</summary>
-      <div className="nf-orientation-menu__options">
-        {options.map(option => (
-          <button key={option} type="button" aria-pressed={value===option} onClick={event => {
-            const menu = event.currentTarget.closest("details");
-            onChange(option);
-            menu.open = false;
-            menu.querySelector("summary").focus();
-          }}>{option}</button>
-        ))}
-      </div>
-    </details>
-  );
 }
 
 function NFE01Orientation({ paciente, onDone }) {
@@ -6969,9 +6989,9 @@ function NFE01Orientation({ paciente, onDone }) {
     <section className="nf-orientation-fields">
     <p style={{fontWeight:700}}>Responde sin consultar reloj ni calendario.</p>
     <div className="nf-orientation-inputs">
-      <OrientationMenu label="Mes actual" options={months} value={month} onChange={setMonth}/>
+      <NFDropdown label="Mes actual" value={month} onChange={e=>setMonth(e.target.value)}>{months.map(option=><option key={option}>{option}</option>)}</NFDropdown>
       <input aria-label='Año actual' value={year} onChange={e=>setYear(e.target.value)} inputMode='numeric' placeholder='Año actual' style={{padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}/>
-      <OrientationMenu label="Día de la semana" options={weekdays} value={weekday} onChange={setWeekday}/>
+      <NFDropdown label="Día de la semana" value={weekday} onChange={e=>setWeekday(e.target.value)}>{weekdays.map(option=><option key={option}>{option}</option>)}</NFDropdown>
     </div>
     </section>
     <section className="nf-orientation-register">
@@ -15195,31 +15215,29 @@ function PerfilIntervencion({ paciente, onUpdate, onIniciarSesion }) {
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10, marginBottom: 10 }}>
                   <div>
                     <label style={{ fontSize: ".72rem", color: COLORS.textMuted, fontWeight: 600 }}>Estado</label>
-                    <select
+                    <NFDropdown label="Estado"
                       value={area.estado}
                       onChange={e => updateArea(area.id, { estado: e.target.value })}
-                      style={{ width: "100%", marginTop: 4, padding: "9px 10px", borderRadius: 9, border: `1.5px solid ${COLORS.border}`, background: COLORS.white, fontFamily: "inherit" }}
                     >
                       <option value="objetivo">Objetivo de intervención</option>
                       <option value="seguimiento">Seguimiento / fortalecimiento</option>
                       <option value="mantenimiento">Mantenimiento</option>
                       <option value="revision">Revisión clínica</option>
                       <option value="excluir">Excluir por ahora</option>
-                    </select>
+                    </NFDropdown>
                   </div>
 
                   <div>
                     <label style={{ fontSize: ".72rem", color: COLORS.textMuted, fontWeight: 600 }}>Prioridad</label>
-                    <select
+                    <NFDropdown label="Prioridad"
                       value={area.prioridad}
                       onChange={e => updateArea(area.id, { prioridad: e.target.value })}
                       disabled={area.estado === "excluir"}
-                      style={{ width: "100%", marginTop: 4, padding: "9px 10px", borderRadius: 9, border: `1.5px solid ${COLORS.border}`, background: area.estado === "excluir" ? COLORS.bg : COLORS.white, fontFamily: "inherit" }}
                     >
                       <option value="alta">Alta</option>
                       <option value="media">Media</option>
                       <option value="baja">Baja</option>
-                    </select>
+                    </NFDropdown>
                   </div>
                 </div>
 
@@ -15935,9 +15953,9 @@ const NF_PATIENT_EMPTY_FORM = {
 function NFPatientSelect({label,value,onChange,children}){
   return <div style={{marginBottom:16}}>
     <label style={{display:"block",fontWeight:600,fontSize:".82rem",color:COLORS.textSecond,marginBottom:6}}>{label}</label>
-    <select value={value||""} onChange={onChange} style={{width:"100%",padding:"10px 12px",borderRadius:10,border:`1.5px solid ${COLORS.border}`,background:"#fff",fontFamily:"inherit",fontSize:".88rem",color:COLORS.textPrimary}}>
+    <NFDropdown label={label} value={value||""} onChange={onChange}>
       {children}
-    </select>
+    </NFDropdown>
   </div>;
 }
 
@@ -17855,13 +17873,13 @@ function ClinicalReportCenter({ paciente, initialSessionNumber = null, onClearIn
         {type === "session" && sesiones.length > 0 && (
           <div className="nf-report-session-select">
             <label>Sesión a incluir</label>
-            <select value={sessionNumber || ""} onChange={e => setSessionNumber(Number(e.target.value))}>
+            <NFDropdown label="Sesión" value={sessionNumber || ""} onChange={e => setSessionNumber(Number(e.target.value))}>
               {sesiones.map(s => (
                 <option key={s.numero} value={s.numero}>
                   Sesión {s.numero} · {new Date(s.date).toLocaleDateString("es")}
                 </option>
               ))}
-            </select>
+            </NFDropdown>
           </div>
         )}
 
@@ -18791,17 +18809,15 @@ function PrescriptionReview({ paciente, config, prescriptionInit, onStart, onBac
                   <div style={{ display: "grid", gridTemplateColumns: "1.6fr .8fr", gap: 10, marginTop: 12 }}>
                     <div>
                       <label style={{ fontSize: "var(--nf-activity-meta, .69rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontWeight: 700 }}>Ejercicio</label>
-                      <select value={item.exId || ""} onChange={e => replaceExercise(index, e.target.value)}
-                        style={{ width: "100%", marginTop: 4, padding: "9px 10px", borderRadius: 9, border: `1.5px solid ${COLORS.border}`, background: COLORS.white, fontFamily: "inherit" }}>
+                      <NFDropdown label="Ejercicio" value={item.exId || ""} onChange={e => replaceExercise(index, e.target.value)}>
                         {exs.map(ex => <option key={ex.id} value={ex.id}>{ex.nombre}</option>)}
-                      </select>
+                      </NFDropdown>
                     </div>
                     <div>
                       <label style={{ fontSize: "var(--nf-activity-meta, .69rem)", color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontWeight: 700 }}>Nivel</label>
-                      <select value={item.adaptiveLevel || 2} onChange={e => updateLevel(index, Number(e.target.value))}
-                        style={{ width: "100%", marginTop: 4, padding: "9px 10px", borderRadius: 9, border: `1.5px solid ${COLORS.border}`, background: COLORS.white, fontFamily: "inherit" }}>
+                      <NFDropdown label="Nivel" value={item.adaptiveLevel || 2} onChange={e => updateLevel(index, Number(e.target.value))}>
                         {[1,2,3,4,5].map(n => <option key={n} value={n}>Nivel {n}</option>)}
-                      </select>
+                      </NFDropdown>
                     </div>
                   </div>
 
@@ -19376,10 +19392,9 @@ function LongitudinalDecisionControl({ paciente, row, onSaveDecision }) {
   return <div style={{marginTop:10,padding:10,borderRadius:10,border:`1px solid ${COLORS.border}`,background:COLORS.bg}}>
     <div style={{fontSize:".68rem",fontWeight:800,marginBottom:6}}>Decisión profesional</div>
     <div style={{display:"grid",gridTemplateColumns:"minmax(200px,1fr) minmax(220px,1.6fr)",gap:8}}>
-      <select value={decision} onChange={e=>{setDecision(e.target.value);setSaved(false);}}
-        style={{padding:"9px 10px",borderRadius:9,border:`1px solid ${COLORS.border}`,background:COLORS.white,fontFamily:"inherit",fontSize:".72rem"}}>
+      <NFDropdown label="Decisión clínica" value={decision} onChange={e=>{setDecision(e.target.value);setSaved(false);}}>
         {NF_LONGITUDINAL_DECISION_OPTIONS.map(o=><option key={o.id} value={o.id}>{o.label}</option>)}
-      </select>
+      </NFDropdown>
       <input value={note} onChange={e=>{setNote(e.target.value);setSaved(false);}}
         placeholder="Nota clínica opcional sobre la decisión"
         style={{padding:"9px 10px",borderRadius:9,border:`1px solid ${COLORS.border}`,background:COLORS.white,fontFamily:"inherit",fontSize:".72rem"}}/>
@@ -19764,7 +19779,7 @@ function GuidedPracticeScreen({ exId, mayor, onComplete }) {
   const correct = selected === p.answer;
 
   return (
-    <div style={{ maxWidth: 540, margin: "0 auto" }}>
+    <div className="nf-guided-practice">
       <Card style={{ padding: mayor ? 32 : 24 }}>
         <div style={{ textAlign: "center", marginBottom: 18 }}>
           <div className="nf-task-ready-mark"><NFLineIcon name="plan" size={26}/></div>
@@ -19772,8 +19787,8 @@ function GuidedPracticeScreen({ exId, mayor, onComplete }) {
           <p style={{ color:"var(--nf-activity-muted, "+COLORS.textMuted+")", fontSize: mayor ? "var(--nf-activity-text, .95rem)" : "var(--nf-activity-text, .78rem)", margin: 0 }}>Esta práctica no cuenta para el resultado de la sesión.</p>
         </div>
 
-        <p style={{ fontWeight: 700, lineHeight: 1.55, fontSize: mayor ? "1.1rem" : "var(--nf-activity-text, .9rem)", marginBottom: 14 }}>{p.prompt}</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        <p className="nf-practice-prompt">{p.prompt}</p>
+        <div className="nf-practice-options">
           {p.options.map(opt => (
             <button key={opt} onClick={() => setSelected(opt)} disabled={selected !== null} style={{
               padding: mayor ? "15px 16px" : "11px 14px",
@@ -21118,8 +21133,8 @@ function NFPortalProfessional({paciente, profesionalUid, onUpdate}) {
       </div>
       {!uid&&<BtnSecondary onClick={()=>setPass(Array.from(crypto.getRandomValues(new Uint8Array(14)),n=>"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789"[n%"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789".length]).join(""))}>Generar contraseña segura</BtnSecondary>}
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginTop:18}}>
-        <div><label style={{fontSize:".77rem",fontWeight:700}}>Duración objetivo diaria</label><select value={minutes} onChange={e=>setMinutes(Number(e.target.value))} style={{width:"100%",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}>{[10,15,20,25,30].map(n=><option key={n} value={n}>{n} minutos</option>)}</select></div>
-        <div><label style={{fontSize:".77rem",fontWeight:700}}>Días por semana</label><select value={days} onChange={e=>setDays(Number(e.target.value))} style={{width:"100%",padding:12,borderRadius:10,border:`1px solid ${COLORS.border}`}}>{[1,2,3,4,5,6,7].map(n=><option key={n} value={n}>{n} días</option>)}</select></div>
+        <div><label style={{fontSize:".77rem",fontWeight:700}}>Duración objetivo diaria</label><NFDropdown label="Duración objetivo diaria" value={minutes} onChange={e=>setMinutes(Number(e.target.value))}>{[10,15,20,25,30].map(n=><option key={n} value={n}>{n} minutos</option>)}</NFDropdown></div>
+        <div><label style={{fontSize:".77rem",fontWeight:700}}>Días por semana</label><NFDropdown label="Días por semana" value={days} onChange={e=>setDays(Number(e.target.value))}>{[1,2,3,4,5,6,7].map(n=><option key={n} value={n}>{n} días</option>)}</NFDropdown></div>
       </div>
     </Card>
     <Card style={cardStyle}>
